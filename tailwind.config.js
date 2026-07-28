@@ -1,0 +1,55 @@
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        ink: { DEFAULT: '#050816', surface: '#111827', card: '#1A2235' },
+        paper: { DEFAULT: '#F8FAFC', surface: '#FFFFFF', card: '#F1F5F9' },
+        primary: { DEFAULT: '#00E5A8', light: '#5BF7C8', dark: '#00B386', 50: '#E6FFF7', 100: '#B3FFE2', 200: '#80FFCC', 300: '#4DFFB5', 400: '#1AFF9F', 500: '#00E5A8', 600: '#00B386', 700: '#00805F', 800: '#004D39', 900: '#001A14' },
+        secondary: { DEFAULT: '#38BDF8', light: '#7DD3FC', dark: '#0284C7' },
+        accent: { DEFAULT: '#7C3AED', light: '#A78BFA', dark: '#5B21B6' },
+        warning: { DEFAULT: '#F59E0B', light: '#FBBF24', dark: '#D97706' },
+        danger: { DEFAULT: '#EF4444', light: '#F87171', dark: '#DC2626' },
+        success: { DEFAULT: '#10B981', light: '#34D399', dark: '#059669' },
+        content: { DEFAULT: '#F8FAFC', muted: '#94A3B8' },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+      },
+      borderRadius: { xl: '1rem', '2xl': '1.5rem', '3xl': '2rem' },
+      boxShadow: {
+        glow: '0 0 40px -10px rgba(0, 229, 168, 0.35)',
+        'glow-secondary': '0 0 40px -10px rgba(56, 189, 248, 0.35)',
+        'glow-accent': '0 0 40px -10px rgba(124, 58, 237, 0.35)',
+        soft: '0 8px 30px -12px rgba(0, 0, 0, 0.25)',
+        'soft-lg': '0 20px 60px -20px rgba(0, 0, 0, 0.4)',
+      },
+      backdropBlur: { xs: '2px' },
+      animation: {
+        'spin-slow': 'spin 20s linear infinite',
+        'spin-slower': 'spin 60s linear infinite',
+        float: 'float 6s ease-in-out infinite',
+        'float-delayed': 'float 6s ease-in-out 2s infinite',
+        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+        shimmer: 'shimmer 2s linear infinite',
+        'gradient-shift': 'gradientShift 8s ease infinite',
+        'fade-in': 'fadeIn 0.6s ease forwards',
+      },
+      keyframes: {
+        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-12px)' } },
+        pulseGlow: { '0%, 100%': { opacity: '0.6' }, '50%': { opacity: '1' } },
+        shimmer: { '0%': { backgroundPosition: '-1000px 0' }, '100%': { backgroundPosition: '1000px 0' } },
+        gradientShift: { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+        fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
+      },
+      backgroundImage: {
+        'grid-dark': "linear-gradient(rgba(148,163,184,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.04) 1px, transparent 1px)",
+        'grid-light': "linear-gradient(rgba(15,23,42,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,0.04) 1px, transparent 1px)",
+      },
+    },
+  },
+  plugins: [],
+};
