@@ -63,6 +63,7 @@ export function useLocalStorage<T>(key: string, initial: T) {
     try {
       localStorage.setItem(key, JSON.stringify(state));
     } catch {
+      // Storage quota exceeded or disabled
     }
   }, [key, state]);
 

@@ -1,46 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-
 @layer base {
   :root {
-    --bg: #050816;
-    --surface: #111827;
-    --card: #1A2235;
-    --text: #F8FAFC;
-    --text-muted: #94A3B8;
+    --bg: #040d1a;
+    --surface: #0a1628;
+    --card: #0f1f38;
+    --text: #F0F6FF;
+    --text-muted: #7A9CC4;
     --primary: #00E5A8;
+    --primary-light: #00FFB9;
     --secondary: #38BDF8;
     --accent: #7C3AED;
-    --border: rgba(148, 163, 184, 0.12);
-    --glass: rgba(17, 24, 39, 0.6);
-    --glass-border: rgba(148, 163, 184, 0.15);
-    --grid-color: rgba(148, 163, 184, 0.04);
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --success: #10B981;
+    --ink: #040d1a;
+    --border: rgba(56, 189, 248, 0.08);
+    --glass: rgba(10, 22, 40, 0.65);
+    --glass-border: rgba(56, 189, 248, 0.12);
+    --grid-color: rgba(56, 189, 248, 0.03);
+    --aurora-1: rgba(0, 229, 168, 0.6);
+    --aurora-2: rgba(124, 58, 237, 0.5);
+    --nasa-green: #00E5A8;
   }
 
   .light {
-    --bg: #F8FAFC;
+    --bg: #F0F6FF;
     --surface: #FFFFFF;
-    --card: #F1F5F9;
-    --text: #0F172A;
-    --text-muted: #475569;
+    --card: #E8F0FE;
+    --text: #0A1628;
+    --text-muted: #4A6A9A;
     --primary: #0F766E;
+    --primary-light: #14B8A6;
     --secondary: #2563EB;
     --accent: #7C3AED;
     --border: rgba(15, 23, 42, 0.08);
-    --glass: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(15, 23, 42, 0.08);
-    --grid-color: rgba(15, 23, 42, 0.04);
+    --glass: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(15, 23, 42, 0.10);
+    --grid-color: rgba(15, 23, 42, 0.03);
   }
 
-  * {
-    border-color: var(--border);
-  }
+  * { border-color: var(--border); box-sizing: border-box; }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
 
   body {
     background-color: var(--bg);
@@ -54,45 +59,47 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', 'Inter', sans-serif;
-    line-height: 1.2;
+    line-height: 1.15;
   }
 
-  ::selection {
-    background: var(--primary);
-    color: var(--bg);
-  }
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--glass-border);
-    border-radius: 9999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
-  }
+  .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }
+
+  ::selection { background: var(--primary); color: var(--bg); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 }
 
 @layer components {
+
+  /* ---- GLASS SYSTEM ---- */
   .glass {
     background: var(--glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid var(--glass-border);
   }
 
   .glass-card {
     background: var(--glass);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
     border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .glass-deep {
+    background: rgba(4, 13, 26, 0.82);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid rgba(56, 189, 248, 0.15);
     border-radius: 1.5rem;
   }
 
+  /* ---- GRADIENTS ---- */
   .gradient-text {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
@@ -109,14 +116,23 @@
     color: transparent;
   }
 
-  .glow-primary {
-    box-shadow: 0 0 40px -10px rgba(0, 229, 168, 0.35);
+  .gradient-text-fire {
+    background: linear-gradient(135deg, #F59E0B, #EF4444);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
-  .glow-secondary {
-    box-shadow: 0 0 40px -10px rgba(56, 189, 248, 0.35);
-  }
+  /* ---- GLOW SYSTEM ---- */
+  .glow-primary { box-shadow: 0 0 40px -10px rgba(0, 229, 168, 0.4), 0 0 80px -20px rgba(0, 229, 168, 0.2); }
+  .glow-secondary { box-shadow: 0 0 40px -10px rgba(56, 189, 248, 0.4), 0 0 80px -20px rgba(56, 189, 248, 0.2); }
+  .glow-accent { box-shadow: 0 0 40px -10px rgba(124, 58, 237, 0.4), 0 0 80px -20px rgba(124, 58, 237, 0.2); }
+  .glow-danger { box-shadow: 0 0 40px -10px rgba(239, 68, 68, 0.4), 0 0 80px -20px rgba(239, 68, 68, 0.2); }
+  .glow-warning { box-shadow: 0 0 40px -10px rgba(245, 158, 11, 0.4); }
+  .shadow-glow { box-shadow: 0 0 30px -5px rgba(0, 229, 168, 0.5); }
 
+  /* ---- GRID BACKGROUNDS ---- */
   .grid-bg {
     background-image:
       linear-gradient(var(--grid-color) 1px, transparent 1px),
@@ -124,6 +140,16 @@
     background-size: 48px 48px;
   }
 
+  .nasa-grid {
+    background-image:
+      linear-gradient(rgba(0, 229, 168, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 168, 0.04) 1px, transparent 1px),
+      linear-gradient(rgba(56, 189, 248, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56, 189, 248, 0.02) 1px, transparent 1px);
+    background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+  }
+
+  /* ---- GRADIENT BORDER ---- */
   .gradient-border {
     position: relative;
     background: var(--card);
@@ -143,31 +169,238 @@
     opacity: 0.4;
     pointer-events: none;
   }
+
+  /* ---- SCANNER / NASA UI ---- */
+  .scanner-overlay {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 229, 168, 0.03) 2px,
+      rgba(0, 229, 168, 0.03) 4px
+    );
+    pointer-events: none;
+  }
+
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+    animation: scanDown 3s linear infinite;
+  }
+
+  .radar-sweep {
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(from 0deg, transparent 340deg, rgba(0, 229, 168, 0.4) 360deg);
+    border-radius: 50%;
+    animation: radarSpin 3s linear infinite;
+  }
+
+  /* ---- ORBITRON / NASA FONT CLASS ---- */
+  .font-orbitron { font-family: 'Orbitron', monospace; }
+
+  /* ---- STATUS DOT ---- */
+  .status-dot-live {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 6px var(--primary);
+    animation: pulseDot 1.5s ease-in-out infinite;
+  }
+
+  /* ---- CINEMATIC BARS ---- */
+  .cinematic-bar-top,
+  .cinematic-bar-bottom {
+    position: absolute;
+    left: 0; right: 0;
+    height: 48px;
+    background: rgba(0,0,0,0.85);
+    z-index: 10;
+  }
+  .cinematic-bar-top { top: 0; }
+  .cinematic-bar-bottom { bottom: 0; }
+
+  /* ---- HEAT MAP CELLS ---- */
+  .heat-cell {
+    border-radius: 2px;
+    transition: background 0.8s ease;
+  }
+
+  /* ---- AURORA TEXT ---- */
+  .text-aurora {
+    background: linear-gradient(90deg, var(--primary), #7FFFD4, var(--accent), var(--primary));
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: auroraShift 4s ease infinite;
+  }
+
+  /* ---- SATELLITE ORBIT PATH ---- */
+  .orbit-path {
+    stroke: rgba(0, 229, 168, 0.3);
+    stroke-dasharray: 4 8;
+    fill: none;
+    animation: orbitDash 20s linear infinite;
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  .preserve-3d {
-    transform-style: preserve-3d;
-  }
+  .text-balance { text-wrap: balance; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .perspective-1000 { perspective: 1000px; }
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
 }
+
+/* ========================================
+   KEYFRAME ANIMATIONS
+   ======================================== */
+
+@keyframes scanDown {
+  0%   { top: 0%; opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes radarSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes auroraShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes orbitDash {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -100; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-8px) rotate(1deg); }
+  66%       { transform: translateY(-4px) rotate(-1deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: -1000px 0; }
+  to   { background-position: 1000px 0; }
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes spinReverse {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 168, 0.3); }
+  50%       { box-shadow: 0 0 40px rgba(0, 229, 168, 0.6), 0 0 60px rgba(0, 229, 168, 0.3); }
+}
+
+@keyframes dataScroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+@keyframes leafFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(300px) rotate(720deg); opacity: 0; }
+}
+
+@keyframes snowFall {
+  0%   { transform: translateY(-10px) translateX(0); opacity: 1; }
+  100% { transform: translateY(300px) translateX(20px); opacity: 0.3; }
+}
+
+@keyframes lightning {
+  0%, 90%, 100% { opacity: 0; }
+  91%, 93%       { opacity: 0.8; }
+  92%, 94%       { opacity: 0; }
+  95%            { opacity: 0.6; }
+}
+
+@keyframes heatHaze {
+  0%, 100% { transform: scaleX(1) scaleY(1); filter: blur(0px); }
+  25%       { transform: scaleX(1.01) scaleY(0.99); filter: blur(0.5px); }
+  75%       { transform: scaleX(0.99) scaleY(1.01); filter: blur(0.5px); }
+}
+
+@keyframes waveRipple {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes satellite {
+  0%   { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+@keyframes xpBurst {
+  0%   { transform: scale(0.5); opacity: 1; }
+  60%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes successPulse {
+  0%         { box-shadow: 0 0 0 0 rgba(0, 229, 168, 0.7); }
+  70%        { box-shadow: 0 0 0 20px rgba(0, 229, 168, 0); }
+  100%       { box-shadow: 0 0 0 0 rgba(0, 229, 168, 0); }
+}
+
+@keyframes failShake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-6px); }
+  80%      { transform: translateX(6px); }
+}
+
+/* ---- UTILITY ANIMATION CLASSES ---- */
+.animate-float        { animation: float 4s ease-in-out infinite; }
+.animate-float-slow   { animation: floatSlow 6s ease-in-out infinite; }
+.animate-shimmer      { animation: shimmer 2s linear infinite; background: linear-gradient(90deg, var(--glass-border) 25%, var(--glass) 50%, var(--glass-border) 75%); background-size: 1000px 100%; }
+.animate-spin-slow    { animation: spinSlow 20s linear infinite; }
+.animate-spin-reverse { animation: spinReverse 15s linear infinite; }
+.animate-pulse-glow   { animation: pulseGlow 2s ease-in-out infinite; }
+.animate-data-scroll  { animation: dataScroll 8s linear infinite; }
+.animate-leaf-fall    { animation: leafFall 3s ease-in infinite; }
+.animate-snow         { animation: snowFall 4s linear infinite; }
+.animate-lightning    { animation: lightning 6s infinite; }
+.animate-haze         { animation: heatHaze 2s ease-in-out infinite; }
+.animate-xp-burst     { animation: xpBurst 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.animate-success      { animation: successPulse 0.8s ease-out; }
+.animate-fail         { animation: failShake 0.5s ease-in-out; }
+.animate-radar        { animation: radarSpin 3s linear infinite; }
+.animate-scan         { animation: scanDown 3s linear infinite; }
+
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
