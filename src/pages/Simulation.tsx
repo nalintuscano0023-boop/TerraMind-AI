@@ -1,16 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Trees, Droplets, Wind, Cloud, Bird, Sun, Factory, Car, Recycle, Trash2,
-  Waves, Fish, Rabbit, Turtle, Leaf,
+  Fish, Rabbit, Turtle, Leaf,
   CloudRain, CloudSnow, CloudFog, Zap, AlertTriangle, CheckCircle2,
-  Plane, Camera, Eye, Moon, Sunset, Compass, Sliders, Play, RotateCcw
+  Plane, Moon, Sunset
 } from 'lucide-react';
-import { GlassCard, SectionTitle, CircularProgress, Badge, Tooltip, Slider, WildlifeCanvas } from '@/components/ui';
+import { GlassCard, SectionTitle, Badge, Tooltip, Slider, WildlifeCanvas } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
-import { CONTROLS, METRIC_META, type ControlKey, type MetricKey } from '@/data/environment';
-import { computeMetrics, computeHealthScore } from '@/lib/advisorEngine';
+import { CONTROLS, type ControlKey, type MetricKey } from '@/data/environment';
+import { computeMetrics } from '@/lib/advisorEngine';
 
 type DayCycle = 'sunrise' | 'day' | 'sunset' | 'night';
 type Season   = 'spring' | 'summer' | 'autumn' | 'winter';
@@ -58,8 +58,7 @@ export default function Simulation() {
   const [wildlifeMode, setWildlifeMode]   = useState<WildlifeMode>('none');
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const metrics     = useMemo(() => computeMetrics(controls), [controls]);
-  const healthScore = useMemo(() => computeHealthScore(metrics), [metrics]);
+  const metrics = useMemo(() => computeMetrics(controls), [controls]);
 
   const updateControl = (key: ControlKey, value: number) => {
     setControls((prev) => prev.map((c) => (c.key === key ? { ...c, value } : c)));
@@ -396,6 +395,18 @@ function EcosystemViewport({
     winter: 'linear-gradient(to bottom, #94A3B8, #64748B)',
   };
 
+  // Turbine speed tied to wind policy level and weather severity
+  const turbineDuration =
+    weather === 'storm'
+      ? Math.max(0.4, 0.7 - (windLevel / 200))
+      : weather === 'rain'
+      ? Math.max(1.0, 1.8 - (windLevel / 100))
+      : Math.max(1.8, 3.5 - (windLevel / 80));
+
+  // Tree sway angles tied to weather force
+  const treeSwayAngle = weather === 'storm' ? 12 : weather === 'rain' ? 4 : 1.5;
+  const treeSwayDuration = weather === 'storm' ? 0.7 : weather === 'rain' ? 1.8 : 3.5;
+
   return (
     <div
       className={`relative w-full h-full bg-gradient-to-b ${skyGradients[dayCycle]} transition-all duration-1000 overflow-hidden`}
@@ -403,9 +414,9 @@ function EcosystemViewport({
         transform: droneMode ? `scale(${1 + (500 - droneAltitude) / 1000})` : 'scale(1)',
       }}
     >
-      {/* Stars in Night Cycle */}
+      {/* 1. Stars in Night Cycle (z-1) */}
       {dayCycle === 'night' && (
-        <div className="absolute inset-0 opacity-80 pointer-events-none">
+        <div className="absolute inset-0 opacity-80 pointer-events-none z-1">
           {Array.from({ length: 30 }).map((_, i) => (
             <div
               key={`star-${i}`}
@@ -420,9 +431,9 @@ function EcosystemViewport({
         </div>
       )}
 
-      {/* Sun / Moon Orb */}
+      {/* 2. Sun / Moon Orb (z-1) */}
       <motion.div
-        className="absolute rounded-full pointer-events-none"
+        className="absolute rounded-full pointer-events-none z-1"
         style={{
           width: dayCycle === 'night' ? 36 : 48,
           height: dayCycle === 'night' ? 36 : 48,
@@ -439,34 +450,67 @@ function EcosystemViewport({
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      {/* Storm Lightning Flash Effect */}
-      {weather === 'storm' && (
-        <motion.div
-          className="absolute inset-0 bg-white/20 pointer-events-none z-20"
-          animate={{ opacity: [0, 0.8, 0, 0.6, 0] }}
-          transition={{ duration: 5, repeat: Infinity, repeatDelay: 2 }}
-        />
+      {/* 3. Storm Clouds Overlay (z-2) */}
+      {(weather === 'storm' || weather === 'rain') && (
+        <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-slate-950/80 to-transparent z-2 pointer-events-none">
+          <motion.div
+            className="w-full h-full opacity-60"
+            style={{ background: 'radial-gradient(ellipse at top, rgba(30,41,59,0.9), transparent)' }}
+            animate={{ x: [-20, 20, -20] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </div>
       )}
 
-      {/* Volumetric Fog Layer */}
-      {weather === 'fog' && (
-        <div className="absolute inset-0 bg-slate-400/30 backdrop-blur-sm z-10 pointer-events-none" />
-      )}
+      {/* 4. Renewable Solar Panels & Wind Turbines (z-3) */}
+      {solarLevel > 30 && Array.from({ length: Math.round((solarLevel / 100) * 4) }).map((_, i) => (
+        <div key={`solar-${i}`} className="absolute bottom-[34%] z-3" style={{ left: `${12 + i * 16}%` }}>
+          <div className="w-8 h-4 bg-sky-600 border border-sky-300 rounded-sm transform -skew-x-12 shadow-md" />
+        </div>
+      ))}
 
-      {/* Ground Terrain Layer */}
+      {windLevel > 30 && Array.from({ length: Math.round((windLevel / 100) * 3) }).map((_, i) => (
+        <div key={`turbine-${i}`} className="absolute bottom-[33%] z-3" style={{ left: `${22 + i * 24}%` }}>
+          <div className="w-1 h-12 bg-gray-200 mx-auto shadow-sm" />
+          <motion.div
+            className="w-8 h-8 rounded-full border-t-2 border-r-2 border-white -mt-14 -ml-3.5 shadow-sm"
+            animate={{ rotate: 360 }}
+            transition={{ duration: turbineDuration, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+      ))}
+
+      {/* 5. Ground Terrain Layer (z-4) */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-1/3 transition-all duration-1000"
+        className="absolute bottom-0 left-0 right-0 h-1/3 transition-all duration-1000 z-4"
         style={{ background: groundColors[season] }}
       />
 
-      {/* Snow Layer in Winter */}
+      {/* Snow Accumulation Layer in Winter (z-4) */}
       {season === 'winter' && (
-        <div className="absolute bottom-[33%] left-0 right-0 h-3 bg-slate-100/90 shadow-sm" />
+        <div className="absolute bottom-[33%] left-0 right-0 h-3 bg-slate-100/90 shadow-sm z-4" />
       )}
 
-      {/* Water River Strip */}
+      {/* 6. Forest Trees with Wind Sway Physics (z-5) */}
+      {Array.from({ length: numTrees }).map((_, i) => (
+        <motion.div
+          key={`tree-${i}`}
+          className="absolute bottom-[20%] z-5 origin-bottom"
+          style={{ left: `${4 + i * (90 / numTrees)}%` }}
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1, rotate: [-treeSwayAngle, treeSwayAngle, -treeSwayAngle] }}
+          transition={{
+            scaleY: { delay: i * 0.05, duration: 0.5 },
+            rotate: { duration: treeSwayDuration + (i % 3) * 0.2, repeat: Infinity, ease: 'easeInOut' },
+          }}
+        >
+          <TreeGraphic healthy={isHealthy} season={season} weather={weather} />
+        </motion.div>
+      ))}
+
+      {/* 7. Water River Strip & Surface Waves (z-6) */}
       <div
-        className="absolute bottom-[16%] left-0 right-0 h-3 overflow-hidden shadow-inner"
+        className="absolute bottom-[16%] left-0 right-0 h-4 overflow-hidden shadow-inner z-6 border-y border-white/10"
         style={{
           background: plasticLevel > 60
             ? 'linear-gradient(90deg, #475569, #334155)'
@@ -474,55 +518,124 @@ function EcosystemViewport({
         }}
       >
         <motion.div
-          className="absolute inset-0 opacity-40"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)' }}
+          className="absolute inset-0 opacity-60"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)' }}
           animate={{ x: ['-100%', '100%'] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+          transition={{ duration: weather === 'storm' ? 1.2 : weather === 'rain' ? 2.2 : 3.5, repeat: Infinity, ease: 'linear' }}
         />
+        {/* Surface Ripple Lines */}
+        {weather === 'storm' && (
+          <div className="absolute inset-0 bg-white/10 animate-pulse" />
+        )}
       </div>
 
-      {/* Forest Trees */}
-      {Array.from({ length: numTrees }).map((_, i) => (
-        <motion.div
-          key={`tree-${i}`}
-          className="absolute bottom-[20%]"
-          style={{ left: `${4 + i * (90 / numTrees)}%` }}
-          initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1 }}
-          transition={{ delay: i * 0.05 }}
-        >
-          <TreeGraphic healthy={isHealthy} season={season} />
-        </motion.div>
-      ))}
-
-      {/* Renewable Solar Panels */}
-      {solarLevel > 30 && Array.from({ length: Math.round((solarLevel / 100) * 4) }).map((_, i) => (
-        <div key={`solar-${i}`} className="absolute bottom-[34%]" style={{ left: `${12 + i * 16}%` }}>
-          <div className="w-8 h-4 bg-sky-600 border border-sky-300 rounded-sm transform -skew-x-12 shadow-md" />
+      {/* 8. Weather Particle Overlays (z-7) */}
+      {/* Heavy Diagonal Wind-Driven Rain / Storm Rain */}
+      {(weather === 'rain' || weather === 'storm') && (
+        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
+          {Array.from({ length: weather === 'storm' ? 45 : 25 }).map((_, i) => (
+            <motion.div
+              key={`rain-${i}`}
+              className="absolute w-0.5 rounded-full bg-sky-200/70"
+              style={{
+                left: `${(i * 4.2) % 100}%`,
+                top: '-10%',
+                height: weather === 'storm' ? 24 : 16,
+                transform: 'rotate(-25deg)',
+              }}
+              animate={{
+                y: ['0%', '120%'],
+                x: ['0%', '-40%'],
+              }}
+              transition={{
+                duration: weather === 'storm' ? 0.45 + (i % 3) * 0.05 : 0.8 + (i % 3) * 0.1,
+                repeat: Infinity,
+                ease: 'linear',
+                delay: (i * 0.03) % 0.5,
+              }}
+            />
+          ))}
         </div>
-      ))}
+      )}
 
-      {/* Wind Turbines */}
-      {windLevel > 30 && Array.from({ length: Math.round((windLevel / 100) * 3) }).map((_, i) => (
-        <div key={`turbine-${i}`} className="absolute bottom-[33%]" style={{ left: `${22 + i * 24}%` }}>
-          <div className="w-1 h-12 bg-gray-200 mx-auto" />
+      {/* Falling Snowflakes */}
+      {weather === 'snow' && (
+        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <motion.div
+              key={`snow-${i}`}
+              className="absolute rounded-full bg-white/90 shadow-sm"
+              style={{
+                left: `${(i * 3.4) % 100}%`,
+                top: '-5%',
+                width: 3 + (i % 3),
+                height: 3 + (i % 3),
+              }}
+              animate={{
+                y: ['0%', '110%'],
+                x: ['0%', `${(i % 2 === 0 ? 15 : -15)}%`],
+              }}
+              transition={{
+                duration: 2.5 + (i % 4) * 0.5,
+                repeat: Infinity,
+                ease: 'linear',
+                delay: (i * 0.1) % 1.5,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Volumetric Fog Layer */}
+      {weather === 'fog' && (
+        <div className="absolute inset-0 bg-slate-400/30 backdrop-blur-[2px] z-7 pointer-events-none" />
+      )}
+
+      {/* Factory Industrial Emissions (z-3) */}
+      {factoryLevel > 40 && (
+        <div className="absolute bottom-[34%] right-[10%] z-3 flex items-end gap-1 opacity-70">
+          <div className="w-4 h-10 bg-slate-700 border border-slate-500 rounded-t-sm" />
+          <div className="w-5 h-14 bg-slate-800 border border-slate-600 rounded-t-sm relative">
+            <motion.div
+              className="absolute -top-4 left-1 w-3 h-3 rounded-full bg-slate-400/50 blur-xs"
+              animate={{ y: [-5, -20], scale: [1, 2], opacity: [0.6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Wildlife Mode Active Indicator Tint */}
+      {wildlifeMode !== 'none' && (
+        <div className="absolute top-2 left-2 z-10 text-[9px] font-mono font-bold text-primary/80 bg-black/40 px-2 py-0.5 rounded-md border border-primary/20">
+          TRACKING: {wildlifeMode.toUpperCase()}
+        </div>
+      )}
+
+      {/* 9. Storm Screen Darkening & Lightning Flash (z-8) */}
+      {weather === 'storm' && (
+        <>
+          <div className="absolute inset-0 bg-black/35 pointer-events-none z-8" />
           <motion.div
-            className="w-8 h-8 rounded-full border-t-2 border-r-2 border-white -mt-14 -ml-3.5"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5 - (windLevel / 100), repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-0 bg-white/35 pointer-events-none z-8"
+            animate={{ opacity: [0, 0.9, 0, 0.7, 0, 0.4, 0] }}
+            transition={{ duration: 4.5, repeat: Infinity, repeatDelay: 1.5 }}
           />
-        </div>
-      ))}
+        </>
+      )}
     </div>
   );
 }
 
-function TreeGraphic({ healthy, season }: { healthy: boolean; season: Season }) {
+function TreeGraphic({ healthy, season, weather }: { healthy: boolean; season: Season; weather?: Weather }) {
   const foliageColor = season === 'autumn' ? '#EA580C' : season === 'winter' ? '#94A3B8' : healthy ? '#166534' : '#78350F';
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-6 h-8 rounded-t-full shadow-md" style={{ backgroundColor: foliageColor }} />
-      <div className="w-1.5 h-4 bg-amber-900" />
+    <div className="flex flex-col items-center" style={{ opacity: weather === 'storm' ? 0.95 : 1 }}>
+      <div
+        className="w-6 h-8 rounded-t-full shadow-md transition-colors duration-500"
+        style={{ backgroundColor: foliageColor }}
+      />
+      <div className="w-1.5 h-4 bg-amber-900 shadow-inner" />
     </div>
   );
 }

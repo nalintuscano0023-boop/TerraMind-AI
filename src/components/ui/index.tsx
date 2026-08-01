@@ -4,6 +4,7 @@ import { useCountUp } from '@/hooks/useUi';
 export { GlassCard, SectionTitle } from '@/components/ui/GlassCard';
 export { Slider } from '@/components/ui/Slider';
 export { WildlifeCanvas } from '@/components/ui/WildlifeCanvas';
+export { OceanHealthCanvas } from '@/components/ui/OceanHealthCanvas';
 
 interface StatCounterProps {
   value: number;

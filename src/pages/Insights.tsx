@@ -1,12 +1,12 @@
 import { useState, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  AlertTriangle, Cloud, Bird, Zap,
-  Droplets, Trees, Wind, TrendingDown, TrendingUp,
+  AlertTriangle, Cloud, Bird,
+  Droplets, Trees, Wind, TrendingUp,
   BarChart3, Activity, Waves,
-  ThermometerSun, Mail, MapPin, Play, RotateCcw, ShieldCheck, Compass, Sparkles, CheckCircle2
+  ThermometerSun
 } from 'lucide-react';
-import { GlassCard, SectionTitle, Badge, ProgressBar, Slider } from '@/components/ui';
+import { GlassCard, SectionTitle, Badge, ProgressBar, Slider, OceanHealthCanvas } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 
@@ -234,93 +234,10 @@ export default function Insights() {
               </div>
 
               {/* Ocean Animated Canvas Container */}
-              <div className="relative h-56 rounded-2xl overflow-hidden mb-5 border border-sky-500/20 shadow-inner">
-                {/* Dynamic Water Gradient */}
-                <motion.div
-                  className="absolute inset-0"
-                  animate={{
-                    background: plasticReduction > 60
-                      ? 'linear-gradient(to bottom, #0284c7, #0369a1, #0c4a6e)'
-                      : plasticReduction > 30
-                      ? 'linear-gradient(to bottom, #0369a1, #1e293b, #0f172a)'
-                      : 'linear-gradient(to bottom, #334155, #1e293b, #020617)',
-                  }}
-                  transition={{ duration: 1.2 }}
-                />
+              <div className="relative h-56 rounded-2xl overflow-hidden mb-5 border border-sky-500/20 shadow-inner bg-slate-950">
+                <OceanHealthCanvas plasticReduction={plasticReduction} activeDroneCount={activeDroneCount} />
 
-                {/* Animated Wave Ripples */}
-                <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                  <motion.path
-                    d="M 0 40 Q 150 20 300 40 T 600 40 T 900 40 V 220 H 0 Z"
-                    fill="url(#waveGrad)"
-                    animate={{ d: [
-                      "M 0 40 Q 150 20 300 40 T 600 40 T 900 40 V 220 H 0 Z",
-                      "M 0 30 Q 150 50 300 30 T 600 30 T 900 30 V 220 H 0 Z",
-                      "M 0 40 Q 150 20 300 40 T 600 40 T 900 40 V 220 H 0 Z",
-                    ] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <defs>
-                    <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
-                      <stop offset="100%" stopColor="#0284c7" stopOpacity="0.1" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-
-                {/* Floating Plastic Waste Items */}
-                {Array.from({ length: Math.max(1, Math.round((1 - plasticReduction / 100) * 14)) }).map((_, i) => (
-                  <motion.div
-                    key={`waste-${i}`}
-                    className="absolute flex items-center justify-center text-xs opacity-85"
-                    style={{ top: `${15 + (i * 12) % 65}%`, left: `${(i * 18 + 10) % 85}%` }}
-                    animate={{
-                      y: [0, 6, -4, 0],
-                      x: [0, 8, -6, 0],
-                      rotate: [0, 15, -15, 0],
-                    }}
-                    transition={{ duration: 3 + (i % 3), repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}
-                  >
-                    {i % 3 === 0 ? '🍾' : i % 3 === 1 ? '🛍️' : '🛢️'}
-                  </motion.div>
-                ))}
-
-                {/* Autonomous Collection Drones & Skimmer Boats */}
-                {Array.from({ length: activeDroneCount }).map((_, i) => (
-                  <motion.div
-                    key={`drone-${i}`}
-                    className="absolute z-20 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-primary/40 text-[10px] text-primary shadow-glow"
-                    style={{ top: `${20 + i * 20}%` }}
-                    animate={{ x: ['-20%', '115%'] }}
-                    transition={{ duration: 7 + i * 2, repeat: Infinity, ease: 'linear', delay: i * 1.5 }}
-                  >
-                    <span>🛸</span> Skimmer #{i + 1}
-                  </motion.div>
-                ))}
-
-                {/* Animated Swimming Marine Life */}
-                {plasticReduction > 30 && Array.from({ length: Math.min(8, Math.round((plasticReduction / 100) * 8)) }).map((_, i) => (
-                  <motion.div
-                    key={`marine-${i}`}
-                    className="absolute z-10 text-base"
-                    style={{ top: `${45 + (i * 10) % 45}%` }}
-                    animate={{ x: ['115%', '-20%'] }}
-                    transition={{ duration: 9 + i * 2, repeat: Infinity, ease: 'linear', delay: i * 1.2 }}
-                  >
-                    {i % 4 === 0 ? '🐋' : i % 4 === 1 ? '🐟' : i % 4 === 2 ? '🐢' : '🐠'}
-                  </motion.div>
-                ))}
-
-                {/* Coral Reef & Seaweed at Bottom */}
-                <div className="absolute bottom-0 inset-x-0 h-8 flex justify-around items-end px-4 pointer-events-none opacity-80">
-                  <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 4, repeat: Infinity }}>🪸</motion.div>
-                  <motion.div animate={{ rotate: [0, -6, 6, 0] }} transition={{ duration: 5, repeat: Infinity }}>🌿</motion.div>
-                  <motion.div animate={{ rotate: [0, 4, -4, 0] }} transition={{ duration: 3.5, repeat: Infinity }}>🪸</motion.div>
-                  <motion.div animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 4.5, repeat: Infinity }}>🪸</motion.div>
-                  <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3.8, repeat: Infinity }}>🌿</motion.div>
-                </div>
-
-                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md rounded-xl px-3 py-1 text-[11px] font-mono text-white/90 border border-white/10">
+                <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md rounded-xl px-3 py-1 text-[11px] font-mono text-white/90 border border-white/10 z-10">
                   Plastic: <strong className="text-secondary">{Math.round(88 - plasticReduction * 0.75)} items/km²</strong> | Recovery: <strong className="text-primary">{Math.round(20 + plasticReduction * 0.75)}%</strong>
                 </div>
               </div>
@@ -366,18 +283,18 @@ export default function Insights() {
                 ))}
               </div>
 
-              {/* Live Statistics Grid */}
+              {/* Live Statistics Grid — Computed Dynamically */}
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="glass rounded-xl p-2.5 border border-white/5">
-                  <div className="font-bold text-secondary font-mono text-sm">{Math.round(11 - plasticReduction * 0.09)}M</div>
+                  <div className="font-bold text-secondary font-mono text-sm">{(11 - (plasticReduction * 0.085)).toFixed(1)}M</div>
                   <div className="text-[10px] text-[var(--text-muted)] mt-0.5">tonnes/yr waste</div>
                 </div>
                 <div className="glass rounded-xl p-2.5 border border-white/5">
-                  <div className="font-bold text-primary font-mono text-sm">{Math.round(25 + plasticReduction * 0.65)}%</div>
+                  <div className="font-bold text-primary font-mono text-sm">{Math.round(25 + plasticReduction * 0.68)}%</div>
                   <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Marine Recovery</div>
                 </div>
                 <div className="glass rounded-xl p-2.5 border border-white/5">
-                  <div className="font-bold text-accent font-mono text-sm">{Math.round(plasticReduction * 18.5)}k</div>
+                  <div className="font-bold text-accent font-mono text-sm">{(plasticReduction * 18.5).toFixed(0)}k</div>
                   <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Species Saved</div>
                 </div>
               </div>

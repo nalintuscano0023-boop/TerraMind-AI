@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Menu, X, Sun, Moon, Sprout, Satellite, Target, BarChart3, Activity } from 'lucide-react';
+import { Globe, Menu, X, Sun, Moon, Sprout, Satellite, BarChart3, Activity } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
 const NAV_ITEMS = [
