@@ -1,21 +1,15 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import {
-  Trees, Droplets, Wind, Cloud, Bird, Sun, Factory, Car, Recycle, Trash2,
-  Fish, Rabbit, Turtle, Leaf,
+  Trees, Droplets, Wind, Cloud, Sun, Factory, Car, Recycle, Trash2,
   CloudRain, CloudSnow, CloudFog, Zap, AlertTriangle, CheckCircle2,
-  Plane, Moon, Sunset
+  Plane, Moon, Sunset, Leaf
 } from 'lucide-react';
-import { GlassCard, SectionTitle, Badge, Tooltip, Slider, WildlifeCanvas } from '@/components/ui';
+import { GlassCard, SectionTitle, Badge, Tooltip, Slider } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
-import { CONTROLS, type ControlKey, type MetricKey } from '@/data/environment';
+import { CONTROLS, type ControlKey } from '@/data/environment';
 import { computeMetrics } from '@/lib/advisorEngine';
-
-type DayCycle = 'sunrise' | 'day' | 'sunset' | 'night';
-type Season   = 'spring' | 'summer' | 'autumn' | 'winter';
-type Weather  = 'clear' | 'rain' | 'storm' | 'snow' | 'fog';
-type WildlifeMode = 'none' | 'bird' | 'fish' | 'butterfly' | 'bee' | 'deer' | 'turtle';
+import { EnvironmentScene, WildlifeScene, type DayCycle, type Season, type Weather } from '@/components/simulation';
 
 const DAY_CYCLES: { key: DayCycle; label: string; icon: typeof Sun; color: string }[] = [
   { key: 'sunrise', label: 'Sunrise', icon: Sunset, color: '#F59E0B' },
@@ -39,15 +33,6 @@ const WEATHERS: { key: Weather; label: string; icon: typeof Cloud; color: string
   { key: 'fog',   label: 'Fog',    icon: CloudFog,  color: '#94A3B8' },
 ];
 
-const WILDLIFE: { key: WildlifeMode; name: string; icon: typeof Bird; factor: MetricKey; description: string }[] = [
-  { key: 'bird',      name: 'Birds',       icon: Bird,   factor: 'biodiversity', description: 'Soaring migratory flocks' },
-  { key: 'fish',      name: 'Fish',        icon: Fish,   factor: 'water',        description: 'Darting marine schools' },
-  { key: 'butterfly', name: 'Butterflies', icon: Leaf,   factor: 'forest',       description: 'Fluttering over flora' },
-  { key: 'bee',       name: 'Bees',        icon: Zap,    factor: 'biodiversity', description: 'Pollinating ecosystems' },
-  { key: 'deer',      name: 'Deer',        icon: Rabbit, factor: 'forest',       description: 'Forest glade herbivores' },
-  { key: 'turtle',    name: 'Turtles',     icon: Turtle, factor: 'water',        description: 'Oceanic coral divers' },
-];
-
 export default function Simulation() {
   const [controls, setControls]     = useState(CONTROLS.map((c) => ({ ...c })));
   const [dayCycle, setDayCycle]     = useState<DayCycle>('day');
@@ -55,7 +40,6 @@ export default function Simulation() {
   const [weather, setWeather]       = useState<Weather>('clear');
   const [droneMode, setDroneMode]   = useState(false);
   const [droneAltitude, setDroneAltitude] = useState(120);
-  const [wildlifeMode, setWildlifeMode]   = useState<WildlifeMode>('none');
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const metrics = useMemo(() => computeMetrics(controls), [controls]);
@@ -68,11 +52,11 @@ export default function Simulation() {
   const ecosystemHealth = (metrics.forest + metrics.water + metrics.biodiversity) / 3;
   const isPolluted = ecosystemHealth < 45;
 
-  const treeDensity   = controls.find((c) => c.key === 'trees')?.value ?? 50;
-  const factoryLevel  = controls.find((c) => c.key === 'factories')?.value ?? 50;
-  const solarLevel    = controls.find((c) => c.key === 'solar')?.value ?? 50;
-  const windLevel     = controls.find((c) => c.key === 'wind')?.value ?? 50;
-  const plasticLevel  = 100 - (controls.find((c) => c.key === 'plastic')?.value ?? 50);
+  const treeDensity  = controls.find((c) => c.key === 'trees')?.value ?? 50;
+  const factoryLevel = controls.find((c) => c.key === 'factories')?.value ?? 50;
+  const solarLevel   = controls.find((c) => c.key === 'solar')?.value ?? 50;
+  const windLevel    = controls.find((c) => c.key === 'wind')?.value ?? 50;
+  const plasticLevel = 100 - (controls.find((c) => c.key === 'plastic')?.value ?? 50);
 
   // Keyboard navigation listener for Drone Mode WASD
   useEffect(() => {
@@ -90,269 +74,231 @@ export default function Simulation() {
       <FloatingShapes />
       <Particles count={15} />
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-6 py-10 space-y-12">
         <SectionTitle
           eyebrow="Environmental Simulation Engine"
           title="Simulate Earth's Ecological Future"
-          description="Adjust environmental policies, time cycles, seasons, and weather to observe planetary ecosystem responses in real time."
+          description="Interactive dual-engine digital twin platform: Environment & Climate Simulator and Species Habitat Simulator."
           className="mb-8"
         />
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* ===== LEFT COLUMN ===== */}
-          <div className="lg:col-span-2 space-y-6">
+        {/* =========================================================
+           SCREEN 1 — ENVIRONMENT SIMULATOR
+           ========================================================= */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold font-display text-white flex items-center gap-2">
+                <Sun className="w-6 h-6 text-primary" />
+                Screen 1 — Planetary Environment Simulator
+              </h2>
+              <p className="text-xs text-[var(--text-muted)] mt-1">
+                Controls planetary lighting, seasonal transitions, and atmospheric weather protocols in real time.
+              </p>
+            </div>
+            <Badge variant={isPolluted ? 'danger' : 'success'}>
+              {isPolluted ? <AlertTriangle className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+              {Math.round(ecosystemHealth)}% Planetary Health
+            </Badge>
+          </div>
 
-            {/* Main Ecosystem Viewport Card */}
-            <GlassCard className="p-6 relative overflow-hidden min-h-[440px] border-primary/20" ref={sectionRef}>
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <div>
-                  <h3 className="text-lg font-bold font-display text-white">Living Ecosystem Digital Twin</h3>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    {isPolluted ? '⚠ Ecosystem under critical stress — adjust policy sliders' : '✓ Ecosystem operating within safe planetary boundaries'}
-                  </p>
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Environment Canvas Box */}
+            <div className="lg:col-span-2 space-y-6">
+              <GlassCard className="p-6 relative overflow-hidden min-h-[440px] border-primary/20" ref={sectionRef}>
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <h3 className="text-base font-bold font-display text-white">Planetary Climate Viewport</h3>
+                  <div className="text-xs font-mono text-primary">
+                    {dayCycle.toUpperCase()} | {season.toUpperCase()} | {weather.toUpperCase()}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={isPolluted ? 'danger' : 'success'}>
-                    {isPolluted ? <AlertTriangle className="w-3 h-3" /> : <CheckCircle2 className="w-3 h-3" />}
-                    {Math.round(ecosystemHealth)}% Health
-                  </Badge>
-                </div>
-              </div>
 
-              {/* Viewport Box */}
-              <div className="relative h-[340px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                {/* 2D/3D Procedural Ecosystem Viewport */}
-                <EcosystemViewport
-                  dayCycle={dayCycle}
-                  season={season}
-                  weather={weather}
-                  droneMode={droneMode}
-                  droneAltitude={droneAltitude}
-                  wildlifeMode={wildlifeMode}
-                  treeDensity={treeDensity}
-                  factoryLevel={factoryLevel}
-                  solarLevel={solarLevel}
-                  windLevel={windLevel}
-                  plasticLevel={plasticLevel}
-                  health={ecosystemHealth}
-                />
+                {/* Environment Canvas Viewport */}
+                <div className="relative h-[340px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                  <EnvironmentScene
+                    dayCycle={dayCycle}
+                    season={season}
+                    weather={weather}
+                    treeDensity={treeDensity}
+                    factoryLevel={factoryLevel}
+                    solarLevel={solarLevel}
+                    windLevel={windLevel}
+                    plasticLevel={plasticLevel}
+                    droneMode={droneMode}
+                    droneAltitude={droneAltitude}
+                    health={ecosystemHealth}
+                  />
 
-                {/* Procedural Canvas Wildlife Viewport Overlay */}
-                <WildlifeCanvas type={wildlifeMode} />
+                  {/* Active Environment Telemetry Status Badge */}
+                  <div className="absolute top-3 left-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15 text-[11px] font-mono font-bold text-white flex items-center gap-2 shadow-xl">
+                    <span>{dayCycle === 'night' ? '🌙' : dayCycle === 'sunset' ? '🌇' : dayCycle === 'sunrise' ? '🌅' : '☀️'} {DAY_CYCLES.find((d) => d.key === dayCycle)?.label}</span>
+                    <span className="text-white/30">|</span>
+                    <span>{season === 'winter' ? '❄️' : season === 'autumn' ? '🍂' : season === 'summer' ? '☀️' : '🌸'} {SEASONS.find((s) => s.key === season)?.label}</span>
+                    <span className="text-white/30">|</span>
+                    <span>{weather === 'storm' ? '⚡' : weather === 'rain' ? '🌧️' : weather === 'snow' ? '❄️' : weather === 'fog' ? '🌫️' : '☀️'} {WEATHERS.find((w) => w.key === weather)?.label}</span>
+                  </div>
 
-                {/* Active Environment Telemetry Status Badge */}
-                <div className="absolute top-3 left-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15 text-[11px] font-mono font-bold text-white flex items-center gap-2 shadow-xl">
-                  <span>{dayCycle === 'night' ? '🌙' : dayCycle === 'sunset' ? '🌇' : dayCycle === 'sunrise' ? '🌅' : '☀️'} {DAY_CYCLES.find((d) => d.key === dayCycle)?.label}</span>
-                  <span className="text-white/30">|</span>
-                  <span>{season === 'winter' ? '❄️' : season === 'autumn' ? '🍂' : season === 'summer' ? '☀️' : '🌸'} {SEASONS.find((s) => s.key === season)?.label}</span>
-                  <span className="text-white/30">|</span>
-                  <span>{weather === 'storm' ? '⚡' : weather === 'rain' ? '🌧️' : weather === 'snow' ? '❄️' : weather === 'fog' ? '🌫️' : '☀️'} {WEATHERS.find((w) => w.key === weather)?.label}</span>
-                  {wildlifeMode !== 'none' && (
-                    <>
-                      <span className="text-white/30">|</span>
-                      <span className="text-primary font-bold">
-                        {wildlifeMode === 'fish' ? '🐟 Underwater Reef' : wildlifeMode === 'turtle' ? '🐢 Underwater Turtle Reef' : wildlifeMode === 'bird' ? '🦅 Sky Flight' : wildlifeMode === 'bee' ? '🐝 Flower Field' : wildlifeMode === 'butterfly' ? '🦋 Meadow' : '🦌 Forest Floor'}
-                      </span>
-                    </>
+                  {/* Drone Telemetry Overlay */}
+                  {droneMode && (
+                    <div className="absolute top-3 right-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-secondary/40 text-[11px] font-mono text-secondary flex items-center gap-2">
+                      <Plane className="w-3.5 h-3.5 animate-pulse" />
+                      DRONE ALTITUDE: <strong>{droneAltitude}m</strong> (Use WASD / Arrow Keys)
+                    </div>
                   )}
                 </div>
 
-                {/* Drone Telemetry Overlay */}
-                {droneMode && (
-                  <div className="absolute top-3 right-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-secondary/40 text-[11px] font-mono text-secondary flex items-center gap-2">
-                    <Plane className="w-3.5 h-3.5 animate-pulse" />
-                    DRONE ALTITUDE: <strong>{droneAltitude}m</strong> (Use WASD / Arrow Keys)
-                  </div>
-                )}
-              </div>
-
-              {/* Day Cycle + Season + Weather Selectors */}
-              <div className="mt-5 space-y-3 relative z-10">
-                {/* Day Cycle Selector */}
-                <div>
-                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
-                    1. Day Cycle Lighting
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {DAY_CYCLES.map((d) => {
-                      const Icon = d.icon;
-                      const isActive = dayCycle === d.key;
-                      return (
-                        <button
-                          key={d.key}
-                          onClick={() => setDayCycle(d.key)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
-                            isActive
-                              ? 'bg-primary/20 text-primary border-primary/40 shadow-glow'
-                              : 'glass text-[var(--text-muted)] hover:text-white border-white/5'
-                          }`}
-                        >
-                          <Icon className="w-3.5 h-3.5" style={{ color: d.color }} />
-                          {d.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Seasons + Weather Selectors Row */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* Day / Season / Weather Controls */}
+                <div className="mt-5 space-y-3 relative z-10">
+                  {/* Day Cycle Selector */}
                   <div>
                     <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
-                      2. Environmental Season
+                      1. Time of Day Lighting
                     </div>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {SEASONS.map((s) => {
-                        const Icon = s.icon;
-                        const isActive = season === s.key;
+                    <div className="flex gap-2 flex-wrap">
+                      {DAY_CYCLES.map((d) => {
+                        const Icon = d.icon;
+                        const isActive = dayCycle === d.key;
                         return (
                           <button
-                            key={s.key}
-                            onClick={() => setSeason(s.key)}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all border ${
+                            key={d.key}
+                            onClick={() => setDayCycle(d.key)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
                               isActive
-                                ? 'bg-secondary/20 text-secondary border-secondary/40'
+                                ? 'bg-primary/20 text-primary border-primary/40 shadow-glow'
                                 : 'glass text-[var(--text-muted)] hover:text-white border-white/5'
                             }`}
                           >
-                            <Icon className="w-3 h-3" style={{ color: s.color }} />
-                            {s.label}
+                            <Icon className="w-3.5 h-3.5" style={{ color: d.color }} />
+                            {d.label}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  <div>
-                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
-                      3. Weather Protocol
+                  {/* Seasons + Weather Selectors */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
+                        2. Season Phase
+                      </div>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {SEASONS.map((s) => {
+                          const Icon = s.icon;
+                          const isActive = season === s.key;
+                          return (
+                            <button
+                              key={s.key}
+                              onClick={() => setSeason(s.key)}
+                              className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all border ${
+                                isActive
+                                  ? 'bg-secondary/20 text-secondary border-secondary/40'
+                                  : 'glass text-[var(--text-muted)] hover:text-white border-white/5'
+                              }`}
+                            >
+                              <Icon className="w-3 h-3" style={{ color: s.color }} />
+                              {s.label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {WEATHERS.map((w) => {
-                        const Icon = w.icon;
-                        const isActive = weather === w.key;
-                        return (
-                          <button
-                            key={w.key}
-                            onClick={() => setWeather(w.key)}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all border ${
-                              isActive
-                                ? 'bg-warning/20 text-warning border-warning/40'
-                                : 'glass text-[var(--text-muted)] hover:text-white border-white/5'
-                            }`}
-                          >
-                            <Icon className="w-3 h-3" style={{ color: w.color }} />
-                            {w.label}
-                          </button>
-                        );
-                      })}
+
+                    <div>
+                      <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
+                        3. Weather Protocol
+                      </div>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {WEATHERS.map((w) => {
+                          const Icon = w.icon;
+                          const isActive = weather === w.key;
+                          return (
+                            <button
+                              key={w.key}
+                              onClick={() => setWeather(w.key)}
+                              className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold transition-all border ${
+                                isActive
+                                  ? 'bg-warning/20 text-warning border-warning/40'
+                                  : 'glass text-[var(--text-muted)] hover:text-white border-white/5'
+                              }`}
+                            >
+                              <Icon className="w-3 h-3" style={{ color: w.color }} />
+                              {w.label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Drone Mode Control Bar */}
-              <div className="mt-4 flex gap-3">
-                <button
-                  onClick={() => setDroneMode((d) => !d)}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border ${
-                    droneMode
-                      ? 'bg-secondary/20 text-secondary border-secondary/40 shadow-glow'
-                      : 'glass text-[var(--text-muted)] hover:text-white border-white/10'
-                  }`}
-                >
-                  <Plane className="w-4 h-4" />
-                  {droneMode ? '🎥 Cinematic Drone Mode Active (WASD Controls)' : '🚁 Engage Cinematic Drone Mode'}
-                </button>
-              </div>
-            </GlassCard>
-
-            {/* Wildlife Mode Panel (No Emojis) */}
-            <GlassCard className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Bird className="w-5 h-5 text-primary" />
-                  <h3 className="text-base font-bold font-display text-white">Realistic Wildlife Mode</h3>
+                {/* Drone Mode Control Bar */}
+                <div className="mt-4 flex gap-3">
+                  <button
+                    onClick={() => setDroneMode((d) => !d)}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border ${
+                      droneMode
+                        ? 'bg-secondary/20 text-secondary border-secondary/40 shadow-glow'
+                        : 'glass text-[var(--text-muted)] hover:text-white border-white/10'
+                    }`}
+                  >
+                    <Plane className="w-4 h-4" />
+                    {droneMode ? '🎥 Cinematic Drone Camera Active (WASD Flight)' : '🚁 Engage Cinematic Drone Flight'}
+                  </button>
                 </div>
-                <Badge variant="secondary">Canvas Telemetry</Badge>
-              </div>
+              </GlassCard>
+            </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-                {WILDLIFE.map((w) => {
-                  const isActive = wildlifeMode === w.key;
-                  const Icon = w.icon;
-                  return (
-                    <button
-                      key={w.key}
-                      onClick={() => setWildlifeMode(isActive ? 'none' : w.key)}
-                      className={`p-3 rounded-xl text-left transition-all border ${
-                        isActive
-                          ? 'bg-primary/20 text-primary border-primary/40 shadow-glow scale-105'
-                          : 'glass border-white/5 text-[var(--text-muted)] hover:text-white'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <Icon className="w-4 h-4 text-primary" />
-                        <span className="text-[10px] font-mono font-bold text-white">{Math.round(metrics[w.factor])}%</span>
-                      </div>
-                      <div className="font-bold text-xs text-white">{w.name}</div>
-                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5 line-clamp-1">{w.description}</div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {wildlifeMode !== 'none' && (
-                <div className="flex items-center justify-between text-xs text-primary font-mono glass p-2.5 rounded-xl border border-primary/20">
-                  <span>Active Species Tracking: <strong>{wildlifeMode.toUpperCase()}</strong></span>
-                  <button onClick={() => setWildlifeMode('none')} className="hover:underline text-[var(--text-muted)]">Clear Camera</button>
+            {/* Policy Controls Panel */}
+            <div>
+              <GlassCard className="p-6 sticky top-24">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold font-display text-white">Policy Controls</h3>
+                  <button
+                    onClick={resetControls}
+                    className="text-xs text-[var(--text-muted)] hover:text-primary transition-colors px-3 py-1 rounded-xl glass border border-white/10 font-semibold"
+                  >
+                    Reset All
+                  </button>
                 </div>
-              )}
-            </GlassCard>
-          </div>
 
-          {/* ===== RIGHT COLUMN: POLICY CONTROLS ===== */}
-          <div>
-            <GlassCard className="p-6 sticky top-24">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold font-display text-white">Policy Controls</h3>
-                <button
-                  onClick={resetControls}
-                  className="text-xs text-[var(--text-muted)] hover:text-primary transition-colors px-3 py-1 rounded-xl glass border border-white/10 font-semibold"
-                >
-                  Reset All
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {controls.map((c) => {
-                  const Icon = iconMap[c.icon] ?? Trees;
-                  const impactColor = Object.values(c.impact).some((v) => (v ?? 0) > 0) ? '#00E5A8' : '#EF4444';
-                  return (
-                    <div key={c.key} className="glass rounded-xl p-3 border border-white/5">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <Tooltip content={c.description}>
-                          <span className="flex items-center gap-2 text-xs font-semibold text-white cursor-help">
-                            <Icon className="w-3.5 h-3.5 text-primary" />
-                            {c.label}
-                          </span>
-                        </Tooltip>
-                        <span className="text-xs font-mono tabular-nums font-bold" style={{ color: impactColor }}>{c.value}</span>
+                <div className="space-y-4">
+                  {controls.map((c) => {
+                    const Icon = iconMap[c.icon] ?? Trees;
+                    const impactColor = Object.values(c.impact).some((v) => (v ?? 0) > 0) ? '#00E5A8' : '#EF4444';
+                    return (
+                      <div key={c.key} className="glass rounded-xl p-3 border border-white/5">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <Tooltip content={c.description}>
+                            <span className="flex items-center gap-2 text-xs font-semibold text-white cursor-help">
+                              <Icon className="w-3.5 h-3.5 text-primary" />
+                              {c.label}
+                            </span>
+                          </Tooltip>
+                          <span className="text-xs font-mono tabular-nums font-bold" style={{ color: impactColor }}>{c.value}</span>
+                        </div>
+                        <Slider
+                          value={c.value}
+                          min={0}
+                          max={100}
+                          onChange={(val) => updateControl(c.key, val)}
+                          aria-label={c.label}
+                        />
                       </div>
-                      <Slider
-                        value={c.value}
-                        min={0}
-                        max={100}
-                        onChange={(val) => updateControl(c.key, val)}
-                        aria-label={c.label}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </GlassCard>
+                    );
+                  })}
+                </div>
+              </GlassCard>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* =========================================================
+           SCREEN 2 — WILDLIFE SIMULATOR
+           ========================================================= */}
+        <section className="space-y-6 pt-6 border-t border-white/10">
+          <WildlifeScene />
+        </section>
       </div>
 
       <Footer />
@@ -363,296 +309,3 @@ export default function Simulation() {
 const iconMap: Record<string, typeof Trees> = {
   Trees, Droplets, Wind, Sun, Factory, Car, Recycle, Trash2, Cloud,
 };
-
-/* =========================================================
-   PROCEDURAL ECOSYSTEM VIEWPORT COMPONENT
-   ========================================================= */
-function EcosystemViewport({
-  dayCycle,
-  season,
-  weather,
-  droneMode,
-  droneAltitude,
-  wildlifeMode = 'none',
-  treeDensity,
-  factoryLevel,
-  solarLevel,
-  windLevel,
-  plasticLevel,
-  health,
-}: {
-  dayCycle: DayCycle;
-  season: Season;
-  weather: Weather;
-  droneMode: boolean;
-  droneAltitude: number;
-  wildlifeMode?: WildlifeMode;
-  treeDensity: number;
-  factoryLevel: number;
-  solarLevel: number;
-  windLevel: number;
-  plasticLevel: number;
-  health: number;
-}) {
-  const isHealthy = health > 50;
-  const numTrees = Math.max(2, Math.round((treeDensity / 100) * 14));
-
-  // Day Cycle Background Sky Gradients
-  const skyGradients: Record<DayCycle, string> = {
-    sunrise: 'from-amber-700/60 via-orange-500/40 to-slate-900',
-    day:     'from-sky-500/40 via-blue-400/20 to-slate-900',
-    sunset:  'from-rose-800/60 via-purple-700/40 to-slate-900',
-    night:   'from-indigo-950/90 via-slate-950 to-[#040d1a]',
-  };
-
-  const groundColors: Record<Season, string> = {
-    spring: isHealthy ? 'linear-gradient(to bottom, #166534, #14532D)' : 'linear-gradient(to bottom, #44403C, #292524)',
-    summer: isHealthy ? 'linear-gradient(to bottom, #15803D, #052E16)' : 'linear-gradient(to bottom, #57534E, #1C1917)',
-    autumn: isHealthy ? 'linear-gradient(to bottom, #92400E, #78350F)' : 'linear-gradient(to bottom, #44403C, #292524)',
-    winter: 'linear-gradient(to bottom, #94A3B8, #64748B)',
-  };
-
-  // Turbine speed tied to wind policy level and weather severity
-  const turbineDuration =
-    weather === 'storm'
-      ? Math.max(0.4, 0.7 - (windLevel / 200))
-      : weather === 'rain'
-      ? Math.max(1.0, 1.8 - (windLevel / 100))
-      : Math.max(1.8, 3.5 - (windLevel / 80));
-
-  // Tree sway angles tied to weather force
-  const treeSwayAngle = weather === 'storm' ? 12 : weather === 'rain' ? 4 : 1.5;
-  const treeSwayDuration = weather === 'storm' ? 0.7 : weather === 'rain' ? 1.8 : 3.5;
-
-  return (
-    <div
-      className={`relative w-full h-full bg-gradient-to-b ${skyGradients[dayCycle]} transition-all duration-1000 overflow-hidden`}
-      style={{
-        transform: droneMode ? `scale(${1 + (500 - droneAltitude) / 1000})` : 'scale(1)',
-      }}
-    >
-      {/* 1. Stars in Night Cycle (z-1) */}
-      {dayCycle === 'night' && (
-        <div className="absolute inset-0 opacity-80 pointer-events-none z-1">
-          {Array.from({ length: 30 }).map((_, i) => (
-            <div
-              key={`star-${i}`}
-              className="absolute w-1 h-1 rounded-full bg-white animate-pulse"
-              style={{
-                top: `${(i * 17) % 60}%`,
-                left: `${(i * 23) % 95}%`,
-                animationDelay: `${i * 0.2}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* 2. Sun / Moon Orb (z-1) */}
-      <motion.div
-        className="absolute rounded-full pointer-events-none z-1"
-        style={{
-          width: dayCycle === 'night' ? 36 : 48,
-          height: dayCycle === 'night' ? 36 : 48,
-          top: dayCycle === 'sunrise' || dayCycle === 'sunset' ? '45%' : '15%',
-          right: '15%',
-          background: dayCycle === 'night'
-            ? 'radial-gradient(circle, #F0F6FF, #94A3B8)'
-            : dayCycle === 'sunset'
-            ? 'radial-gradient(circle, #F97316, #DC2626)'
-            : 'radial-gradient(circle, #FBBF24, #F59E0B)',
-          boxShadow: dayCycle === 'night' ? '0 0 20px rgba(240,246,255,0.4)' : '0 0 40px rgba(251,191,36,0.6)',
-        }}
-        animate={{ y: [0, -6, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      />
-
-      {/* 3. Storm Clouds Overlay (z-2) */}
-      {(weather === 'storm' || weather === 'rain') && (
-        <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-slate-950/80 to-transparent z-2 pointer-events-none">
-          <motion.div
-            className="w-full h-full opacity-60"
-            style={{ background: 'radial-gradient(ellipse at top, rgba(30,41,59,0.9), transparent)' }}
-            animate={{ x: [-20, 20, -20] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </div>
-      )}
-
-      {/* 4. Renewable Solar Panels & Wind Turbines (z-3) */}
-      {solarLevel > 30 && Array.from({ length: Math.round((solarLevel / 100) * 4) }).map((_, i) => (
-        <div key={`solar-${i}`} className="absolute bottom-[34%] z-3" style={{ left: `${12 + i * 16}%` }}>
-          <div className="w-8 h-4 bg-sky-600 border border-sky-300 rounded-sm transform -skew-x-12 shadow-md" />
-        </div>
-      ))}
-
-      {windLevel > 30 && Array.from({ length: Math.round((windLevel / 100) * 3) }).map((_, i) => (
-        <div key={`turbine-${i}`} className="absolute bottom-[33%] z-3" style={{ left: `${22 + i * 24}%` }}>
-          <div className="w-1 h-12 bg-gray-200 mx-auto shadow-sm" />
-          <motion.div
-            className="w-8 h-8 rounded-full border-t-2 border-r-2 border-white -mt-14 -ml-3.5 shadow-sm"
-            animate={{ rotate: 360 }}
-            transition={{ duration: turbineDuration, repeat: Infinity, ease: 'linear' }}
-          />
-        </div>
-      ))}
-
-      {/* 5. Ground Terrain Layer (z-4) */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-1/3 transition-all duration-1000 z-4"
-        style={{ background: groundColors[season] }}
-      />
-
-      {/* Snow Accumulation Layer in Winter (z-4) */}
-      {season === 'winter' && (
-        <div className="absolute bottom-[33%] left-0 right-0 h-3 bg-slate-100/90 shadow-sm z-4" />
-      )}
-
-      {/* 6. Forest Trees with Wind Sway Physics (z-5) */}
-      {Array.from({ length: numTrees }).map((_, i) => (
-        <motion.div
-          key={`tree-${i}`}
-          className="absolute bottom-[20%] z-5 origin-bottom"
-          style={{ left: `${4 + i * (90 / numTrees)}%` }}
-          initial={{ scaleY: 0 }}
-          animate={{ scaleY: 1, rotate: [-treeSwayAngle, treeSwayAngle, -treeSwayAngle] }}
-          transition={{
-            scaleY: { delay: i * 0.05, duration: 0.5 },
-            rotate: { duration: treeSwayDuration + (i % 3) * 0.2, repeat: Infinity, ease: 'easeInOut' },
-          }}
-        >
-          <TreeGraphic healthy={isHealthy} season={season} weather={weather} />
-        </motion.div>
-      ))}
-
-      {/* 7. Water River Strip & Surface Waves (z-6) */}
-      <div
-        className="absolute bottom-[16%] left-0 right-0 h-4 overflow-hidden shadow-inner z-6 border-y border-white/10"
-        style={{
-          background: plasticLevel > 60
-            ? 'linear-gradient(90deg, #475569, #334155)'
-            : 'linear-gradient(90deg, #38BDF8, #0284C7)',
-        }}
-      >
-        <motion.div
-          className="absolute inset-0 opacity-60"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)' }}
-          animate={{ x: ['-100%', '100%'] }}
-          transition={{ duration: weather === 'storm' ? 1.2 : weather === 'rain' ? 2.2 : 3.5, repeat: Infinity, ease: 'linear' }}
-        />
-        {/* Surface Ripple Lines */}
-        {weather === 'storm' && (
-          <div className="absolute inset-0 bg-white/10 animate-pulse" />
-        )}
-      </div>
-
-      {/* 8. Weather Particle Overlays (z-7) */}
-      {/* Heavy Diagonal Wind-Driven Rain / Storm Rain */}
-      {(weather === 'rain' || weather === 'storm') && (
-        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
-          {Array.from({ length: weather === 'storm' ? 45 : 25 }).map((_, i) => (
-            <motion.div
-              key={`rain-${i}`}
-              className="absolute w-0.5 rounded-full bg-sky-200/70"
-              style={{
-                left: `${(i * 4.2) % 100}%`,
-                top: '-10%',
-                height: weather === 'storm' ? 24 : 16,
-                transform: 'rotate(-25deg)',
-              }}
-              animate={{
-                y: ['0%', '120%'],
-                x: ['0%', '-40%'],
-              }}
-              transition={{
-                duration: weather === 'storm' ? 0.45 + (i % 3) * 0.05 : 0.8 + (i % 3) * 0.1,
-                repeat: Infinity,
-                ease: 'linear',
-                delay: (i * 0.03) % 0.5,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Falling Snowflakes */}
-      {weather === 'snow' && (
-        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
-          {Array.from({ length: 30 }).map((_, i) => (
-            <motion.div
-              key={`snow-${i}`}
-              className="absolute rounded-full bg-white/90 shadow-sm"
-              style={{
-                left: `${(i * 3.4) % 100}%`,
-                top: '-5%',
-                width: 3 + (i % 3),
-                height: 3 + (i % 3),
-              }}
-              animate={{
-                y: ['0%', '110%'],
-                x: ['0%', `${(i % 2 === 0 ? 15 : -15)}%`],
-              }}
-              transition={{
-                duration: 2.5 + (i % 4) * 0.5,
-                repeat: Infinity,
-                ease: 'linear',
-                delay: (i * 0.1) % 1.5,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Volumetric Fog Layer */}
-      {weather === 'fog' && (
-        <div className="absolute inset-0 bg-slate-400/30 backdrop-blur-[2px] z-7 pointer-events-none" />
-      )}
-
-      {/* Factory Industrial Emissions (z-3) */}
-      {factoryLevel > 40 && (
-        <div className="absolute bottom-[34%] right-[10%] z-3 flex items-end gap-1 opacity-70">
-          <div className="w-4 h-10 bg-slate-700 border border-slate-500 rounded-t-sm" />
-          <div className="w-5 h-14 bg-slate-800 border border-slate-600 rounded-t-sm relative">
-            <motion.div
-              className="absolute -top-4 left-1 w-3 h-3 rounded-full bg-slate-400/50 blur-xs"
-              animate={{ y: [-5, -20], scale: [1, 2], opacity: [0.6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Wildlife Mode Active Indicator Tint */}
-      {wildlifeMode !== 'none' && (
-        <div className="absolute top-2 left-2 z-10 text-[9px] font-mono font-bold text-primary/80 bg-black/40 px-2 py-0.5 rounded-md border border-primary/20">
-          TRACKING: {wildlifeMode.toUpperCase()}
-        </div>
-      )}
-
-      {/* 9. Storm Screen Darkening & Lightning Flash (z-8) */}
-      {weather === 'storm' && (
-        <>
-          <div className="absolute inset-0 bg-black/35 pointer-events-none z-8" />
-          <motion.div
-            className="absolute inset-0 bg-white/35 pointer-events-none z-8"
-            animate={{ opacity: [0, 0.9, 0, 0.7, 0, 0.4, 0] }}
-            transition={{ duration: 4.5, repeat: Infinity, repeatDelay: 1.5 }}
-          />
-        </>
-      )}
-    </div>
-  );
-}
-
-function TreeGraphic({ healthy, season, weather }: { healthy: boolean; season: Season; weather?: Weather }) {
-  const foliageColor = season === 'autumn' ? '#EA580C' : season === 'winter' ? '#94A3B8' : healthy ? '#166534' : '#78350F';
-  return (
-    <div className="flex flex-col items-center" style={{ opacity: weather === 'storm' ? 0.95 : 1 }}>
-      <div
-        className="w-6 h-8 rounded-t-full shadow-md transition-colors duration-500"
-        style={{ backgroundColor: foliageColor }}
-      />
-      <div className="w-1.5 h-4 bg-amber-900 shadow-inner" />
-    </div>
-  );
-}
