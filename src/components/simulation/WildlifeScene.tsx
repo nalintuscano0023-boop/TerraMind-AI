@@ -9,7 +9,7 @@ interface WildlifeMeta {
   key: WildlifeType;
   name: string;
   habitat: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   population: string;
   health: number;
   migration: string;

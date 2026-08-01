@@ -385,7 +385,7 @@ export default function Insights() {
                       const xPos = idx * 100;
                       const yPos = 150 - (idx * 28);
                       const isCurrent = yr === activeYear;
-                      const proj = PROJECTIONS_BY_YEAR[yr];
+                      const proj = TIMELINE_DATA[yr];
 
                       return (
                         <g key={yr} onClick={() => setActiveYear(yr)} className="group cursor-pointer">
@@ -452,7 +452,7 @@ export default function Insights() {
               <div className="space-y-3">
                 <div className="text-xs font-mono uppercase tracking-widest text-primary font-bold flex items-center justify-between">
                   <span>{activeYear} Environmental Indicators</span>
-                  <Badge variant="outline" className="text-[10px] font-mono">LIVE MODELING</Badge>
+                  <Badge variant="secondary" className="text-[10px] font-mono">LIVE MODELING</Badge>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
