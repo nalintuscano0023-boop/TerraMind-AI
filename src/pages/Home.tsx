@@ -566,6 +566,132 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ===== ABOUT TERRAMIND AI SECTION ===== */}
+      <section className="relative py-20 bg-gradient-to-b from-transparent via-[#0a1628]/60 to-transparent">
+        <div className="mx-auto max-w-7xl px-6">
+          <SectionTitle
+            center
+            eyebrow="About TerraMind AI"
+            title="Architecting Planetary Resilience Through Decision Intelligence"
+            description="Created for the AI-for-Earth Hackathon 2026. Designed to democratize Earth observation, simulate policy interventions, and protect planetary boundaries."
+          />
+
+          {/* Mission & Vision Cards */}
+          <div className="mt-12 grid md:grid-cols-2 gap-6 mb-12">
+            <GlassCard className="p-8 border-primary/20 relative overflow-hidden bg-gradient-to-br from-primary/5 via-transparent to-transparent">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center font-bold">
+                  🎯
+                </div>
+                <h3 className="text-xl font-bold font-display text-white">Our Mission</h3>
+              </div>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                Empower climate decision-makers, researchers, and global citizens with real-time, interactive 3D digital twin simulations of Earth's critical ecosystems to reverse environmental degradation.
+              </p>
+            </GlassCard>
+
+            <GlassCard className="p-8 border-secondary/20 relative overflow-hidden bg-gradient-to-br from-secondary/5 via-transparent to-transparent">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center font-bold">
+                  🚀
+                </div>
+                <h3 className="text-xl font-bold font-display text-white">Our Vision</h3>
+              </div>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                Build the world's most accessible planetary digital twin platform — combining orbital telemetry, rule-based ecological engines, and immersive 3D WebGL visuals for immediate impact.
+              </p>
+            </GlassCard>
+          </div>
+
+          {/* Core Problem & Story Grid */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <GlassCard className="p-6 border-white/10">
+              <div className="text-xs font-mono text-primary uppercase tracking-widest mb-2 font-semibold">The Problem We Solve</div>
+              <h4 className="text-base font-bold font-display text-white mb-2">Fragmented Climate Data</h4>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                Traditional environmental data is locked in dense academic reports. TerraMind AI translates complex orbital metrics into intuitive, interactive 3D simulations.
+              </p>
+            </GlassCard>
+
+            <GlassCard className="p-6 border-white/10">
+              <div className="text-xs font-mono text-secondary uppercase tracking-widest mb-2 font-semibold">Why This Matters</div>
+              <h4 className="text-base font-bold font-display text-white mb-2">Tipping Points Are Near</h4>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                With atmospheric CO₂ over 421 ppm and 1M species endangered, instant feedback loops on policy decisions are mandatory for global resilience.
+              </p>
+            </GlassCard>
+
+            <GlassCard className="p-6 border-white/10">
+              <div className="text-xs font-mono text-warning uppercase tracking-widest mb-2 font-semibold">Development Team</div>
+              <h4 className="text-base font-bold font-display text-white mb-2">Built by Nalin & Tanishq</h4>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                Architected by <strong>Nalin Tuscano</strong> (3D WebGL & Full-Stack Engine) and <strong>Tanishq</strong> (AI Systems & Environmental Telemetry).
+              </p>
+            </GlassCard>
+          </div>
+
+          {/* Project Statistics - Animated Counters */}
+          <GlassCard className="p-8 border-primary/20 bg-gradient-to-r from-[#0a1628] via-[#0f2442] to-[#0a1628] mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div>
+                <div className="text-3xl md:text-4xl font-bold font-display text-primary">
+                  <StatCounter value={10} suffix=" Domains" />
+                </div>
+                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Climate Monitoring</div>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-bold font-display text-secondary">
+                  <StatCounter value={142} suffix=" Nodes" />
+                </div>
+                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Orbital Satellites</div>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-bold font-display text-warning">
+                  <StatCounter value={100} suffix="%" />
+                </div>
+                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Deterministic Engine</div>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-bold font-display text-accent">
+                  <StatCounter value={1.2} decimals={1} suffix="s" />
+                </div>
+                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Telemetry Speed</div>
+              </div>
+            </div>
+          </GlassCard>
+
+          {/* Interactive Roadmap / Timeline */}
+          <div className="glass rounded-2xl p-8 border border-white/10">
+            <h3 className="text-lg font-bold font-display text-white mb-6 text-center">Project Development Timeline</h3>
+            <div className="grid md:grid-cols-3 gap-6 relative">
+              <div className="glass rounded-xl p-5 border-l-4 border-l-primary border-white/5">
+                <div className="text-xs font-mono text-primary font-bold">2026 — HACKATHON PROTOTYPE</div>
+                <h4 className="font-bold text-sm text-white mt-1">TerraMind AI v1.0</h4>
+                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
+                  Interactive 3D Earth Digital Twin, Policy Simulation, Climate Action Hub, and Ocean Cleanup Simulator.
+                </p>
+              </div>
+
+              <div className="glass rounded-xl p-5 border-l-4 border-l-secondary border-white/5">
+                <div className="text-xs font-mono text-secondary font-bold">2027 — LIVE IOT INTEGRATION</div>
+                <h4 className="font-bold text-sm text-white mt-1">Ground & Ocean Sensor Mesh</h4>
+                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
+                  Direct API streaming from NASA Sentinel, NOAA buoys, and autonomous oceanic monitoring drones.
+                </p>
+              </div>
+
+              <div className="glass rounded-xl p-5 border-l-4 border-l-accent border-white/5">
+                <div className="text-xs font-mono text-accent font-bold">2030 — GLOBAL DEPLOYMENT</div>
+                <h4 className="font-bold text-sm text-white mt-1">Autonomous Policy Grid</h4>
+                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
+                  AI-driven policy execution and automated carbon offset verification across international jurisdictions.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== CTA ===== */}
       <section className="relative py-20">
         <div className="mx-auto max-w-4xl px-6 text-center">
