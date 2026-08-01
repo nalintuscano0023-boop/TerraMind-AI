@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { Globe, Menu, X, Sun, Moon, Sprout, Satellite, BarChart3, Activity } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -26,7 +26,7 @@ function NavItem({ to, label, icon: Icon, end }: NavItemProps) {
       end={end}
       className={({ isActive }) =>
         `relative px-4 py-2 h-9 rounded-full text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 leading-none border border-transparent ${
-          isActive ? 'text-primary border-primary/20' : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+          isActive ? 'text-primary border-primary/20 shadow-glow' : 'text-[var(--text-muted)] hover:text-white'
         }`
       }
     >
@@ -37,7 +37,7 @@ function NavItem({ to, label, icon: Icon, end }: NavItemProps) {
           {isActive && (
             <motion.div
               layoutId="nav-active"
-              className="absolute inset-0 rounded-full bg-primary/15 border border-primary/25 -z-10"
+              className="absolute inset-0 rounded-full bg-primary/15 border border-primary/30 -z-10 shadow-glow"
               transition={{ type: 'spring', stiffness: 380, damping: 30 }}
             />
           )}
@@ -52,6 +52,9 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 400, damping: 30 });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -72,6 +75,12 @@ export function Navbar() {
 
   return (
     <>
+      {/* Top Page Scroll Progress Indicator Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary via-secondary to-accent z-50 origin-left shadow-glow"
+        style={{ scaleX }}
+      />
+
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled ? 'py-2' : 'py-4'
@@ -80,26 +89,26 @@ export function Navbar() {
         <nav className="mx-auto max-w-7xl px-4 md:px-6">
           <div
             className={`glass-deep rounded-2xl px-4 md:px-6 py-3 flex items-center justify-between transition-all duration-500 ${
-              scrolled ? 'shadow-glow border-primary/20' : ''
+              scrolled ? 'shadow-2xl border-primary/30 bg-[#040d1a]/90 backdrop-blur-3xl' : 'border-white/10'
             }`}
           >
             {/* Branding */}
             <NavLink to="/" className="flex items-center gap-2.5 group" aria-label="TerraMind AI home">
               <motion.div
-                className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0"
+                className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 shadow-glow"
                 whileHover={{ rotate: 360, scale: 1.08 }}
                 transition={{ duration: 0.8 }}
               >
                 <Globe className="w-5 h-5 text-ink" strokeWidth={2.5} />
                 <motion.div
-                  className="absolute inset-0 rounded-xl bg-primary opacity-30 blur-md"
-                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  className="absolute inset-0 rounded-xl bg-primary opacity-40 blur-md"
+                  animate={{ opacity: [0.4, 0.7, 0.4] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
               </motion.div>
               <div className="hidden sm:block">
-                <div className="font-display font-bold text-base leading-none tracking-tight">
-                  TerraMind <span className="text-primary font-mono text-xs">AI</span>
+                <div className="font-display font-bold text-base leading-none tracking-tight text-white flex items-center gap-1">
+                  TerraMind <span className="text-primary font-mono text-xs px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">AI</span>
                 </div>
                 <div className="text-[9px] text-[var(--text-muted)] tracking-[0.2em] uppercase font-mono mt-0.5">
                   Digital Twin Platform
@@ -108,7 +117,7 @@ export function Navbar() {
             </NavLink>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1 glass rounded-full px-3 py-1.5 border border-primary/10">
+            <div className="hidden lg:flex items-center gap-1 glass rounded-full px-3 py-1.5 border border-primary/15 bg-black/40 shadow-inner">
               {NAV_ITEMS.map((item) => (
                 <NavItem key={item.to} to={item.to} label={item.label} icon={item.icon} end={item.to === '/'} />
               ))}
@@ -117,16 +126,16 @@ export function Navbar() {
             {/* Live Health Pill & Controls */}
             <div className="flex items-center gap-3">
               {/* Earth Health Status Pill */}
-              <div className="hidden sm:flex items-center gap-2 glass rounded-full px-3 py-1 text-xs border border-primary/15">
-                <span className="status-dot-live" />
+              <div className="hidden sm:flex items-center gap-2 glass rounded-full px-3.5 py-1 text-xs border border-primary/20 shadow-glow">
+                <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
                 <Activity className="w-3.5 h-3.5 text-primary" />
-                <span className="font-mono font-semibold text-primary text-[11px]">EARTH 62%</span>
+                <span className="font-mono font-bold text-primary text-[11px]">EARTH 62%</span>
               </div>
 
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="w-9 h-9 rounded-full glass flex items-center justify-center hover:text-primary transition-colors border border-primary/15"
+                className="w-9 h-9 rounded-full glass flex items-center justify-center hover:text-primary transition-colors border border-primary/20 shadow-sm"
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
                 <AnimatePresence mode="wait">
@@ -145,7 +154,7 @@ export function Navbar() {
               {/* Mobile Menu Trigger */}
               <button
                 onClick={() => setMobileOpen((o) => !o)}
-                className="lg:hidden w-9 h-9 rounded-full glass flex items-center justify-center border border-primary/15"
+                className="lg:hidden w-9 h-9 rounded-full glass flex items-center justify-center border border-primary/20"
                 aria-label="Toggle navigation menu"
                 aria-expanded={mobileOpen}
               >
