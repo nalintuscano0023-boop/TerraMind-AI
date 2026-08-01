@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Trees, Droplets, Wind, Cloud, Bird, Sun, Factory, Car, Recycle, Trash2,
-  Rabbit, Turtle, Leaf,
+  Rabbit, Turtle, Leaf, Fish,
   CloudRain, CloudSnow, CloudFog, Zap, AlertTriangle, CheckCircle2,
   Plane, Moon, Sunset
 } from 'lucide-react';
