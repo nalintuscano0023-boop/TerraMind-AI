@@ -1,37 +1,53 @@
-import { forwardRef, useState, type HTMLAttributes, type MouseEvent } from 'react';
+import React, { forwardRef, useState, type HTMLAttributes, type MouseEvent } from 'react';
 import { motion, type HTMLMotionProps } from 'framer-motion';
 
-type GlassCardProps = HTMLMotionProps<'div'> & {
+export interface GlassCardProps extends HTMLMotionProps<'div'> {
   hover?: boolean;
   glow?: 'primary' | 'secondary' | 'accent' | 'none';
   tilt?: boolean;
-};
+  children?: React.ReactNode;
+}
 
 export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
-  ({ children, className = '', hover = true, glow = 'none', tilt = true, ...props }, ref) => {
+  (
+    {
+      children,
+      className = '',
+      hover = true,
+      glow = 'none',
+      tilt = true,
+      onMouseMove,
+      onMouseLeave,
+      ...props
+    },
+    ref
+  ) => {
     const [rotateX, setRotateX] = useState(0);
     const [rotateY, setRotateY] = useState(0);
     const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
 
     const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-      if (!tilt) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      const rX = ((y - centerY) / centerY) * -5;
-      const rY = ((x - centerX) / centerX) * 5;
-      
-      setRotateX(rX);
-      setRotateY(rY);
-      setMousePos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
+      if (tilt) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rX = ((y - centerY) / centerY) * -5;
+        const rY = ((x - centerX) / centerX) * 5;
+
+        setRotateX(rX);
+        setRotateY(rY);
+        setMousePos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
+      }
+      onMouseMove?.(e);
     };
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = (e: MouseEvent<HTMLDivElement>) => {
       setRotateX(0);
       setRotateY(0);
+      onMouseLeave?.(e);
     };
 
     const glowClass =
@@ -66,20 +82,28 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
         {children}
       </motion.div>
     );
-  },
+  }
 );
+
 GlassCard.displayName = 'GlassCard';
 
-type SectionTitleProps = HTMLAttributes<HTMLDivElement> & {
+export interface SectionTitleProps extends HTMLAttributes<HTMLDivElement> {
   eyebrow?: string;
   title: string;
   description?: string;
   center?: boolean;
-};
+}
 
-export function SectionTitle({ eyebrow, title, description, center = false, className = '' }: SectionTitleProps) {
+export function SectionTitle({
+  eyebrow,
+  title,
+  description,
+  center = false,
+  className = '',
+  ...props
+}: SectionTitleProps) {
   return (
-    <div className={`${center ? 'text-center mx-auto max-w-3xl' : ''} ${className}`}>
+    <div className={`${center ? 'text-center mx-auto max-w-3xl' : ''} ${className}`} {...props}>
       {eyebrow && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
