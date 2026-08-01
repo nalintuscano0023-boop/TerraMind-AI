@@ -7,7 +7,7 @@ import {
   Target, Trophy, Star, Lock, CheckCircle2, XCircle, Play, RotateCcw,
   Sparkles, AlertTriangle, ChevronRight, Rocket,
 } from 'lucide-react';
-import { GlassCard, SectionTitle, Badge, ProgressBar, CircularProgress, Tooltip } from '@/components/ui';
+import { GlassCard, SectionTitle, Badge, ProgressBar, CircularProgress, Tooltip, Slider } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 import {
@@ -656,14 +656,12 @@ function MissionOverlay({
                         </span>
                         <span className="text-xs font-mono text-[var(--text-muted)]">{c.value}</span>
                       </div>
-                      <input
-                        type="range"
+                      <Slider
                         min={0}
                         max={100}
                         value={c.value}
-                        onChange={(e) => onUpdate(c.key, Number(e.target.value))}
-                        className="w-full cursor-pointer"
-                        style={{ accentColor: config.accent }}
+                        onChange={(val) => onUpdate(c.key, val)}
+                        accentColor={config.accent}
                         aria-label={c.label}
                       />
                     </div>

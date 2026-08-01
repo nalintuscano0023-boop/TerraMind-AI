@@ -2,6 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useCountUp } from '@/hooks/useUi';
 export { GlassCard, SectionTitle } from '@/components/ui/GlassCard';
+export { Slider } from '@/components/ui/Slider';
 
 interface StatCounterProps {
   value: number;

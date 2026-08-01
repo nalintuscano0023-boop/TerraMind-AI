@@ -7,7 +7,7 @@ import {
   BarChart3, Activity, Waves,
   ThermometerSun, Mail, MapPin,
 } from 'lucide-react';
-import { GlassCard, SectionTitle, Badge, ProgressBar } from '@/components/ui';
+import { GlassCard, SectionTitle, Badge, ProgressBar, Slider } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 
@@ -241,10 +241,13 @@ export default function Insights() {
                 <span className="text-[var(--text-muted)]">Intervention Level</span>
                 <span className="font-bold text-secondary">{plasticReduction}%</span>
               </div>
-              <input
-                type="range" min={0} max={100} value={plasticReduction}
-                onChange={(e) => setPlasticReduction(Number(e.target.value))}
-                className="w-full cursor-pointer" style={{ accentColor: '#38BDF8' }}
+              <Slider
+                min={0}
+                max={100}
+                value={plasticReduction}
+                onChange={(val) => setPlasticReduction(val)}
+                accentColor="#38BDF8"
+                aria-label="Plastic intervention level"
               />
               <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="glass rounded-lg p-2">
@@ -461,9 +464,14 @@ export default function Insights() {
                     <span className="text-[var(--text-muted)]">Renewable Deployment</span>
                     <span className="font-bold text-primary">{renewablePlan}%</span>
                   </div>
-                  <input type="range" min={10} max={100} value={renewablePlan}
-                    onChange={(e) => setRenewablePlan(Number(e.target.value))}
-                    className="w-full cursor-pointer" style={{ accentColor: '#00E5A8' }} />
+                  <Slider
+                    min={10}
+                    max={100}
+                    value={renewablePlan}
+                    onChange={(val) => setRenewablePlan(val)}
+                    accentColor="#00E5A8"
+                    aria-label="Renewable Deployment"
+                  />
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-center">
                   {[

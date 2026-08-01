@@ -6,7 +6,7 @@ import {
   CloudRain, CloudSnow, CloudFog, Zap, AlertTriangle, CheckCircle2,
   Plane, Camera, Eye,
 } from 'lucide-react';
-import { GlassCard, SectionTitle, CircularProgress, Badge, Tooltip } from '@/components/ui';
+import { GlassCard, SectionTitle, CircularProgress, Badge, Tooltip, Slider } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 import { CONTROLS, METRIC_META, type ControlKey, type MetricKey } from '@/data/environment';
@@ -317,27 +317,13 @@ export default function Simulation() {
                         </Tooltip>
                         <span className="text-xs font-mono tabular-nums" style={{ color: impactColor }}>{c.value}</span>
                       </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min={0}
-                          max={100}
-                          value={c.value}
-                          onChange={(e) => updateControl(c.key, Number(e.target.value))}
-                          className="w-full cursor-pointer h-2 rounded-full appearance-none"
-                          style={{ accentColor: 'var(--primary)' }}
-                          aria-label={c.label}
-                        />
-                        {/* Visual fill overlay */}
-                        <div
-                          className="absolute top-0 left-0 h-2 rounded-full pointer-events-none"
-                          style={{
-                            width: `${c.value}%`,
-                            background: `linear-gradient(90deg, var(--primary), var(--secondary))`,
-                            opacity: 0.4,
-                          }}
-                        />
-                      </div>
+                      <Slider
+                        value={c.value}
+                        min={0}
+                        max={100}
+                        onChange={(val) => updateControl(c.key, val)}
+                        aria-label={c.label}
+                      />
                     </div>
                   );
                 })}
