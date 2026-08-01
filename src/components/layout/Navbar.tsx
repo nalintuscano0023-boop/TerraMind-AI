@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: Globe },
   { to: '/simulation', label: 'Simulation', icon: Sprout },
   { to: '/command-center', label: 'Command Center', icon: Satellite },
-  { to: '/challenges', label: 'Challenges', icon: Target },
+  { to: '/challenges', label: 'Climate Hub', icon: Activity },
   { to: '/insights', label: 'Insights', icon: BarChart3 },
 ];
 
