@@ -472,26 +472,151 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
 
           ctx.restore();
         });
-      } else if (type === 'butterfly' || type === 'bee') {
-        // Fluttering Insects (Meadow & Canopy)
-        creatures.forEach((c) => {
-          c.x += (Math.random() - 0.5) * 1.8;
-          c.y += (Math.random() - 0.5) * 1.8;
-          c.wingAngle += 0.35;
+      } else if (type === 'bee') {
+        // --- 🐝 REALISTIC HONEYBEE HABITAT & POLLINATING FLIGHT ---
+        creatures.forEach((c, idx) => {
+          // Zig-zag pollinating hovering towards meadow flowers
+          const targetFlower = flowers[idx % flowers.length];
+          const dx = targetFlower.x - c.x;
+          const dy = (height - 35 - targetFlower.size) - c.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (c.x > width - 10) c.x = 20;
-          if (c.x < 10) c.x = width - 20;
+          if (dist < 15) {
+            // Hovering over flower to pollinate
+            c.vx = (Math.random() - 0.5) * 0.4;
+            c.vy = (Math.random() - 0.5) * 0.4;
+          } else {
+            // Flight towards flower with zig-zag wobble
+            c.vx += (dx / dist) * 0.05 + (Math.sin(t * 5 + idx) * 0.3);
+            c.vy += (dy / dist) * 0.05 + (Math.cos(t * 4 + idx) * 0.2);
+            c.vx *= 0.95;
+            c.vy *= 0.95;
+          }
+
+          c.x += c.vx * speedMultiplier;
+          c.y += c.vy * speedMultiplier;
+          c.wingAngle += 0.8 * speedMultiplier; // High frequency wing buzz
+
+          // Screen boundary safety
+          if (c.x > width - 15) c.x = 20;
+          if (c.x < 15) c.x = width - 20;
+          if (c.y > height - 25) c.y = height - 50;
+          if (c.y < 20) c.y = 40;
+
+          c.targetAngle = Math.atan2(c.vy, c.vx);
+          let diff = c.targetAngle - c.currentAngle;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          c.currentAngle += diff * 0.15;
+
+          ctx.save();
+          ctx.translate(c.x, c.y);
+          ctx.rotate(c.currentAngle);
+
+          // 1. Translucent Rapidly Flapping Buzzing Wings
+          const wingFlap = Math.sin(c.wingAngle) * 6;
+          ctx.fillStyle = 'rgba(240, 249, 255, 0.75)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.lineWidth = 0.8;
+
+          // Upper & Lower Wings (Left & Right)
+          ctx.beginPath();
+          ctx.ellipse(0, -7 + wingFlap * 0.5, 7, 4, -0.4, 0, Math.PI * 2);
+          ctx.ellipse(-3, -8 - wingFlap * 0.5, 5, 3, -0.6, 0, Math.PI * 2);
+          ctx.ellipse(0, 7 - wingFlap * 0.5, 7, 4, 0.4, 0, Math.PI * 2);
+          ctx.ellipse(-3, 8 + wingFlap * 0.5, 5, 3, 0.6, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // 2. Bee Abdomen (Yellow & Black Striped Body)
+          ctx.fillStyle = '#F59E0B'; // Bright Bee Yellow
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 11, 7, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Black Abdominal Stripes
+          ctx.fillStyle = '#0F172A';
+          ctx.beginPath();
+          ctx.rect(-6, -6.5, 2.5, 13);
+          ctx.rect(-1, -7, 2.5, 14);
+          ctx.rect(4, -6.5, 2.5, 13);
+          ctx.fill();
+
+          // Re-clip Body for Smooth Oval Edge
+          ctx.strokeStyle = '#D97706';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 11, 7, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // 3. Thorax & Small Black Head
+          ctx.fillStyle = '#334155'; // Dark Thorax
+          ctx.beginPath();
+          ctx.ellipse(7, 0, 4, 5, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#0F172A'; // Black Head
+          ctx.beginPath();
+          ctx.arc(11, 0, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Head Eyes
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(12, -1.2, 0.8, 0, Math.PI * 2);
+          ctx.arc(12, 1.2, 0.8, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 4. Tiny Antennae
+          ctx.strokeStyle = '#0F172A';
+          ctx.lineWidth = 1.2;
+          ctx.beginPath();
+          ctx.moveTo(13, -1); ctx.lineTo(17, -4);
+          ctx.moveTo(13, 1);  ctx.lineTo(17, 4);
+          ctx.stroke();
+
+          // 5. Stinger Point at Tail
+          ctx.fillStyle = '#0F172A';
+          ctx.beginPath();
+          ctx.moveTo(-11, 0);
+          ctx.lineTo(-14, -1);
+          ctx.lineTo(-14, 1);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.restore();
+        });
+      } else if (type === 'butterfly') {
+        // --- 🦋 REALISTIC BUTTERFLY FLUTTERING ---
+        creatures.forEach((c) => {
+          c.x += (Math.random() - 0.5) * 1.8 * speedMultiplier;
+          c.y += (Math.random() - 0.5) * 1.8 * speedMultiplier;
+          c.wingAngle += 0.35 * speedMultiplier;
+
+          if (c.x > width - 15) c.x = 25;
+          if (c.x < 15) c.x = width - 25;
           if (c.y > height - 30) c.y = height - 60;
           if (c.y < 20) c.y = 40;
 
           ctx.save();
           ctx.translate(c.x, c.y);
-          const w = Math.abs(Math.sin(c.wingAngle)) * 8 + 2;
+          const w = Math.abs(Math.sin(c.wingAngle)) * 10 + 3;
+
+          // Butterfly Forewings & Hindwings
           ctx.fillStyle = c.color;
           ctx.beginPath();
-          ctx.ellipse(-w / 2, 0, w, 4, 0.2, 0, Math.PI * 2);
-          ctx.ellipse(w / 2, 0, w, 4, -0.2, 0, Math.PI * 2);
+          ctx.ellipse(-w * 0.4, -4, w * 0.8, 6, 0.3, 0, Math.PI * 2);
+          ctx.ellipse(w * 0.4, -4, w * 0.8, 6, -0.3, 0, Math.PI * 2);
+          ctx.ellipse(-w * 0.3, 4, w * 0.6, 5, -0.2, 0, Math.PI * 2);
+          ctx.ellipse(w * 0.3, 4, w * 0.6, 5, 0.2, 0, Math.PI * 2);
           ctx.fill();
+
+          // Slender Body
+          ctx.fillStyle = '#1E293B';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 1.8, 8, 0, 0, Math.PI * 2);
+          ctx.fill();
+
           ctx.restore();
         });
       } else if (type === 'deer') {
