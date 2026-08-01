@@ -1,10 +1,9 @@
 import { useState, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   AlertTriangle, Cloud, Bird, Zap,
-  Droplets, Trees, Wind, TrendingDown, TrendingUp,
-  BarChart3, Activity, Waves,
-  ThermometerSun, Mail, MapPin, Play, RotateCcw, ShieldCheck, Compass, Sparkles, CheckCircle2
+  Droplets, Trees, Wind, TrendingUp,
+  BarChart3, Activity, Waves, ThermometerSun
 } from 'lucide-react';
 import { GlassCard, SectionTitle, Badge, ProgressBar, Slider } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
