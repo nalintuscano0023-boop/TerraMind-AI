@@ -342,12 +342,12 @@ export default function Insights() {
                 </div>
 
                 {/* Animated Line Chart Container */}
-                <div className="relative h-52 w-full rounded-2xl glass p-4 border border-white/10 flex items-end">
+                <div className="relative h-56 w-full rounded-2xl glass p-4 border border-white/10 flex items-end">
                   <svg className="w-full h-full overflow-visible" viewBox="0 0 500 180">
                     {/* Grid lines */}
-                    <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
-                    <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
-                    <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
+                    <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.06)" strokeDasharray="4 4" />
+                    <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.06)" strokeDasharray="4 4" />
+                    <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.06)" strokeDasharray="4 4" />
 
                     {/* Dynamic Path for CO2 */}
                     <defs>
@@ -357,42 +357,90 @@ export default function Insights() {
                       </linearGradient>
                     </defs>
 
-                    {/* Area Fill */}
-                    <path
+                    {/* Animated Area Fill */}
+                    <motion.path
+                      key={`area-${activeYear}`}
                       d="M 0 150 L 100 135 L 200 110 L 300 85 L 400 40 L 500 10 L 500 180 L 0 180 Z"
                       fill="url(#carbonGrad)"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.6 }}
                     />
 
-                    {/* Trend Line */}
+                    {/* Animated Trend Line Left-to-Right Drawing */}
                     <motion.path
+                      key={`line-${activeYear}`}
                       d="M 0 150 L 100 135 L 200 110 L 300 85 L 400 40 L 500 10"
                       fill="none"
                       stroke="#EF4444"
-                      strokeWidth="3"
+                      strokeWidth="3.5"
                       strokeLinecap="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
                     />
 
-                    {/* Active Year Highlight Node */}
+                    {/* Interactive Data Point Nodes & Tooltips */}
                     {TIMELINE_YEARS.map((yr, idx) => {
                       const xPos = idx * 100;
                       const yPos = 150 - (idx * 28);
                       const isCurrent = yr === activeYear;
+                      const proj = PROJECTIONS_BY_YEAR[yr];
 
                       return (
-                        <g key={yr} onClick={() => setActiveYear(yr)} className="cursor-pointer">
+                        <g key={yr} onClick={() => setActiveYear(yr)} className="group cursor-pointer">
+                          {/* Active Pulse Ring */}
+                          {isCurrent && (
+                            <motion.circle
+                              cx={xPos}
+                              cy={yPos}
+                              r={14}
+                              fill="none"
+                              stroke="#00E5A8"
+                              strokeWidth="2"
+                              animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.8, 0.1, 0.8] }}
+                              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+                            />
+                          )}
+
+                          {/* Data Circle Node */}
                           <motion.circle
                             cx={xPos}
                             cy={yPos}
-                            r={isCurrent ? 8 : 4}
+                            r={isCurrent ? 7 : 4.5}
                             fill={isCurrent ? "#00E5A8" : "#EF4444"}
                             stroke="#040d1a"
-                            strokeWidth="2"
-                            animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
-                            transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0 }}
+                            strokeWidth="2.5"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: idx * 0.08, duration: 0.4 }}
+                            className="group-hover:scale-125 transition-transform"
                           />
-                          <text x={xPos} y={175} fill={isCurrent ? "#00E5A8" : "#7A9CC4"} fontSize="10" textAnchor="middle" fontFamily="monospace">
+
+                          {/* Year Label */}
+                          <text x={xPos} y={175} fill={isCurrent ? "#00E5A8" : "#7A9CC4"} fontSize="11" textAnchor="middle" fontFamily="monospace" fontWeight={isCurrent ? "bold" : "normal"}>
                             {yr}
                           </text>
+
+                          {/* SVG Hover Tooltip Overlay */}
+                          <g className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                            <rect
+                              x={Math.max(0, Math.min(380, xPos - 60))}
+                              y={Math.max(10, yPos - 55)}
+                              width="120"
+                              height="42"
+                              rx="8"
+                              fill="#040d1a"
+                              stroke="rgba(56,189,248,0.4)"
+                              strokeWidth="1"
+                            />
+                            <text x={Math.max(0, Math.min(380, xPos - 60)) + 60} y={Math.max(10, yPos - 55) + 16} fill="#38BDF8" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace">
+                              {yr}: {proj.carbonPpm} PPM
+                            </text>
+                            <text x={Math.max(0, Math.min(380, xPos - 60)) + 60} y={Math.max(10, yPos - 55) + 32} fill="#F8FAFC" fontSize="9" textAnchor="middle" fontFamily="monospace">
+                              +{proj.tempAnomaly}°C | +{proj.seaLevelCm}cm
+                            </text>
+                          </g>
                         </g>
                       );
                     })}
@@ -400,35 +448,36 @@ export default function Insights() {
                 </div>
               </div>
 
-              {/* Right Col: Dynamic Year Indicator Metrics */}
+              {/* Right Col: Dynamic Year Indicator Metrics with Animated Transitions */}
               <div className="space-y-3">
-                <div className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
-                  {activeYear} Environmental Indicators
+                <div className="text-xs font-mono uppercase tracking-widest text-primary font-bold flex items-center justify-between">
+                  <span>{activeYear} Environmental Indicators</span>
+                  <Badge variant="outline" className="text-[10px] font-mono">LIVE MODELING</Badge>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="glass rounded-xl p-3 border border-white/5">
+                  <motion.div key={`temp-${activeYear}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="glass rounded-xl p-3 border border-white/5 shadow-md">
                     <div className="text-[10px] text-[var(--text-muted)] font-mono">Global Temp Anomaly</div>
                     <div className="text-lg font-bold font-mono text-warning mt-0.5">+{currentProjection.tempAnomaly}°C</div>
-                  </div>
+                  </motion.div>
 
-                  <div className="glass rounded-xl p-3 border border-white/5">
+                  <motion.div key={`sea-${activeYear}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: 0.05 }} className="glass rounded-xl p-3 border border-white/5 shadow-md">
                     <div className="text-[10px] text-[var(--text-muted)] font-mono">Sea Level Rise</div>
                     <div className="text-lg font-bold font-mono text-secondary mt-0.5">+{currentProjection.seaLevelCm} cm</div>
-                  </div>
+                  </motion.div>
 
-                  <div className="glass rounded-xl p-3 border border-white/5">
+                  <motion.div key={`forest-${activeYear}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: 0.1 }} className="glass rounded-xl p-3 border border-white/5 shadow-md">
                     <div className="text-[10px] text-[var(--text-muted)] font-mono">Forest Coverage</div>
                     <div className="text-lg font-bold font-mono text-primary mt-0.5">{currentProjection.forestCoverage}%</div>
-                  </div>
+                  </motion.div>
 
-                  <div className="glass rounded-xl p-3 border border-white/5">
+                  <motion.div key={`bio-${activeYear}`} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: 0.15 }} className="glass rounded-xl p-3 border border-white/5 shadow-md">
                     <div className="text-[10px] text-[var(--text-muted)] font-mono">Biodiversity Index</div>
                     <div className="text-lg font-bold font-mono text-accent mt-0.5">{currentProjection.biodiversityPct}%</div>
-                  </div>
+                  </motion.div>
                 </div>
 
-                <div className="glass rounded-xl p-3 border border-danger/20 bg-danger/5 text-xs">
+                <motion.div key={`status-${activeYear}`} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="glass rounded-xl p-3 border border-danger/20 bg-danger/5 text-xs">
                   <span className="font-bold text-danger font-mono">STATUS ({activeYear}): </span>
                   <span className="text-white">
                     {currentProjection.tempAnomaly > 2.5
@@ -437,7 +486,7 @@ export default function Insights() {
                       ? 'Critical warming threshold exceeded. Accelerated ice sheet loss.'
                       : 'Moderate baseline climate stress.'}
                   </span>
-                </div>
+                </motion.div>
               </div>
             </div>
           </GlassCard>

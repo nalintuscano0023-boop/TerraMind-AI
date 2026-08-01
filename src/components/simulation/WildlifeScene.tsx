@@ -119,8 +119,8 @@ export const WildlifeScene: React.FC<WildlifeSceneProps> = ({ className = '', in
         </div>
       </div>
 
-      {/* Wildlife Selector Tabs */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
+      {/* Wildlife Selector Tabs with Pixel-Perfect Spacing & Uniform Card Heights */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {WILDLIFE_SPECIES.map((w) => {
           const SpeciesIcon = w.icon;
           const isActive = selectedSpecies === w.key;
@@ -128,19 +128,19 @@ export const WildlifeScene: React.FC<WildlifeSceneProps> = ({ className = '', in
             <button
               key={w.key}
               onClick={() => setSelectedSpecies(w.key)}
-              className={`p-3 rounded-2xl text-left transition-all border flex flex-col justify-between ${
+              className={`p-3.5 rounded-2xl text-left transition-all border flex flex-col justify-between h-20 shadow-sm ${
                 isActive
-                  ? 'bg-primary/20 text-white border-primary/50 shadow-glow scale-105'
-                  : 'glass border-white/5 text-[var(--text-muted)] hover:text-white hover:border-white/10'
+                  ? 'bg-primary/20 text-white border-primary/50 shadow-glow scale-[1.03] z-10'
+                  : 'glass border-white/5 text-[var(--text-muted)] hover:text-white hover:border-white/15 hover:bg-white/5'
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <SpeciesIcon className="w-4 h-4" style={{ color: w.color }} />
-                <span className="text-[10px] font-mono font-bold" style={{ color: w.color }}>
+              <div className="flex items-center justify-between mb-1.5 w-full">
+                <SpeciesIcon className="w-4 h-4 flex-shrink-0" style={{ color: w.color }} />
+                <span className="text-[11px] font-mono font-bold tabular-nums" style={{ color: w.color }}>
                   {w.health}%
                 </span>
               </div>
-              <div className="font-bold text-xs text-white">{w.name}</div>
+              <div className="font-bold text-xs text-white tracking-wide truncate">{w.name}</div>
             </button>
           );
         })}
