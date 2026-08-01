@@ -5,26 +5,26 @@
 
 @layer base {
   :root {
-    --bg: #050B18;
-    --surface: #081625;
-    --card: #0c1e34;
-    --text: #F0F6FF;
-    --text-muted: #7A9CC4;
-    --primary: #00E5A8;
-    --primary-light: #00FFB9;
-    --secondary: #38BDF8;
-    --accent: #60A5FA;
-    --warning: #F59E0B;
-    --danger: #EF4444;
-    --success: #10B981;
-    --ink: #050B18;
-    --border: rgba(56, 189, 248, 0.10);
-    --glass: rgba(8, 22, 37, 0.72);
-    --glass-border: rgba(56, 189, 248, 0.14);
-    --grid-color: rgba(56, 189, 248, 0.04);
-    --aurora-1: rgba(0, 229, 168, 0.5);
-    --aurora-2: rgba(56, 189, 248, 0.4);
-    --nasa-green: #00E5A8;
+    --bg: #040B16;
+    --surface: #081220;
+    --card: #0D1B2A;
+    --text: #F8FAFC;
+    --text-muted: #94A3B8;
+    --primary: #2EE6A6;
+    --primary-light: #3DDC97;
+    --secondary: #4CC9F0;
+    --accent: #4CC9F0;
+    --warning: #FFD166;
+    --danger: #FF5D73;
+    --success: #7CFFB2;
+    --ink: #040B16;
+    --border: rgba(255, 255, 255, 0.08);
+    --glass: rgba(8, 18, 32, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --grid-color: rgba(76, 201, 240, 0.04);
+    --aurora-1: rgba(46, 230, 166, 0.45);
+    --aurora-2: rgba(76, 201, 240, 0.35);
+    --nasa-green: #2EE6A6;
   }
 
   .light {
