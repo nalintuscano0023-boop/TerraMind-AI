@@ -34,17 +34,13 @@ export const Slider: React.FC<SliderProps> = ({
   // Thumb diameter in px
   const THUMB_SIZE = 22;
 
-  // Calculate exact left offset so thumb never clips edges at 0% or 100%
-  // Formula: left = calc(P% - (P / 100) * THUMB_SIZE px)
-  const thumbLeft = `calc(${percentage}% - ${(percentage / 100) * THUMB_SIZE}px)`;
-
   return (
     <div className={`relative w-full py-2 select-none ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className}`}>
-      {/* Container for track and thumb alignment */}
-      <div className="relative w-full h-6 flex items-center">
+      {/* Outer alignment box with horizontal inset padding for thumb bounds */}
+      <div className="relative w-full h-7 flex items-center px-[11px] box-border">
         {/* Background Track - 8px height */}
-        <div className="absolute inset-x-0 h-2 rounded-full bg-[#0a1628]/90 border border-sky-500/15 overflow-hidden pointer-events-none shadow-inner">
-          {/* Filled Progress Bar - 8px height matching track */}
+        <div className="absolute inset-x-2.5 h-2 rounded-full bg-[#0a1628]/95 border border-sky-500/20 overflow-hidden pointer-events-none shadow-inner">
+          {/* Filled Progress Bar */}
           <div
             className={`h-full rounded-full ${isDragging ? '' : 'transition-[width] duration-150 ease-out'}`}
             style={{
@@ -57,25 +53,31 @@ export const Slider: React.FC<SliderProps> = ({
           />
         </div>
 
-        {/* Visual Thumb - Always vertically centered at top: 50% with translateY(-50%) */}
-        <div
-          className={`absolute pointer-events-none rounded-full bg-white flex items-center justify-center border-2 shadow-[0_0_12px_rgba(0,229,168,0.5),0_2px_6px_rgba(0,0,0,0.6)] ${
-            isFocused ? 'ring-2 ring-[#00E5A8]/50 ring-offset-2 ring-offset-[#040d1a]' : ''
-          } ${isDragging ? 'shadow-[0_0_20px_rgba(0,229,168,0.8),0_0_30px_rgba(56,189,248,0.5)]' : 'transition-[left,box-shadow] duration-150 ease-out'}`}
-          style={{
-            left: thumbLeft,
-            width: `${THUMB_SIZE}px`,
-            height: `${THUMB_SIZE}px`,
-            top: '50%',
-            transform: `translateY(-50%) scale(${isDragging ? 1.22 : 1})`,
-            borderColor: accentColor || '#00E5A8',
-          }}
-        >
-          {/* Subtle inner core dot */}
-          <div className="w-1.5 h-1.5 rounded-full bg-[#040d1a]" />
+        {/* Inner Track Area for 0% to 100% position calculations */}
+        <div className="relative w-full h-full pointer-events-none">
+          {/* Visual Thumb - Strictly centered at top: 50%, left: percentage%, translate(-50%, -50%) */}
+          <div
+            className={`absolute pointer-events-none rounded-full bg-white flex items-center justify-center border-2 shadow-[0_0_12px_rgba(0,229,168,0.5),0_2px_6px_rgba(0,0,0,0.6)] ${
+              isFocused ? 'ring-2 ring-[#00E5A8]/60 ring-offset-2 ring-offset-[#040d1a]' : ''
+            } ${isDragging ? 'shadow-[0_0_20px_rgba(0,229,168,0.9),0_0_30px_rgba(56,189,248,0.6)]' : 'transition-[left,box-shadow] duration-150 ease-out'}`}
+            style={{
+              left: `${percentage}%`,
+              top: '50%',
+              transform: `translate(-50%, -50%) scale(${isDragging ? 1.25 : 1})`,
+              width: `${THUMB_SIZE}px`,
+              height: `${THUMB_SIZE}px`,
+              borderColor: accentColor || '#00E5A8',
+              margin: 0,
+              padding: 0,
+              boxSizing: 'border-box',
+            }}
+          >
+            {/* Subtle inner core dot */}
+            <div className="w-1.5 h-1.5 rounded-full bg-[#040d1a]" />
+          </div>
         </div>
 
-        {/* Accessible Native Range Input Overlay */}
+        {/* Accessible Native Range Input Overlay - Full Overlay Reset */}
         <input
           type="range"
           min={min}
@@ -90,8 +92,11 @@ export const Slider: React.FC<SliderProps> = ({
           onTouchEnd={() => setIsDragging(false)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-grab active:cursor-grabbing z-20 appearance-none m-0 p-0"
-          style={{ WebkitAppearance: 'none' }}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-grab active:cursor-grabbing z-20 m-0 p-0 border-none outline-none appearance-none"
+          style={{
+            WebkitAppearance: 'none',
+            MozAppearance: 'none',
+          }}
           aria-label={ariaLabel || label || 'Slider'}
         />
       </div>

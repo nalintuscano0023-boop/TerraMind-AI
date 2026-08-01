@@ -224,58 +224,165 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
         />
       </div>
 
-      {/* 8. SINGLE WEATHER PARTICLES (NO STACKING) */}
+      {/* 8. DYNAMIC WEATHER ENGINE (RAIN, STORM, SNOW, FOG) */}
+
+      {/* --- RAIN PROTOCOL --- */}
       {weather === 'rain' && (
         <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
-          {Array.from({ length: 25 }).map((_, i) => (
+          {/* Layer 1: Back Ambient Rain Drops */}
+          {Array.from({ length: 30 }).map((_, i) => (
             <motion.div
-              key={`rain-${i}`}
-              className="absolute w-0.5 h-4 bg-sky-200/80 rounded-full"
-              style={{ left: `${(i * 4) % 100}%`, top: '-10%', transform: 'rotate(-15deg)' }}
-              animate={{ y: ['0%', '120%'] }}
-              transition={{ duration: 0.8 + (i % 3) * 0.1, repeat: Infinity, ease: 'linear', delay: (i * 0.04) % 0.5 }}
+              key={`rain-back-${i}`}
+              className="absolute w-0.5 h-3.5 bg-sky-200/50 rounded-full"
+              style={{ left: `${(i * 3.3 + 1.5) % 100}%`, top: '-10%', transform: 'rotate(-15deg)' }}
+              animate={{ y: [0, 380] }}
+              transition={{ duration: 0.75 + (i % 3) * 0.1, repeat: Infinity, ease: 'linear', delay: (i * 0.03) % 0.6 }}
             />
           ))}
-        </div>
-      )}
 
-      {weather === 'storm' && (
-        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
-          {/* Heavy Diagonal Rain */}
-          {Array.from({ length: 45 }).map((_, i) => (
+          {/* Layer 2: Front Fast Rain Drops Traveling Full Viewport Height */}
+          {Array.from({ length: 35 }).map((_, i) => (
             <motion.div
-              key={`storm-rain-${i}`}
-              className="absolute w-0.5 h-6 bg-sky-100/90 rounded-full"
-              style={{ left: `${(i * 2.2) % 100}%`, top: '-10%', transform: 'rotate(-25deg)' }}
-              animate={{ y: ['0%', '120%'], x: ['0%', '-30%'] }}
+              key={`rain-front-${i}`}
+              className="absolute w-0.5 h-5 bg-sky-100/85 rounded-full shadow-sm"
+              style={{ left: `${(i * 2.8) % 100}%`, top: '-12%', transform: 'rotate(-15deg)' }}
+              animate={{ y: [0, 420], x: [0, -35] }}
               transition={{ duration: 0.45 + (i % 3) * 0.05, repeat: Infinity, ease: 'linear', delay: (i * 0.02) % 0.4 }}
             />
           ))}
-          {/* Lightning Flash */}
-          <motion.div
-            className="absolute inset-0 bg-white/35 pointer-events-none z-8"
-            animate={{ opacity: [0, 0.9, 0, 0.6, 0] }}
-            transition={{ duration: 4, repeat: Infinity, repeatDelay: 2 }}
-          />
-        </div>
-      )}
 
-      {weather === 'snow' && (
-        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
-          {Array.from({ length: 30 }).map((_, i) => (
+          {/* River & Ground Rain Splashes & Surface Ripples */}
+          {Array.from({ length: 8 }).map((_, i) => (
             <motion.div
-              key={`snow-${i}`}
-              className="absolute rounded-full bg-white/90 shadow-sm"
-              style={{ left: `${(i * 3.3) % 100}%`, top: '-5%', width: 3 + (i % 3), height: 3 + (i % 3) }}
-              animate={{ y: ['0%', '110%'], x: ['0%', `${i % 2 === 0 ? 15 : -15}%`] }}
-              transition={{ duration: 2.5 + (i % 4) * 0.5, repeat: Infinity, ease: 'linear', delay: (i * 0.1) % 1.5 }}
+              key={`rain-splash-${i}`}
+              className="absolute bottom-[16%] rounded-full border border-sky-200/70 pointer-events-none"
+              style={{ left: `${10 + i * 11}%`, width: 14, height: 6 }}
+              animate={{ scale: [0.3, 1.8], opacity: [0.9, 0] }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: (i * 0.12) % 0.8, ease: 'easeOut' }}
             />
           ))}
         </div>
       )}
 
+      {/* --- STORM PROTOCOL --- */}
+      {weather === 'storm' && (
+        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
+          {/* Storm Sky & Screen Darkening */}
+          <div className="absolute inset-0 bg-slate-950/45 z-7" />
+
+          {/* Heavy Wind-Driven Diagonal Rain (80+ Particles Across 2 Layers) */}
+          {Array.from({ length: 45 }).map((_, i) => (
+            <motion.div
+              key={`storm-rain-1-${i}`}
+              className="absolute w-0.5 h-7 bg-sky-100/90 rounded-full"
+              style={{ left: `${(i * 2.2) % 100}%`, top: '-15%', transform: 'rotate(-28deg)' }}
+              animate={{ y: [0, 440], x: [0, -60] }}
+              transition={{ duration: 0.35 + (i % 3) * 0.04, repeat: Infinity, ease: 'linear', delay: (i * 0.015) % 0.35 }}
+            />
+          ))}
+          {Array.from({ length: 35 }).map((_, i) => (
+            <motion.div
+              key={`storm-rain-2-${i}`}
+              className="absolute w-0.5 h-5 bg-sky-200/60 rounded-full"
+              style={{ left: `${(i * 2.9 + 1) % 100}%`, top: '-15%', transform: 'rotate(-28deg)' }}
+              animate={{ y: [0, 440], x: [0, -60] }}
+              transition={{ duration: 0.5 + (i % 3) * 0.05, repeat: Infinity, ease: 'linear', delay: (i * 0.02) % 0.4 }}
+            />
+          ))}
+
+          {/* SVG Multi-Branch Lightning Bolt Strike */}
+          <motion.svg
+            className="absolute inset-0 w-full h-full z-8 pointer-events-none"
+            viewBox="0 0 400 320"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0, 0.8, 0, 0] }}
+            transition={{ duration: 4.2, repeat: Infinity, repeatDelay: 1.8 }}
+          >
+            <path
+              d="M 220 0 L 195 90 L 225 105 L 175 210 L 205 220 L 160 320"
+              stroke="#FFFFFF"
+              strokeWidth="2.5"
+              fill="none"
+              style={{ filter: 'drop-shadow(0 0 12px #38BDF8)' }}
+            />
+            <path
+              d="M 195 90 L 160 130"
+              stroke="#E0F2FE"
+              strokeWidth="1.5"
+              fill="none"
+            />
+          </motion.svg>
+
+          {/* Full Screen Lightning Flash */}
+          <motion.div
+            className="absolute inset-0 bg-white/40 pointer-events-none z-8"
+            animate={{ opacity: [0, 0.95, 0, 0.7, 0, 0] }}
+            transition={{ duration: 4.2, repeat: Infinity, repeatDelay: 1.8 }}
+          />
+
+          {/* Heavy River Water Waves & Splash Ripples */}
+          {Array.from({ length: 10 }).map((_, i) => (
+            <motion.div
+              key={`storm-splash-${i}`}
+              className="absolute bottom-[15%] rounded-full border-2 border-sky-100/90 pointer-events-none"
+              style={{ left: `${5 + i * 9.5}%`, width: 18, height: 7 }}
+              animate={{ scale: [0.2, 2.2], opacity: [1, 0] }}
+              transition={{ duration: 0.6, repeat: Infinity, delay: (i * 0.08) % 0.6, ease: 'easeOut' }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* --- SNOW PROTOCOL --- */}
+      {weather === 'snow' && (
+        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
+          {/* Cold Atmosphere Tint */}
+          <div className="absolute inset-0 bg-sky-950/20 z-7" />
+
+          {/* Floating Snowflakes with Sinusoidal Wind Sway Traveling Full Height */}
+          {Array.from({ length: 40 }).map((_, i) => {
+            const flakeSize = 2.5 + (i % 4) * 1.2;
+            return (
+              <motion.div
+                key={`snow-${i}`}
+                className="absolute rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.9)]"
+                style={{
+                  left: `${(i * 2.5) % 100}%`,
+                  top: '-8%',
+                  width: flakeSize,
+                  height: flakeSize,
+                }}
+                animate={{
+                  y: [0, 390],
+                  x: [0, Math.sin(i) * 25, Math.cos(i) * -20, 0],
+                }}
+                transition={{
+                  duration: 3.2 + (i % 5) * 0.6,
+                  repeat: Infinity,
+                  ease: 'linear',
+                  delay: (i * 0.08) % 1.6,
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {/* --- FOG PROTOCOL --- */}
       {weather === 'fog' && (
-        <div className="absolute inset-0 bg-slate-400/35 backdrop-blur-[2px] z-7 pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none z-7 overflow-hidden">
+          {/* Multi-Layer Horizontal Drifting Volumetric Fog */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-slate-400/30 via-slate-300/40 to-slate-400/30 backdrop-blur-[2px]"
+            animate={{ x: ['-15%', '15%', '-15%'] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-300/25 to-slate-400/40"
+            animate={{ x: ['10%', '-10%', '10%'] }}
+            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </div>
       )}
 
       {/* Industrial Smoke Plumes */}
