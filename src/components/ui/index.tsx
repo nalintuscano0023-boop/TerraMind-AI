@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useCountUp } from '@/hooks/useUi';
 export { GlassCard, SectionTitle } from '@/components/ui/GlassCard';
 export { Slider } from '@/components/ui/Slider';
+export { WildlifeCanvas } from '@/components/ui/WildlifeCanvas';
 
 interface StatCounterProps {
   value: number;
