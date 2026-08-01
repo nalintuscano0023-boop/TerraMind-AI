@@ -3,8 +3,7 @@ import { motion } from 'framer-motion';
 import {
   AlertTriangle, Cloud, Bird,
   Droplets, Trees, Wind, TrendingUp,
-  BarChart3, Activity, Waves,
-  ThermometerSun
+  BarChart3, Activity, Waves, ThermometerSun
 } from 'lucide-react';
 import { GlassCard, SectionTitle, Badge, ProgressBar, Slider, OceanHealthCanvas } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';

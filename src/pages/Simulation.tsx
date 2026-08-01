@@ -128,7 +128,6 @@ export default function Simulation() {
                   weather={weather}
                   droneMode={droneMode}
                   droneAltitude={droneAltitude}
-                  wildlifeMode={wildlifeMode}
                   treeDensity={treeDensity}
                   factoryLevel={factoryLevel}
                   solarLevel={solarLevel}
@@ -356,7 +355,6 @@ function EcosystemViewport({
   weather,
   droneMode,
   droneAltitude,
-  wildlifeMode,
   treeDensity,
   factoryLevel,
   solarLevel,
@@ -369,7 +367,6 @@ function EcosystemViewport({
   weather: Weather;
   droneMode: boolean;
   droneAltitude: number;
-  wildlifeMode: WildlifeMode;
   treeDensity: number;
   factoryLevel: number;
   solarLevel: number;
