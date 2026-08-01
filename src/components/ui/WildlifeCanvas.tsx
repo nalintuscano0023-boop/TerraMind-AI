@@ -19,6 +19,11 @@ interface Creature {
   secondaryColor: string;
   targetAngle: number;
   currentAngle: number;
+  deerState?: 'walking' | 'running' | 'jumping' | 'grazing' | 'looking' | 'idle';
+  deerTimer?: number;
+  jumpProgress?: number;
+  headAngle?: number;
+  legCycle?: number;
 }
 
 interface Bubble {
@@ -302,17 +307,241 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
           ctx.restore();
         });
       } else if (type === 'deer') {
-        // --- 🌲 WOODLAND FOREST HABITAT ---
+        // --- 🦌 REALISTIC WOODLAND HABITAT & HERD SIMULATION ---
         const forestGrad = ctx.createLinearGradient(0, 0, 0, height);
-        forestGrad.addColorStop(0, '#0f172a');
-        forestGrad.addColorStop(0.5, '#166534');
-        forestGrad.addColorStop(1, '#14532d');
+        forestGrad.addColorStop(0, '#0a131f');
+        forestGrad.addColorStop(0.4, '#113524');
+        forestGrad.addColorStop(1, '#144d32');
         ctx.fillStyle = forestGrad;
         ctx.fillRect(0, 0, width, height);
 
-        // Woodland Grass Floor
+        // Parallax Background Canopy Trees
+        for (let b = 0; b < 6; b++) {
+          const treeX = 30 + b * (width / 5) + Math.sin(t * 0.2 + b) * 8;
+          ctx.fillStyle = b % 2 === 0 ? 'rgba(20, 83, 45, 0.65)' : 'rgba(15, 118, 62, 0.55)';
+          ctx.beginPath();
+          ctx.ellipse(treeX, height - 70, 24, 55, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#451A03';
+          ctx.fillRect(treeX - 3, height - 70, 6, 40);
+        }
+
+        // Woodland Terrain Rocks & Fallen Log
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.ellipse(80, height - 22, 18, 9, -0.1, 0, Math.PI * 2);
+        ctx.ellipse(width - 120, height - 25, 24, 11, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fallen Log
+        ctx.fillStyle = '#78350F';
+        ctx.beginPath();
+        ctx.ellipse(width * 0.45, height - 18, 35, 7, 0.05, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#451A03';
+        ctx.beginPath();
+        ctx.ellipse(width * 0.45 - 33, height - 18, 4, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Woodland Grass Floor & Wildflowers
         ctx.fillStyle = '#15803d';
-        ctx.fillRect(0, height - 35, width, 35);
+        ctx.fillRect(0, height - 28, width, 28);
+
+        for (let g = 0; g < 15; g++) {
+          const gx = 15 + g * (width / 14);
+          const sway = Math.sin(t * 2 + g) * 3;
+          ctx.strokeStyle = g % 2 === 0 ? '#22C55E' : '#166534';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.moveTo(gx, height - 28);
+          ctx.lineTo(gx + sway, height - 42);
+          ctx.moveTo(gx + 4, height - 28);
+          ctx.lineTo(gx + 4 + sway * 0.8, height - 38);
+          ctx.stroke();
+
+          // Wildflower Blossom
+          if (g % 3 === 0) {
+            ctx.fillStyle = g % 6 === 0 ? '#EC4899' : '#F59E0B';
+            ctx.beginPath();
+            ctx.arc(gx + sway, height - 43, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // --- DEER HERD PHYSICS & ANIMATION ---
+        creatures.forEach((c, idx) => {
+          // Initialize state machine properties if absent
+          if (!c.deerState) {
+            c.deerState = idx === 0 ? 'walking' : idx === 1 ? 'grazing' : 'idle';
+            c.deerTimer = 60 + Math.floor(Math.random() * 120);
+            c.jumpProgress = 0;
+            c.headAngle = 0;
+            c.legCycle = idx * 1.2;
+          }
+
+          // State Machine Transition Logic
+          c.deerTimer -= 1;
+          if (c.deerTimer <= 0) {
+            const states: Array<'walking' | 'running' | 'jumping' | 'grazing' | 'looking' | 'idle'> = [
+              'walking', 'walking', 'grazing', 'grazing', 'looking', 'idle', 'running', 'jumping'
+            ];
+            c.deerState = states[Math.floor(Math.random() * states.length)];
+            c.deerTimer = c.deerState === 'jumping' ? 45 : c.deerState === 'grazing' ? 140 : 80 + Math.floor(Math.random() * 100);
+            if (c.deerState === 'jumping') c.jumpProgress = 0;
+          }
+
+          // Herd Separation & Cohesion (Avoid Collision / Overlapping)
+          creatures.forEach((other, oIdx) => {
+            if (idx !== oIdx) {
+              const distX = Math.abs(c.x - other.x);
+              if (distX < 45) {
+                c.x += c.x > other.x ? 0.6 : -0.6;
+              }
+            }
+          });
+
+          // State Behaviors
+          let moveSpeed = 0;
+          let yOffset = 0;
+          let headTargetAngle = 0;
+
+          if (c.deerState === 'walking') {
+            moveSpeed = 0.75 * speedMultiplier;
+            c.legCycle += 0.12 * speedMultiplier;
+            headTargetAngle = Math.sin(t * 3 + idx) * 0.08;
+          } else if (c.deerState === 'running') {
+            moveSpeed = 2.2 * speedMultiplier;
+            c.legCycle += 0.25 * speedMultiplier;
+            headTargetAngle = 0.15;
+          } else if (c.deerState === 'jumping') {
+            moveSpeed = 1.8 * speedMultiplier;
+            c.jumpProgress = Math.min(1, c.jumpProgress + 0.025 * speedMultiplier);
+            yOffset = -Math.sin(c.jumpProgress * Math.PI) * 32;
+            c.legCycle += 0.2;
+            headTargetAngle = -0.2;
+          } else if (c.deerState === 'grazing') {
+            moveSpeed = 0.05;
+            headTargetAngle = 0.75; // Head lowered to grass
+          } else if (c.deerState === 'looking') {
+            moveSpeed = 0;
+            headTargetAngle = -0.35 + Math.sin(t * 1.5) * 0.25; // Looking up & around
+          } else {
+            // Idle
+            moveSpeed = 0;
+            headTargetAngle = Math.sin(t * 2 + idx) * 0.05;
+          }
+
+          c.x += moveSpeed;
+          if (c.x > width + 50) c.x = -50;
+
+          // Head Angle Lerp
+          c.headAngle += (headTargetAngle - c.headAngle) * 0.1;
+
+          // Draw Articulated Deer Body
+          ctx.save();
+          const baseGroundY = height - 32 + yOffset;
+          const breathingScale = 1 + Math.sin(t * 2.5 + idx) * 0.02;
+          ctx.translate(c.x, baseGroundY);
+          ctx.scale(breathingScale, breathingScale);
+
+          // 1. Articulated Legs (4 Legs with Knee/Hock Joints)
+          ctx.strokeStyle = '#D97706'; // Warm Cervid Brown
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = 'round';
+
+          const legSwing1 = Math.sin(c.legCycle) * 12;
+          const legSwing2 = Math.sin(c.legCycle + Math.PI) * 12;
+
+          // Hind Legs (Back Left & Right)
+          ctx.beginPath();
+          ctx.moveTo(-10, 6);
+          ctx.lineTo(-12 - legSwing1 * 0.5, 15);
+          ctx.lineTo(-10 - legSwing1, 24);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(-4, 6);
+          ctx.lineTo(-6 - legSwing2 * 0.5, 15);
+          ctx.lineTo(-4 - legSwing2, 24);
+          ctx.stroke();
+
+          // Fore Legs (Front Left & Right)
+          ctx.beginPath();
+          ctx.moveTo(8, 6);
+          ctx.lineTo(10 + legSwing2 * 0.5, 15);
+          ctx.lineTo(8 + legSwing2, 24);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(14, 6);
+          ctx.lineTo(16 + legSwing1 * 0.5, 15);
+          ctx.lineTo(14 + legSwing1, 24);
+          ctx.stroke();
+
+          // 2. Main Deer Body (Torso & Flank)
+          ctx.fillStyle = c.color || '#B45309';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 18, 10, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Underbelly Highlight
+          ctx.fillStyle = '#FDE68A';
+          ctx.beginPath();
+          ctx.ellipse(-2, 3, 12, 5, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Tail Flick
+          const tailFlick = Math.sin(t * 4 + idx) * 0.4;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.ellipse(-18, -3 + tailFlick * 2, 4, 3, -0.4 + tailFlick, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 3. Neck & Articulated Head (Rotates on headAngle)
+          ctx.save();
+          ctx.translate(14, -6);
+          ctx.rotate(c.headAngle);
+
+          // Neck
+          ctx.fillStyle = c.color || '#B45309';
+          ctx.beginPath();
+          ctx.ellipse(4, -6, 5, 9, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Head & Snout
+          ctx.beginPath();
+          ctx.ellipse(9, -12, 6, 4.5, 0.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Eye
+          ctx.fillStyle = '#0F172A';
+          ctx.beginPath();
+          ctx.arc(10, -13.5, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Twitching Ears
+          const earTwitch = Math.sin(t * 6 + idx) * 0.15;
+          ctx.fillStyle = c.secondaryColor || '#78350F';
+          ctx.beginPath();
+          ctx.ellipse(6, -17 + earTwitch * 3, 3, 1.5, -0.8 + earTwitch, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Branching Antlers (For Bucks)
+          if (idx % 2 === 0) {
+            ctx.strokeStyle = '#78350F';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(7, -15);
+            ctx.lineTo(10, -24);
+            ctx.lineTo(14, -22);
+            ctx.moveTo(10, -24);
+            ctx.lineTo(8, -28);
+            ctx.stroke();
+          }
+
+          ctx.restore(); // End Head Transform
+          ctx.restore(); // End Deer Body Transform
+        });
       }
 
       /* =========================================================

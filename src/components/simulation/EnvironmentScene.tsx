@@ -69,17 +69,43 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
         transform: droneMode ? `scale(${1 + (500 - droneAltitude) / 1000})` : 'scale(1)',
       }}
     >
-      {/* 1. Stars & Moon in Night Cycle */}
+      {/* 1. Stars & Moon in Night Cycle (Organic Random Distribution) */}
       {dayCycle === 'night' && (
         <div className="absolute inset-0 opacity-90 pointer-events-none z-1">
-          {Array.from({ length: 35 }).map((_, i) => (
+          {/* Multi-layer organic stars with deterministic pseudo-random positions */}
+          {[
+            { top: '8%',  left: '12%', size: 2,   delay: '0.2s', opacity: 0.9 },
+            { top: '15%', left: '44%', size: 1.5, delay: '1.1s', opacity: 0.7 },
+            { top: '22%', left: '78%', size: 2.5, delay: '0.5s', opacity: 1.0 },
+            { top: '35%', left: '25%', size: 1,   delay: '1.8s', opacity: 0.6 },
+            { top: '18%', left: '62%', size: 2,   delay: '0.9s', opacity: 0.8 },
+            { top: '42%', left: '88%', size: 1.5, delay: '2.3s', opacity: 0.75 },
+            { top: '10%', left: '33%', size: 1,   delay: '0.4s', opacity: 0.65 },
+            { top: '29%', left: '07%', size: 2,   delay: '1.4s', opacity: 0.85 },
+            { top: '06%', left: '91%', size: 1.5, delay: '0.7s', opacity: 0.7 },
+            { top: '38%', left: '53%', size: 2.5, delay: '2.1s', opacity: 0.95 },
+            { top: '27%', left: '38%', size: 1,   delay: '1.6s', opacity: 0.55 },
+            { top: '14%', left: '21%', size: 2,   delay: '0.3s', opacity: 0.9 },
+            { top: '48%', left: '16%', size: 1.5, delay: '2.7s', opacity: 0.8 },
+            { top: '20%', left: '84%', size: 1,   delay: '1.2s', opacity: 0.6 },
+            { top: '09%', left: '68%', size: 2,   delay: '0.1s', opacity: 0.85 },
+            { top: '32%', left: '71%', size: 1.5, delay: '1.9s', opacity: 0.75 },
+            { top: '45%', left: '41%', size: 2,   delay: '2.4s', opacity: 0.9 },
+            { top: '12%', left: '51%', size: 1,   delay: '0.8s', opacity: 0.5 },
+            { top: '25%', left: '96%', size: 2.5, delay: '1.5s', opacity: 1.0 },
+            { top: '39%', left: '03%', size: 1.5, delay: '2.0s', opacity: 0.7 },
+          ].map((star, i) => (
             <div
               key={`star-${i}`}
-              className="absolute w-1 h-1 rounded-full bg-white animate-pulse"
+              className="absolute rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,0.8)] animate-pulse"
               style={{
-                top: `${(i * 17) % 65}%`,
-                left: `${(i * 23) % 95}%`,
-                animationDelay: `${i * 0.15}s`,
+                top: star.top,
+                left: star.left,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                opacity: star.opacity,
+                animationDelay: star.delay,
+                animationDuration: `${2 + (i % 3) * 0.8}s`,
               }}
             />
           ))}
