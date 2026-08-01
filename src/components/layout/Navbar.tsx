@@ -82,26 +82,19 @@ export function Navbar() {
                     to={item.to}
                     end={item.to === '/'}
                     className={({ isActive }) =>
-                      `relative px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
+                      `relative px-4 py-2 h-8 rounded-full text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 leading-none ${
                         isActive ? 'text-primary' : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                       }`
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <Icon className="w-3.5 h-3.5" />
-                        <span>{item.label}</span>
+                        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="leading-none flex items-center">{item.label}</span>
                         {isActive && (
                           <motion.div
                             layoutId="nav-active"
                             className="absolute inset-0 rounded-full bg-primary/15 border border-primary/25 -z-10"
-                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                          />
-                        )}
-                        {isActive && (
-                          <motion.div
-                            layoutId="nav-dot"
-                            className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-glow"
                             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                           />
                         )}
