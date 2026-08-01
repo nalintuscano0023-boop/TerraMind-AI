@@ -5,6 +5,7 @@ type WildlifeType = 'bird' | 'fish' | 'butterfly' | 'bee' | 'deer' | 'turtle' | 
 interface WildlifeCanvasProps {
   type: WildlifeType;
   className?: string;
+  speedMultiplier?: number;
 }
 
 interface Creature {
@@ -42,7 +43,7 @@ interface Flower {
   petalCount: number;
 }
 
-export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className = '' }) => {
+export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className = '', speedMultiplier = 1 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -156,7 +157,7 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
     }
 
     const render = () => {
-      t += 0.025;
+      t += 0.025 * speedMultiplier;
       ctx.clearRect(0, 0, width, height);
 
       /* =========================================================
@@ -540,7 +541,7 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [type]);
+  }, [type, speedMultiplier]);
 
   if (type === 'none') return null;
 

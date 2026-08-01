@@ -86,15 +86,20 @@ const WILDLIFE_SPECIES: WildlifeMeta[] = [
   },
 ];
 
-export const WildlifeScene: React.FC = () => {
-  const [selectedSpecies, setSelectedSpecies] = useState<WildlifeType>('fish');
+export interface WildlifeSceneProps {
+  className?: string;
+  initialSpecies?: WildlifeType;
+}
+
+export const WildlifeScene: React.FC<WildlifeSceneProps> = ({ className = '', initialSpecies = 'fish' }) => {
+  const [selectedSpecies, setSelectedSpecies] = useState<WildlifeType>(initialSpecies);
   const [animSpeed, setAnimSpeed]               = useState<number>(1);
 
   const activeMeta = WILDLIFE_SPECIES.find((s) => s.key === selectedSpecies) ?? WILDLIFE_SPECIES[1];
   const Icon = activeMeta.icon;
 
   return (
-    <GlassCard className="p-6 relative overflow-hidden border-primary/20 bg-gradient-to-b from-[#0a1628] to-[#040d1a]">
+    <GlassCard className={`p-6 relative overflow-hidden border-primary/20 bg-gradient-to-b from-[#0a1628] to-[#040d1a] ${className}`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -144,7 +149,7 @@ export const WildlifeScene: React.FC = () => {
       {/* Large Interactive Wildlife Canvas Viewport */}
       <div className="relative h-[360px] rounded-2xl overflow-hidden shadow-2xl border border-white/10 mb-6 bg-slate-950">
         {/* Canvas Engine */}
-        <WildlifeCanvas type={selectedSpecies} />
+        <WildlifeCanvas type={selectedSpecies} speedMultiplier={animSpeed} />
 
         {/* Top Active Telemetry Badge Overlay */}
         <div className="absolute top-3 left-3 z-30 bg-black/70 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/15 text-xs font-mono font-bold text-white flex items-center gap-2 shadow-xl">
