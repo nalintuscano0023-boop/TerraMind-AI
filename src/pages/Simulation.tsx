@@ -140,6 +140,23 @@ export default function Simulation() {
                 {/* Procedural Canvas Wildlife Viewport Overlay */}
                 <WildlifeCanvas type={wildlifeMode} />
 
+                {/* Active Environment Telemetry Status Badge */}
+                <div className="absolute top-3 left-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15 text-[11px] font-mono font-bold text-white flex items-center gap-2 shadow-xl">
+                  <span>{dayCycle === 'night' ? '🌙' : dayCycle === 'sunset' ? '🌇' : dayCycle === 'sunrise' ? '🌅' : '☀️'} {DAY_CYCLES.find((d) => d.key === dayCycle)?.label}</span>
+                  <span className="text-white/30">|</span>
+                  <span>{season === 'winter' ? '❄️' : season === 'autumn' ? '🍂' : season === 'summer' ? '☀️' : '🌸'} {SEASONS.find((s) => s.key === season)?.label}</span>
+                  <span className="text-white/30">|</span>
+                  <span>{weather === 'storm' ? '⚡' : weather === 'rain' ? '🌧️' : weather === 'snow' ? '❄️' : weather === 'fog' ? '🌫️' : '☀️'} {WEATHERS.find((w) => w.key === weather)?.label}</span>
+                  {wildlifeMode !== 'none' && (
+                    <>
+                      <span className="text-white/30">|</span>
+                      <span className="text-primary font-bold">
+                        {wildlifeMode === 'fish' ? '🐟 Underwater Reef' : wildlifeMode === 'turtle' ? '🐢 Underwater Turtle Reef' : wildlifeMode === 'bird' ? '🦅 Sky Flight' : wildlifeMode === 'bee' ? '🐝 Flower Field' : wildlifeMode === 'butterfly' ? '🦋 Meadow' : '🦌 Forest Floor'}
+                      </span>
+                    </>
+                  )}
+                </div>
+
                 {/* Drone Telemetry Overlay */}
                 {droneMode && (
                   <div className="absolute top-3 right-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-secondary/40 text-[11px] font-mono text-secondary flex items-center gap-2">

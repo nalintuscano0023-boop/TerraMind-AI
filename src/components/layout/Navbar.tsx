@@ -12,6 +12,41 @@ const NAV_ITEMS = [
   { to: '/insights', label: 'Insights', icon: BarChart3 },
 ];
 
+interface NavItemProps {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  end?: boolean;
+}
+
+function NavItem({ to, label, icon: Icon, end }: NavItemProps) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        `relative px-4 py-2 h-9 rounded-full text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 leading-none border border-transparent ${
+          isActive ? 'text-primary border-primary/20' : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+        }`
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+          <span className="leading-none flex items-center">{label}</span>
+          {isActive && (
+            <motion.div
+              layoutId="nav-active"
+              className="absolute inset-0 rounded-full bg-primary/15 border border-primary/25 -z-10"
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            />
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
@@ -74,35 +109,9 @@ export function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1 glass rounded-full px-3 py-1.5 border border-primary/10">
-              {NAV_ITEMS.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    end={item.to === '/'}
-                    className={({ isActive }) =>
-                      `relative px-4 py-2 h-8 rounded-full text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 leading-none ${
-                        isActive ? 'text-primary' : 'text-[var(--text-muted)] hover:text-[var(--text)]'
-                      }`
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="leading-none flex items-center">{item.label}</span>
-                        {isActive && (
-                          <motion.div
-                            layoutId="nav-active"
-                            className="absolute inset-0 rounded-full bg-primary/15 border border-primary/25 -z-10"
-                            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                          />
-                        )}
-                      </>
-                    )}
-                  </NavLink>
-                );
-              })}
+              {NAV_ITEMS.map((item) => (
+                <NavItem key={item.to} to={item.to} label={item.label} icon={item.icon} end={item.to === '/'} />
+              ))}
             </div>
 
             {/* Live Health Pill & Controls */}
