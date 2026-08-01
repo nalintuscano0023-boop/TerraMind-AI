@@ -37,9 +37,9 @@ export function Particles({ count = 40, className = '', color }: ParticlesProps)
             opacity: p.opacity,
           }}
           animate={{
-            y: [0, -30, 0],
-            x: [0, 15, 0],
-            opacity: [p.opacity, p.opacity * 1.5, p.opacity],
+            y: [0, -35, 0],
+            x: [0, 18, 0],
+            opacity: [p.opacity, p.opacity * 1.6, p.opacity],
           }}
           transition={{
             duration: p.duration,
@@ -56,9 +56,9 @@ export function Particles({ count = 40, className = '', color }: ParticlesProps)
 export function FloatingShapes() {
   const shapes = useMemo(
     () => [
-      { x: '5%', y: '15%', size: 300, color: 'rgba(0, 229, 168, 0.08)', duration: 18 },
-      { x: '85%', y: '60%', size: 400, color: 'rgba(56, 189, 248, 0.07)', duration: 22 },
-      { x: '60%', y: '20%', size: 250, color: 'rgba(124, 58, 237, 0.06)', duration: 16 },
+      { x: '5%', y: '10%', size: 450, color: 'rgba(0, 229, 168, 0.07)', duration: 18 },
+      { x: '80%', y: '50%', size: 500, color: 'rgba(56, 189, 248, 0.06)', duration: 22 },
+      { x: '50%', y: '15%', size: 350, color: 'rgba(96, 165, 250, 0.05)', duration: 16 },
     ],
     [],
   );
@@ -67,12 +67,13 @@ export function FloatingShapes() {
       {shapes.map((s, i) => (
         <motion.div
           key={i}
-          className="absolute rounded-full blur-3xl"
+          className="absolute rounded-full blur-[120px]"
           style={{ left: s.x, top: s.y, width: s.size, height: s.size, background: s.color }}
-          animate={{ y: [0, 40, 0], x: [0, -20, 0] }}
+          animate={{ y: [0, 50, 0], x: [0, -30, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: s.duration, repeat: Infinity, ease: 'easeInOut' }}
         />
       ))}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050B18]/40 to-[#050B18]" />
     </div>
   );
 }

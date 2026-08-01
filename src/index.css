@@ -5,25 +5,25 @@
 
 @layer base {
   :root {
-    --bg: #040d1a;
-    --surface: #0a1628;
-    --card: #0f1f38;
+    --bg: #050B18;
+    --surface: #081625;
+    --card: #0c1e34;
     --text: #F0F6FF;
     --text-muted: #7A9CC4;
     --primary: #00E5A8;
     --primary-light: #00FFB9;
     --secondary: #38BDF8;
-    --accent: #7C3AED;
+    --accent: #60A5FA;
     --warning: #F59E0B;
     --danger: #EF4444;
     --success: #10B981;
-    --ink: #040d1a;
-    --border: rgba(56, 189, 248, 0.08);
-    --glass: rgba(10, 22, 40, 0.65);
-    --glass-border: rgba(56, 189, 248, 0.12);
-    --grid-color: rgba(56, 189, 248, 0.03);
-    --aurora-1: rgba(0, 229, 168, 0.6);
-    --aurora-2: rgba(124, 58, 237, 0.5);
+    --ink: #050B18;
+    --border: rgba(56, 189, 248, 0.10);
+    --glass: rgba(8, 22, 37, 0.72);
+    --glass-border: rgba(56, 189, 248, 0.14);
+    --grid-color: rgba(56, 189, 248, 0.04);
+    --aurora-1: rgba(0, 229, 168, 0.5);
+    --aurora-2: rgba(56, 189, 248, 0.4);
     --nasa-green: #00E5A8;
   }
 
