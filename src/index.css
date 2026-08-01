@@ -5,26 +5,26 @@
 
 @layer base {
   :root {
-    --bg: #040B16;
-    --surface: #081220;
-    --card: #0D1B2A;
+    --bg: #020712;
+    --surface: #06111F;
+    --card: #081A2C;
     --text: #F8FAFC;
     --text-muted: #94A3B8;
-    --primary: #2EE6A6;
-    --primary-light: #3DDC97;
-    --secondary: #4CC9F0;
-    --accent: #4CC9F0;
-    --warning: #FFD166;
-    --danger: #FF5D73;
-    --success: #7CFFB2;
-    --ink: #040B16;
+    --primary: #00E676;
+    --primary-light: #7CFF7A;
+    --secondary: #00C2FF;
+    --accent: #5DAEFF;
+    --warning: #FFD54A;
+    --danger: #FF4D6D;
+    --success: #00F5A0;
+    --ink: #020712;
     --border: rgba(255, 255, 255, 0.08);
-    --glass: rgba(8, 18, 32, 0.75);
+    --glass: rgba(6, 17, 31, 0.78);
     --glass-border: rgba(255, 255, 255, 0.10);
-    --grid-color: rgba(76, 201, 240, 0.04);
-    --aurora-1: rgba(46, 230, 166, 0.45);
-    --aurora-2: rgba(76, 201, 240, 0.35);
-    --nasa-green: #2EE6A6;
+    --grid-color: rgba(0, 194, 255, 0.04);
+    --aurora-1: rgba(0, 230, 118, 0.45);
+    --aurora-2: rgba(0, 194, 255, 0.35);
+    --nasa-green: #00E676;
   }
 
   .light {
