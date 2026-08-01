@@ -1,27 +1,50 @@
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  AlertTriangle, Cloud, Bird,
-  Brain, Zap, Globe2,
+  AlertTriangle, Cloud, Bird, Zap,
   Droplets, Trees, Wind, TrendingDown, TrendingUp,
   BarChart3, Activity, Waves,
-  ThermometerSun, Mail, MapPin,
+  ThermometerSun, Mail, MapPin, Play, RotateCcw, ShieldCheck, Compass, Sparkles, CheckCircle2
 } from 'lucide-react';
 import { GlassCard, SectionTitle, Badge, ProgressBar, Slider } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 
 /* =========================================================
-   DATA
+   DATA & TIMELINE PROJECTIONS
    ========================================================= */
 const RISK_METRICS = [
-  { label: 'Forest Risk',   value: 72, icon: Trees,          color: '#00E5A8', desc: 'Deforestation at 4.7M ha/yr',   trend: 'up'   },
-  { label: 'Ocean Risk',    value: 65, icon: Waves,          color: '#38BDF8', desc: 'Acidification pH 8.08',         trend: 'up'   },
-  { label: 'Air Quality',   value: 58, icon: Wind,           color: '#F59E0B', desc: 'PM2.5 above WHO limits',        trend: 'up'   },
-  { label: 'Climate Risk',  value: 79, icon: ThermometerSun, color: '#EF4444', desc: '+1.4°C above baseline',        trend: 'up'   },
-  { label: 'Biodiversity',  value: 61, icon: Bird,           color: '#7C3AED', desc: '1M species at extinction risk', trend: 'up'   },
-  { label: 'Water Security',value: 43, icon: Droplets,       color: '#06B6D4', desc: '2B people lack clean access',  trend: 'same' },
+  { label: 'Forest Risk',    value: 72, icon: Trees,          color: '#00E5A8', desc: 'Deforestation at 4.7M ha/yr',   trend: 'up'   },
+  { label: 'Ocean Risk',     value: 65, icon: Waves,          color: '#38BDF8', desc: 'Acidification pH 8.08',         trend: 'up'   },
+  { label: 'Air Quality',    value: 58, icon: Wind,           color: '#F59E0B', desc: 'PM2.5 above WHO limits',        trend: 'up'   },
+  { label: 'Climate Risk',   value: 79, icon: ThermometerSun, color: '#EF4444', desc: '+1.4°C above baseline',        trend: 'up'   },
+  { label: 'Biodiversity',   value: 61, icon: Bird,           color: '#7C3AED', desc: '1M species at extinction risk', trend: 'up'   },
+  { label: 'Water Security', value: 43, icon: Droplets,       color: '#06B6D4', desc: '2B people lack clean access',  trend: 'same' },
 ];
+
+const TIMELINE_YEARS = [2026, 2030, 2040, 2050, 2075, 2100] as const;
+type TimelineYear = typeof TIMELINE_YEARS[number];
+
+interface YearProjection {
+  year: TimelineYear;
+  carbonPpm: number;
+  tempAnomaly: number;
+  seaLevelCm: number;
+  forestCoverage: number;
+  waterQuality: number;
+  airQuality: number;
+  renewablePct: number;
+  biodiversityPct: number;
+}
+
+const TIMELINE_DATA: Record<TimelineYear, YearProjection> = {
+  2026: { year: 2026, carbonPpm: 421, tempAnomaly: 1.3, seaLevelCm: 12, forestCoverage: 52, waterQuality: 61, airQuality: 48, renewablePct: 28, biodiversityPct: 44 },
+  2030: { year: 2030, carbonPpm: 432, tempAnomaly: 1.5, seaLevelCm: 18, forestCoverage: 48, waterQuality: 56, airQuality: 42, renewablePct: 38, biodiversityPct: 39 },
+  2040: { year: 2040, carbonPpm: 450, tempAnomaly: 1.9, seaLevelCm: 32, forestCoverage: 41, waterQuality: 48, airQuality: 35, renewablePct: 52, biodiversityPct: 31 },
+  2050: { year: 2050, carbonPpm: 468, tempAnomaly: 2.4, seaLevelCm: 48, forestCoverage: 35, waterQuality: 40, airQuality: 28, renewablePct: 68, biodiversityPct: 24 },
+  2075: { year: 2075, carbonPpm: 505, tempAnomaly: 3.1, seaLevelCm: 85, forestCoverage: 26, waterQuality: 31, airQuality: 22, renewablePct: 82, biodiversityPct: 16 },
+  2100: { year: 2100, carbonPpm: 540, tempAnomaly: 3.8, seaLevelCm: 124, forestCoverage: 18, waterQuality: 22, airQuality: 15, renewablePct: 95, biodiversityPct: 9 },
+};
 
 const PLASTIC_DATA = [
   { region: 'Pacific Ocean', level: 88, color: '#EF4444' },
@@ -48,13 +71,13 @@ const BEFORE_AFTER = [
   { label: 'Carbon', icon: Cloud,    before: 80, after: 20, color: '#EF4444' },
 ];
 
-const WILDLIFE_RECOVERY = [
-  { name: 'Blue Whale',     status: 68,  trend: +12, emoji: '🐋', color: '#38BDF8' },
-  { name: 'Snow Leopard',   status: 42,  trend: -3,  emoji: '🐆', color: '#F59E0B' },
-  { name: 'Mountain Gorilla',status: 55, trend: +8,  emoji: '🦍', color: '#00E5A8' },
-  { name: 'Sea Turtle',     status: 61,  trend: +5,  emoji: '🐢', color: '#06B6D4' },
-  { name: 'Tiger',          status: 38,  trend: +2,  emoji: '🐯', color: '#F97316' },
-  { name: 'African Elephant',status: 47, trend: -1,  emoji: '🐘', color: '#94A3B8' },
+const FLOOD_ZONES = [
+  { city: 'Miami',    risk: 'Critical', pct: 89, color: '#EF4444' },
+  { city: 'Jakarta',  risk: 'Critical', pct: 94, color: '#EF4444' },
+  { city: 'Mumbai',   risk: 'High',     pct: 73, color: '#F59E0B' },
+  { city: 'Shanghai', risk: 'High',     pct: 68, color: '#F59E0B' },
+  { city: 'London',   risk: 'Medium',   pct: 41, color: '#38BDF8' },
+  { city: 'Tokyo',    risk: 'Medium',   pct: 45, color: '#38BDF8' },
 ];
 
 const ENERGY_PLAN = [
@@ -65,20 +88,15 @@ const ENERGY_PLAN = [
   { source: 'Fossil',  current: 53, potential:  0, emoji: '🏭', color: '#EF4444' },
 ];
 
-const FLOOD_ZONES = [
-  { city: 'Miami',    risk: 'Critical', pct: 89, color: '#EF4444' },
-  { city: 'Jakarta',  risk: 'Critical', pct: 94, color: '#EF4444' },
-  { city: 'Mumbai',   risk: 'High',     pct: 73, color: '#F59E0B' },
-  { city: 'Shanghai', risk: 'High',     pct: 68, color: '#F59E0B' },
-  { city: 'London',   risk: 'Medium',   pct: 41, color: '#38BDF8' },
-  { city: 'Tokyo',    risk: 'Medium',   pct: 45, color: '#38BDF8' },
-];
-
 export default function Insights() {
-  const [sliderPos, setSliderPos]     = useState(50);
-  const [plasticReduction, setPlasticReduction] = useState(0);
+  const [sliderPos, setSliderPos]               = useState(50);
+  const [plasticReduction, setPlasticReduction] = useState(25);
+  const [activeYear, setActiveYear]             = useState<TimelineYear>(2026);
   const [renewablePlan, setRenewablePlan]       = useState(50);
+  const [activeDroneCount, setActiveDroneCount] = useState(4);
   const compareRef = useRef<HTMLDivElement>(null);
+
+  const currentProjection = useMemo(() => TIMELINE_DATA[activeYear], [activeYear]);
 
   const handleSlider = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!compareRef.current) return;
@@ -88,7 +106,7 @@ export default function Insights() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen">
       <FloatingShapes />
       <Particles count={15} />
 
@@ -99,21 +117,21 @@ export default function Insights() {
           <SectionTitle
             eyebrow="Global Environmental Crisis"
             title="Earth's systems are failing — and decisions are blind"
-            description="Climate change, biodiversity loss, and pollution are accelerating. TerraMind makes these crises visible, interactive, and solvable."
+            description="Climate change, ocean degradation, and biodiversity loss are accelerating. TerraMind translates complex environmental science into real-time decision intelligence."
           />
           <div className="mt-8 grid md:grid-cols-3 gap-4">
             {[
-              { icon: AlertTriangle, title: '75% of ecosystems degraded',    desc: 'UN reports find terrestrial ecosystems in rapid decline. Urgent action required by 2030.', color: '#EF4444' },
-              { icon: Cloud,         title: 'CO₂ at 421+ ppm',               desc: 'Highest levels in human history, rising 2–3 ppm annually. Tipping points approaching.',   color: '#F59E0B' },
-              { icon: Bird,          title: '1M+ species at extinction risk', desc: 'IPBES warns of unprecedented extinction rates — 6th mass extinction underway.',           color: '#7C3AED' },
+              { icon: AlertTriangle, title: '75% of ecosystems degraded',     desc: 'UN reports find terrestrial ecosystems in rapid decline. Urgent intervention required.', color: '#EF4444' },
+              { icon: Cloud,         title: 'CO₂ at 421+ ppm',                desc: 'Highest atmospheric concentration in human history, rising annually. Dangerous tipping points.', color: '#F59E0B' },
+              { icon: Bird,          title: '1M+ species at extinction risk', desc: 'IPBES warns of unprecedented extinction rates — 6th mass extinction currently underway.',        color: '#7C3AED' },
             ].map((item, i) => {
               const Icon = item.icon;
               return (
                 <motion.div key={item.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
                   <motion.div whileHover={{ scale: 1.03, y: -4 }} className="glass-card p-6 h-full" style={{ borderLeft: `3px solid ${item.color}50` }}>
                     <Icon className="w-8 h-8 mb-3" style={{ color: item.color }} />
-                    <h3 className="font-bold font-display mb-1.5 text-base">{item.title}</h3>
-                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{item.desc}</p>
+                    <h3 className="font-bold font-display mb-1.5 text-base text-white">{item.title}</h3>
+                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">{item.desc}</p>
                   </motion.div>
                 </motion.div>
               );
@@ -126,7 +144,7 @@ export default function Insights() {
           <SectionTitle
             eyebrow="Risk Dashboard"
             title="Global Environmental Risk Monitor"
-            description="Real-time risk indices across six planetary systems — updated from environmental research data."
+            description="Real-time risk indices across six planetary systems — continuously updated from satellite telemetry."
           />
           <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {RISK_METRICS.map((m, i) => {
@@ -147,7 +165,7 @@ export default function Insights() {
                       </Badge>
                     </div>
                     <div className="text-2xl font-bold font-orbitron mb-1" style={{ color: m.color }}>{m.value}%</div>
-                    <div className="font-semibold font-display text-sm mb-1">{m.label}</div>
+                    <div className="font-semibold font-display text-sm mb-1 text-white">{m.label}</div>
                     <div className="text-xs text-[var(--text-muted)] mb-3">{m.desc}</div>
                     <div className="h-2 rounded-full bg-[var(--glass-border)] overflow-hidden">
                       <motion.div
@@ -166,105 +184,347 @@ export default function Insights() {
           </div>
         </section>
 
-        {/* ===== OCEAN PLASTIC TRACKER ===== */}
+        {/* ===== REQUIREMENT 10 & 6: INTERACTIVE OCEAN CLEANUP SIMULATOR & ECOSYSTEM ===== */}
         <section>
           <div className="grid lg:grid-cols-2 gap-8 items-start">
+            {/* Left: Plastic Tracker */}
             <div>
-              <Badge variant="secondary" className="mb-3"><Waves className="w-3 h-3" /> Ocean Tracker</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-balance mb-4">
-                Ocean Plastic{' '}
-                <span className="gradient-text">Tracker</span>
+              <Badge variant="secondary" className="mb-3"><Waves className="w-3 h-3" /> Marine Ecosystem</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold font-display text-balance mb-4 text-white">
+                Ocean Plastic & <span className="gradient-text">Ecosystem Health</span>
               </h2>
-              <p className="text-[var(--text-muted)] leading-relaxed mb-6">
-                Over 11 million tonnes of plastic enter the ocean annually. Interactive tracker shows
-                concentration levels by region and projects cleanup scenarios.
+              <p className="text-[var(--text-muted)] leading-relaxed mb-6 text-sm">
+                Over 11 million tonnes of waste enter ocean gyres annually. Adjust cleanup deployment vectors to watch marine life recover and plastic density drop in real time.
               </p>
               <div className="space-y-3">
-                {PLASTIC_DATA.map((p, i) => (
-                  <motion.div key={p.region} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="font-medium">{p.region}</span>
-                      <span className="font-mono font-bold" style={{ color: p.color }}>
-                        {Math.round(Math.max(0, p.level - (plasticReduction * 0.4)))}%
-                      </span>
-                    </div>
-                    <div className="h-2.5 rounded-full bg-[var(--glass-border)] overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: p.color }}
-                        animate={{ width: `${Math.max(0, p.level - (plasticReduction * 0.4))}%` }}
-                        transition={{ duration: 0.8 }}
-                      />
-                    </div>
-                  </motion.div>
-                ))}
+                {PLASTIC_DATA.map((p, i) => {
+                  const currentLevel = Math.max(0, p.level - Math.round(plasticReduction * 0.65));
+                  return (
+                    <motion.div key={p.region} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="font-medium text-white">{p.region}</span>
+                        <span className="font-mono font-bold" style={{ color: currentLevel > 60 ? '#EF4444' : currentLevel > 30 ? '#F59E0B' : '#00E5A8' }}>
+                          {currentLevel}% Density
+                        </span>
+                      </div>
+                      <div className="h-2.5 rounded-full bg-[var(--glass-border)] overflow-hidden">
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{ background: currentLevel > 60 ? '#EF4444' : currentLevel > 30 ? '#F59E0B' : '#00E5A8' }}
+                          animate={{ width: `${currentLevel}%` }}
+                          transition={{ duration: 0.8 }}
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
 
-            <GlassCard className="p-6 glow-secondary">
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-5 h-5 text-secondary" />
-                <h3 className="font-bold font-display">Reduction Simulator</h3>
+            {/* Right: Interactive Ocean Cleanup Simulator Canvas Viewport */}
+            <GlassCard className="p-6 glow-secondary border-primary/20 relative overflow-hidden bg-gradient-to-b from-[#0a1628] to-[#040d1a]">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Waves className="w-5 h-5 text-secondary animate-pulse" />
+                  <h3 className="font-bold font-display text-base text-white">Interactive Ocean Cleanup Simulator</h3>
+                </div>
+                <Badge variant={plasticReduction > 60 ? 'success' : plasticReduction > 30 ? 'warning' : 'danger'}>
+                  {plasticReduction > 60 ? 'THRIFTY ECOSYSTEM' : plasticReduction > 30 ? 'MODERATE DEBRIS' : 'CRITICAL POLLUTION'}
+                </Badge>
               </div>
-              {/* Animated ocean */}
-              <div className="relative h-40 rounded-2xl overflow-hidden mb-5">
+
+              {/* Ocean Animated Canvas Container */}
+              <div className="relative h-56 rounded-2xl overflow-hidden mb-5 border border-sky-500/20 shadow-inner">
+                {/* Dynamic Water Gradient */}
                 <motion.div
                   className="absolute inset-0"
-                  animate={{ background: plasticReduction > 60
-                    ? 'linear-gradient(to bottom, rgba(14,165,233,0.5), rgba(3,105,161,0.7))'
-                    : plasticReduction > 30
-                    ? 'linear-gradient(to bottom, rgba(82,82,91,0.4), rgba(39,39,42,0.6))'
-                    : 'linear-gradient(to bottom, rgba(82,82,91,0.6), rgba(24,24,27,0.8))',
+                  animate={{
+                    background: plasticReduction > 60
+                      ? 'linear-gradient(to bottom, #0284c7, #0369a1, #0c4a6e)'
+                      : plasticReduction > 30
+                      ? 'linear-gradient(to bottom, #0369a1, #1e293b, #0f172a)'
+                      : 'linear-gradient(to bottom, #334155, #1e293b, #020617)',
                   }}
-                  transition={{ duration: 1.5 }}
+                  transition={{ duration: 1.2 }}
                 />
-                {/* Plastic debris (reduce as slider moves) */}
-                {Array.from({ length: Math.round((1 - plasticReduction / 100) * 12) }).map((_, i) => (
-                  <motion.div key={i} className="absolute w-2.5 h-2.5 rounded-sm bg-gray-300/50"
-                    style={{ top: `${20 + Math.random() * 60}%`, left: `${Math.random() * 90}%` }}
-                    animate={{ x: [0, 10, -5, 0] }} transition={{ duration: 5, repeat: Infinity, delay: i * 0.5 }}
+
+                {/* Animated Wave Ripples */}
+                <svg className="absolute inset-0 w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                  <motion.path
+                    d="M 0 40 Q 150 20 300 40 T 600 40 T 900 40 V 220 H 0 Z"
+                    fill="url(#waveGrad)"
+                    animate={{ d: [
+                      "M 0 40 Q 150 20 300 40 T 600 40 T 900 40 V 220 H 0 Z",
+                      "M 0 30 Q 150 50 300 30 T 600 30 T 900 30 V 220 H 0 Z",
+                      "M 0 40 Q 150 20 300 40 T 600 40 T 900 40 V 220 H 0 Z",
+                    ] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                   />
-                ))}
-                {/* Fish return when clean */}
-                {plasticReduction > 50 && Array.from({ length: 4 }).map((_, i) => (
-                  <motion.div key={`fish-${i}`} className="absolute text-sm" style={{ top: `${30 + i * 15}%` }}
-                    animate={{ x: ['-10%', '110%'] }} transition={{ duration: 8 + i * 2, repeat: Infinity, ease: 'linear' }}>
-                    🐟
+                  <defs>
+                    <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#0284c7" stopOpacity="0.1" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                {/* Floating Plastic Waste Items */}
+                {Array.from({ length: Math.max(1, Math.round((1 - plasticReduction / 100) * 14)) }).map((_, i) => (
+                  <motion.div
+                    key={`waste-${i}`}
+                    className="absolute flex items-center justify-center text-xs opacity-85"
+                    style={{ top: `${15 + (i * 12) % 65}%`, left: `${(i * 18 + 10) % 85}%` }}
+                    animate={{
+                      y: [0, 6, -4, 0],
+                      x: [0, 8, -6, 0],
+                      rotate: [0, 15, -15, 0],
+                    }}
+                    transition={{ duration: 3 + (i % 3), repeat: Infinity, ease: 'easeInOut', delay: i * 0.3 }}
+                  >
+                    {i % 3 === 0 ? '🍾' : i % 3 === 1 ? '🛍️' : '🛢️'}
                   </motion.div>
                 ))}
-                <div className="absolute bottom-2 left-3 text-[10px] font-mono text-white/70">
-                  Plastic: {Math.round(75 - plasticReduction * 0.6)}% | Marine Recovery: {Math.round(25 + plasticReduction * 0.65)}%
+
+                {/* Autonomous Collection Drones & Skimmer Boats */}
+                {Array.from({ length: activeDroneCount }).map((_, i) => (
+                  <motion.div
+                    key={`drone-${i}`}
+                    className="absolute z-20 flex items-center gap-1 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-full border border-primary/40 text-[10px] text-primary shadow-glow"
+                    style={{ top: `${20 + i * 20}%` }}
+                    animate={{ x: ['-20%', '115%'] }}
+                    transition={{ duration: 7 + i * 2, repeat: Infinity, ease: 'linear', delay: i * 1.5 }}
+                  >
+                    <span>🛸</span> Skimmer #{i + 1}
+                  </motion.div>
+                ))}
+
+                {/* Animated Swimming Marine Life */}
+                {plasticReduction > 30 && Array.from({ length: Math.min(8, Math.round((plasticReduction / 100) * 8)) }).map((_, i) => (
+                  <motion.div
+                    key={`marine-${i}`}
+                    className="absolute z-10 text-base"
+                    style={{ top: `${45 + (i * 10) % 45}%` }}
+                    animate={{ x: ['115%', '-20%'] }}
+                    transition={{ duration: 9 + i * 2, repeat: Infinity, ease: 'linear', delay: i * 1.2 }}
+                  >
+                    {i % 4 === 0 ? '🐋' : i % 4 === 1 ? '🐟' : i % 4 === 2 ? '🐢' : '🐠'}
+                  </motion.div>
+                ))}
+
+                {/* Coral Reef & Seaweed at Bottom */}
+                <div className="absolute bottom-0 inset-x-0 h-8 flex justify-around items-end px-4 pointer-events-none opacity-80">
+                  <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 4, repeat: Infinity }}>🪸</motion.div>
+                  <motion.div animate={{ rotate: [0, -6, 6, 0] }} transition={{ duration: 5, repeat: Infinity }}>🌿</motion.div>
+                  <motion.div animate={{ rotate: [0, 4, -4, 0] }} transition={{ duration: 3.5, repeat: Infinity }}>🪸</motion.div>
+                  <motion.div animate={{ rotate: [0, -8, 8, 0] }} transition={{ duration: 4.5, repeat: Infinity }}>🪸</motion.div>
+                  <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 3.8, repeat: Infinity }}>🌿</motion.div>
+                </div>
+
+                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md rounded-xl px-3 py-1 text-[11px] font-mono text-white/90 border border-white/10">
+                  Plastic: <strong className="text-secondary">{Math.round(88 - plasticReduction * 0.75)} items/km²</strong> | Recovery: <strong className="text-primary">{Math.round(20 + plasticReduction * 0.75)}%</strong>
                 </div>
               </div>
 
-              <div className="mb-2 flex justify-between text-sm">
-                <span className="text-[var(--text-muted)]">Intervention Level</span>
-                <span className="font-bold text-secondary">{plasticReduction}%</span>
+              {/* Slider Control */}
+              <div className="mb-4">
+                <div className="flex justify-between text-xs mb-1 font-mono">
+                  <span className="text-[var(--text-muted)]">Cleanup Deployment Vector</span>
+                  <span className="font-bold text-secondary">{plasticReduction}% Active</span>
+                </div>
+                <Slider
+                  min={0}
+                  max={100}
+                  value={plasticReduction}
+                  onChange={(val) => setPlasticReduction(val)}
+                  accentColor="#38BDF8"
+                  aria-label="Ocean Cleanup Intensity"
+                />
               </div>
-              <Slider
-                min={0}
-                max={100}
-                value={plasticReduction}
-                onChange={(val) => setPlasticReduction(val)}
-                accentColor="#38BDF8"
-                aria-label="Plastic intervention level"
-              />
-              <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="glass rounded-lg p-2">
-                  <div className="font-bold text-secondary">{Math.round(11 - plasticReduction * 0.09)}M</div>
-                  <div className="text-[var(--text-muted)]">tonnes/yr</div>
+
+              {/* Quick Preset Buttons */}
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                {[
+                  { label: 'Baseline', val: 0, drones: 1 },
+                  { label: '+Drones', val: 35, drones: 3 },
+                  { label: '+Skimmers', val: 70, drones: 5 },
+                  { label: 'Maximum', val: 100, drones: 6 },
+                ].map((b) => (
+                  <button
+                    key={b.label}
+                    onClick={() => {
+                      setPlasticReduction(b.val);
+                      setActiveDroneCount(b.drones);
+                    }}
+                    className={`py-1.5 rounded-xl text-[11px] font-semibold transition-all border ${
+                      plasticReduction === b.val
+                        ? 'bg-secondary/20 text-secondary border-secondary/40 shadow-glow'
+                        : 'glass text-[var(--text-muted)] border-white/5 hover:text-white'
+                    }`}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Live Statistics Grid */}
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="glass rounded-xl p-2.5 border border-white/5">
+                  <div className="font-bold text-secondary font-mono text-sm">{Math.round(11 - plasticReduction * 0.09)}M</div>
+                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">tonnes/yr waste</div>
                 </div>
-                <div className="glass rounded-lg p-2">
-                  <div className="font-bold text-primary">{Math.round(25 + plasticReduction * 0.65)}%</div>
-                  <div className="text-[var(--text-muted)]">Recovery</div>
+                <div className="glass rounded-xl p-2.5 border border-white/5">
+                  <div className="font-bold text-primary font-mono text-sm">{Math.round(25 + plasticReduction * 0.65)}%</div>
+                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Marine Recovery</div>
                 </div>
-                <div className="glass rounded-lg p-2">
-                  <div className="font-bold text-accent">{Math.round(plasticReduction * 18)}k</div>
-                  <div className="text-[var(--text-muted)]">Species saved</div>
+                <div className="glass rounded-xl p-2.5 border border-white/5">
+                  <div className="font-bold text-accent font-mono text-sm">{Math.round(plasticReduction * 18.5)}k</div>
+                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Species Saved</div>
                 </div>
               </div>
             </GlassCard>
           </div>
+        </section>
+
+        {/* ===== REQUIREMENT 7: FUTURE TIMELINE & ANIMATED CARBON GRAPH ===== */}
+        <section>
+          <GlassCard className="p-8 relative overflow-hidden border-primary/20 bg-gradient-to-br from-[#0a1628] via-[#0f2442] to-[#0a1628]">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
+              <div>
+                <Badge variant="primary" className="mb-2"><BarChart3 className="w-3 h-3" /> Predictive Modeling</Badge>
+                <h2 className="text-2xl md:text-3xl font-bold font-display text-white">Centennial Climate Projection (2026 – 2100)</h2>
+                <p className="text-xs text-[var(--text-muted)] mt-1">
+                  Select any year to animate environmental feedback metrics and project atmospheric carbon pathways.
+                </p>
+              </div>
+
+              {/* Year Selector Tabs */}
+              <div className="flex items-center gap-1.5 glass rounded-2xl p-1.5 border border-white/10 overflow-x-auto max-w-full">
+                {TIMELINE_YEARS.map((yr) => (
+                  <button
+                    key={yr}
+                    onClick={() => setActiveYear(yr)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
+                      activeYear === yr
+                        ? 'bg-gradient-to-r from-primary to-secondary text-ink shadow-glow scale-105'
+                        : 'text-[var(--text-muted)] hover:text-white'
+                    }`}
+                  >
+                    {yr}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8 items-center">
+              {/* Left 2 Cols: Animated SVG Carbon Graph */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="flex items-center justify-between text-xs font-mono mb-2">
+                  <span className="text-white font-semibold flex items-center gap-2">
+                    <Cloud className="w-4 h-4 text-danger" /> Atmospheric CO₂ Concentration Pathway
+                  </span>
+                  <span className="text-danger font-bold">{currentProjection.carbonPpm} PPM ({activeYear})</span>
+                </div>
+
+                {/* Animated Line Chart Container */}
+                <div className="relative h-52 w-full rounded-2xl glass p-4 border border-white/10 flex items-end">
+                  <svg className="w-full h-full overflow-visible" viewBox="0 0 500 180">
+                    {/* Grid lines */}
+                    <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
+                    <line x1="0" y1="75" x2="500" y2="75" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
+                    <line x1="0" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.05)" strokeDasharray="4 4" />
+
+                    {/* Dynamic Path for CO2 */}
+                    <defs>
+                      <linearGradient id="carbonGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#EF4444" stopOpacity="0.5" />
+                        <stop offset="100%" stopColor="#EF4444" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Area Fill */}
+                    <path
+                      d="M 0 150 L 100 135 L 200 110 L 300 85 L 400 40 L 500 10 L 500 180 L 0 180 Z"
+                      fill="url(#carbonGrad)"
+                    />
+
+                    {/* Trend Line */}
+                    <motion.path
+                      d="M 0 150 L 100 135 L 200 110 L 300 85 L 400 40 L 500 10"
+                      fill="none"
+                      stroke="#EF4444"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                    />
+
+                    {/* Active Year Highlight Node */}
+                    {TIMELINE_YEARS.map((yr, idx) => {
+                      const xPos = idx * 100;
+                      const yPos = 150 - (idx * 28);
+                      const isCurrent = yr === activeYear;
+
+                      return (
+                        <g key={yr} onClick={() => setActiveYear(yr)} className="cursor-pointer">
+                          <motion.circle
+                            cx={xPos}
+                            cy={yPos}
+                            r={isCurrent ? 8 : 4}
+                            fill={isCurrent ? "#00E5A8" : "#EF4444"}
+                            stroke="#040d1a"
+                            strokeWidth="2"
+                            animate={{ scale: isCurrent ? [1, 1.3, 1] : 1 }}
+                            transition={{ duration: 1.5, repeat: isCurrent ? Infinity : 0 }}
+                          />
+                          <text x={xPos} y={175} fill={isCurrent ? "#00E5A8" : "#7A9CC4"} fontSize="10" textAnchor="middle" fontFamily="monospace">
+                            {yr}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                </div>
+              </div>
+
+              {/* Right Col: Dynamic Year Indicator Metrics */}
+              <div className="space-y-3">
+                <div className="text-xs font-mono uppercase tracking-widest text-primary font-bold">
+                  {activeYear} Environmental Indicators
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="glass rounded-xl p-3 border border-white/5">
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono">Global Temp Anomaly</div>
+                    <div className="text-lg font-bold font-mono text-warning mt-0.5">+{currentProjection.tempAnomaly}°C</div>
+                  </div>
+
+                  <div className="glass rounded-xl p-3 border border-white/5">
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono">Sea Level Rise</div>
+                    <div className="text-lg font-bold font-mono text-secondary mt-0.5">+{currentProjection.seaLevelCm} cm</div>
+                  </div>
+
+                  <div className="glass rounded-xl p-3 border border-white/5">
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono">Forest Coverage</div>
+                    <div className="text-lg font-bold font-mono text-primary mt-0.5">{currentProjection.forestCoverage}%</div>
+                  </div>
+
+                  <div className="glass rounded-xl p-3 border border-white/5">
+                    <div className="text-[10px] text-[var(--text-muted)] font-mono">Biodiversity Index</div>
+                    <div className="text-lg font-bold font-mono text-accent mt-0.5">{currentProjection.biodiversityPct}%</div>
+                  </div>
+                </div>
+
+                <div className="glass rounded-xl p-3 border border-danger/20 bg-danger/5 text-xs">
+                  <span className="font-bold text-danger font-mono">STATUS ({activeYear}): </span>
+                  <span className="text-white">
+                    {currentProjection.tempAnomaly > 2.5
+                      ? 'Severe catastrophic tipping points breached.'
+                      : currentProjection.tempAnomaly > 1.5
+                      ? 'Critical warming threshold exceeded. Accelerated ice sheet loss.'
+                      : 'Moderate baseline climate stress.'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </GlassCard>
         </section>
 
         {/* ===== DEFORESTATION MONITOR ===== */}
@@ -274,13 +534,11 @@ export default function Insights() {
             <div className="relative grid lg:grid-cols-2 gap-8 items-center">
               <div>
                 <Badge variant="primary" className="mb-3"><Trees className="w-3 h-3" /> Deforestation Monitor</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold font-display mb-3">Global Forest Loss Tracker</h2>
-                <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-6">
-                  Real-time deforestation monitoring across five critical forest ecosystems. Each pixel lost
-                  represents irreversible biodiversity damage.
+                <h2 className="text-2xl md:text-3xl font-bold font-display mb-3 text-white">Global Forest Loss Tracker</h2>
+                <p className="text-[var(--text-muted)] text-xs leading-relaxed mb-6">
+                  Real-time deforestation monitoring across five critical forest ecosystems. Each pixel lost represents irreversible biomass loss.
                 </p>
-                {/* Animated deforestation visualization */}
-                <div className="relative h-32 rounded-xl overflow-hidden">
+                <div className="relative h-32 rounded-xl overflow-hidden shadow-inner">
                   <div style={{ background: 'linear-gradient(to right, #166534, #14532D, #78350F, #92400E)' }} className="absolute inset-0" />
                   <div className="absolute inset-0 flex items-end justify-around px-2 pb-2">
                     {Array.from({ length: 14 }).map((_, i) => (
@@ -302,7 +560,7 @@ export default function Insights() {
                   <motion.div key={h.name} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                     className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: h.color }} />
-                    <span className="text-sm font-medium flex-1">{h.name}</span>
+                    <span className="text-xs font-medium text-white flex-1">{h.name}</span>
                     <span className="text-xs font-mono text-[var(--text-muted)]">
                       {(h.loss / 1000000).toFixed(1)}M ha/yr
                     </span>
@@ -311,16 +569,12 @@ export default function Insights() {
                     </div>
                   </motion.div>
                 ))}
-                <div className="glass rounded-xl p-3 mt-2 border border-danger/20">
-                  <div className="text-xs text-danger font-bold mb-1">⚠ Critical Threshold</div>
-                  <div className="text-xs text-[var(--text-muted)]">Amazon tipping point at &lt;75% coverage. Currently at 78%.</div>
-                </div>
               </div>
             </div>
           </GlassCard>
         </section>
 
-        {/* ===== IMPACT COMPARISON (keep existing slider) ===== */}
+        {/* ===== IMPACT COMPARISON ===== */}
         <section>
           <SectionTitle
             center
@@ -341,7 +595,7 @@ export default function Insights() {
                   whileHover={{ scale: 1.2 }}
                 />
               </div>
-              <div className="flex justify-between mt-2 text-xs font-medium">
+              <div className="flex justify-between mt-2 text-xs font-medium font-mono">
                 <span className="text-danger">🌑 Degraded Earth</span>
                 <span className="text-primary">🌍 Restored Earth</span>
               </div>
@@ -364,7 +618,7 @@ export default function Insights() {
                         {Math.round(interpolated)}{item.label === 'Carbon' ? ' ppm' : '%'}
                       </motion.div>
                       <ProgressBar value={interpolated} color={item.color} height={7} />
-                      <div className="flex justify-between mt-2 text-[10px] text-[var(--text-muted)]">
+                      <div className="flex justify-between mt-2 text-[10px] text-[var(--text-muted)] font-mono">
                         <span>Was: {item.before}</span><span>Goal: {item.after}</span>
                       </div>
                     </motion.div>
@@ -381,14 +635,14 @@ export default function Insights() {
             <GlassCard className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <Waves className="w-5 h-5 text-danger" />
-                <h3 className="font-bold font-display text-lg">Flood Risk Prediction</h3>
+                <h3 className="font-bold font-display text-lg text-white">Flood Risk Prediction</h3>
                 <Badge variant="danger" className="ml-auto">High Alert</Badge>
               </div>
               <div className="space-y-3">
                 {FLOOD_ZONES.map((z, i) => (
                   <motion.div key={z.city} initial={{ opacity: 0, x: -15 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}
                     className="flex items-center gap-3">
-                    <span className="font-medium text-sm w-20">{z.city}</span>
+                    <span className="font-medium text-xs w-20 text-white">{z.city}</span>
                     <div className="flex-1">
                       <ProgressBar value={z.pct} color={z.color} height={8} />
                     </div>
@@ -400,18 +654,14 @@ export default function Insights() {
                   </motion.div>
                 ))}
               </div>
-              <div className="mt-4 glass rounded-xl p-3 text-xs text-[var(--text-muted)]">
-                <span className="text-danger font-semibold">Model basis:</span> IPCC AR6 sea level projections + urban drainage capacity analysis.
-              </div>
             </GlassCard>
 
             <GlassCard className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <ThermometerSun className="w-5 h-5 text-warning" />
-                <h3 className="font-bold font-display text-lg">Heatwave Analysis</h3>
+                <h3 className="font-bold font-display text-lg text-white">Heatwave Analysis</h3>
                 <Badge variant="warning" className="ml-auto">2026 Data</Badge>
               </div>
-              {/* Animated temperature grid */}
               <div className="grid grid-cols-7 gap-1 mb-4">
                 {Array.from({ length: 35 }, (_, i) => {
                   const temp = 28 + Math.sin(i * 0.8) * 12 + Math.cos(i * 1.2) * 8;
@@ -429,7 +679,7 @@ export default function Insights() {
                   );
                 })}
               </div>
-              <div className="flex justify-between text-xs text-[var(--text-muted)] mb-4">
+              <div className="flex justify-between text-xs text-[var(--text-muted)] mb-4 font-mono">
                 <span>Cool (20°C)</span><span>Extreme (50°C+)</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
@@ -440,7 +690,7 @@ export default function Insights() {
                 ].map((s) => (
                   <div key={s.label} className="glass rounded-xl p-3">
                     <div className="font-bold text-lg" style={{ color: s.color }}>{s.value}</div>
-                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{s.label}</div>
+                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5 font-mono">{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -448,19 +698,19 @@ export default function Insights() {
           </div>
         </section>
 
-        {/* ===== CARBON REDUCTION PLANNER ===== */}
+        {/* ===== RENEWABLE ENERGY EXPANSION PLANNER ===== */}
         <section>
           <GlassCard className="p-8 glow-primary">
             <div className="grid lg:grid-cols-2 gap-8 items-center">
               <div>
                 <Badge variant="primary" className="mb-3"><BarChart3 className="w-3 h-3" /> Carbon Planner</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold font-display mb-4">Carbon Reduction Planner</h2>
-                <p className="text-[var(--text-muted)] text-sm leading-relaxed mb-5">
-                  Simulate renewable energy expansion and see the projected CO₂ pathway to 2050.
+                <h2 className="text-2xl md:text-3xl font-bold font-display mb-4 text-white">Carbon Reduction Planner</h2>
+                <p className="text-[var(--text-muted)] text-xs leading-relaxed mb-5">
+                  Simulate renewable energy expansion and see projected CO₂ pathways.
                   Each percentage of clean energy deployed reduces atmospheric carbon.
                 </p>
                 <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
+                  <div className="flex justify-between text-xs font-mono mb-2">
                     <span className="text-[var(--text-muted)]">Renewable Deployment</span>
                     <span className="font-bold text-primary">{renewablePlan}%</span>
                   </div>
@@ -481,7 +731,7 @@ export default function Insights() {
                   ].map((s) => (
                     <div key={s.label} className="glass rounded-xl p-3">
                       <div className="font-bold text-base font-orbitron" style={{ color: s.color }}>{s.value}</div>
-                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{s.label}</div>
+                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5 font-mono">{s.label}</div>
                     </div>
                   ))}
                 </div>
@@ -489,7 +739,7 @@ export default function Insights() {
 
               {/* Renewable Energy Mix */}
               <div>
-                <h3 className="font-semibold mb-4 text-sm text-[var(--text-muted)] uppercase tracking-widest">Energy Source Comparison</h3>
+                <h3 className="font-semibold mb-4 text-xs text-[var(--text-muted)] uppercase tracking-widest font-mono">Energy Source Comparison</h3>
                 <div className="space-y-3">
                   {ENERGY_PLAN.map((e, i) => {
                     const projected = e.source === 'Fossil'
@@ -497,10 +747,10 @@ export default function Insights() {
                       : Math.min(e.potential, e.current + (e.potential - e.current) * (renewablePlan / 100));
                     return (
                       <motion.div key={e.source} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}>
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 text-xs">
                           <span className="text-base">{e.emoji}</span>
-                          <span className="text-sm font-medium flex-1">{e.source}</span>
-                          <span className="text-xs font-mono" style={{ color: e.color }}>{Math.round(projected)}%</span>
+                          <span className="font-medium text-white flex-1">{e.source}</span>
+                          <span className="font-mono font-bold" style={{ color: e.color }}>{Math.round(projected)}%</span>
                         </div>
                         <div className="h-2 rounded-full bg-[var(--glass-border)] overflow-hidden">
                           <motion.div className="h-full rounded-full" style={{ background: e.color }}
@@ -515,120 +765,6 @@ export default function Insights() {
           </GlassCard>
         </section>
 
-        {/* ===== WILDLIFE RECOVERY DASHBOARD ===== */}
-        <section>
-          <SectionTitle
-            center
-            eyebrow="Biodiversity Monitor"
-            title="Wildlife Recovery Dashboard"
-            description="Population recovery status for key indicator species across global ecosystems."
-          />
-          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {WILDLIFE_RECOVERY.map((w, i) => (
-              <motion.div key={w.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
-                <motion.div whileHover={{ scale: 1.04, y: -4 }} className="glass-card p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <motion.span className="text-4xl" animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}>
-                      {w.emoji}
-                    </motion.span>
-                    <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${w.trend > 0 ? 'bg-primary/15 text-primary' : 'bg-danger/15 text-danger'}`}>
-                      {w.trend > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                      {w.trend > 0 ? '+' : ''}{w.trend}%
-                    </span>
-                  </div>
-                  <div className="font-bold font-display mb-1">{w.name}</div>
-                  <div className="text-xs text-[var(--text-muted)] mb-3">
-                    Population index: <span className="font-mono font-bold" style={{ color: w.color }}>{w.status}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-[var(--glass-border)] overflow-hidden">
-                    <motion.div className="h-full rounded-full" style={{ background: `linear-gradient(90deg, ${w.color}, ${w.color}88)` }}
-                      initial={{ width: 0 }} whileInView={{ width: `${w.status}%` }} viewport={{ once: true }} transition={{ duration: 1.2, delay: i * 0.1 }} />
-                  </div>
-                  <div className="mt-2 text-[10px] text-[var(--text-muted)]">
-                    {w.status > 60 ? '✅ Recovering' : w.status > 40 ? '⚠ Vulnerable' : '🚨 Endangered'}
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* ===== RULE-BASED AI (keep) ===== */}
-        <section>
-          <GlassCard className="p-8 md:p-10 glow-primary">
-            <div className="grid lg:grid-cols-2 gap-8">
-              <div>
-                <Badge variant="primary" className="mb-3"><Brain className="w-3 h-3" /> Rule-Based AI</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold font-display mb-4">Explainable — not a black box</h2>
-                <p className="text-[var(--text-muted)] leading-relaxed mb-5">
-                  Unlike LLM-based systems, our advisor uses explicit if-then rules grounded in
-                  environmental science. Every recommendation shows exactly why it was made —
-                  transparent, deterministic, and auditable.
-                </p>
-                <div className="space-y-2.5">
-                  {[
-                    'No external AI APIs — runs entirely client-side',
-                    'Threshold-based rules from climate research (IPCC, NASA)',
-                    'Every insight is auditable and fully explainable',
-                    'Deterministic — same inputs always produce same outputs',
-                  ].map((item) => (
-                    <div key={item} className="flex items-start gap-2.5">
-                      <Zap className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="glass rounded-2xl p-5 font-mono text-xs leading-relaxed overflow-x-auto border border-primary/10">
-                <div className="text-[var(--text-muted)] mb-2">// Rule-based insight example</div>
-                <div><span className="text-secondary">if</span> (metrics.forest &lt; 60) {'{'}</div>
-                <div className="pl-4"><span className="text-secondary">if</span> (controls.trees &lt; 50)</div>
-                <div className="pl-8">insight.cause = <span className="text-primary">"Insufficient reforestation"</span>;</div>
-                <div className="pl-4"><span className="text-secondary">else</span></div>
-                <div className="pl-8">insight.cause = <span className="text-primary">"Wildfires outpace restoration"</span>;</div>
-                <div className="pl-4">insight.solution = <span className="text-primary">"Increase trees slider"</span>;</div>
-                <div>{'}'}</div>
-                <div className="mt-3 text-[var(--text-muted)]">// Severity thresholds</div>
-                <div>severity = value &lt; 40 ? <span className="text-danger">"high"</span> : value &lt; 60 ? <span className="text-warning">"moderate"</span> : <span className="text-primary">"low"</span>;</div>
-              </div>
-            </div>
-          </GlassCard>
-        </section>
-
-        {/* ===== CTA ===== */}
-        <section>
-          <GlassCard className="p-8 md:p-12 text-center relative overflow-hidden glow-primary">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5" />
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-            <div className="relative">
-              <Badge variant="primary" className="mb-4"><Mail className="w-3 h-3" /> Contact</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-balance mb-4">
-                Let's build a sustainable future together
-              </h2>
-              <p className="text-[var(--text-muted)] max-w-xl mx-auto mb-8 leading-relaxed">
-                TerraMind is an open environmental intelligence platform. Reach out for
-                collaborations, education programs, or policy decision tools.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="mailto:team@terramind.ai"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-primary text-ink font-bold shadow-glow hover:bg-primary-light transition-colors">
-                  <Mail className="w-4 h-4" /> team@terramind.ai
-                </a>
-                <div className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full glass text-[var(--text-muted)]">
-                  <MapPin className="w-4 h-4" /> AI-for-Earth Hackathon 2026
-                </div>
-              </div>
-            </div>
-          </GlassCard>
-        </section>
-
-        <section className="text-center pb-8">
-          <div className="text-xs text-[var(--text-muted)] uppercase tracking-widest mb-2">Data Sources</div>
-          <p className="text-sm text-[var(--text-muted)] max-w-2xl mx-auto">
-            Environmental data references: NASA Earth Observatory, IPCC AR6 Reports, UN Environment Programme,
-            IPBES Global Assessment, WWF Living Planet Index. 3D Earth rendered procedurally via WebGL shaders.
-          </p>
-        </section>
       </div>
 
       <Footer />
