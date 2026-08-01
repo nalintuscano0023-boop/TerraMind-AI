@@ -1,16 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Trees, Droplets, Wind, Cloud, Bird, Sun, Factory, Car, Recycle, Trash2,
-  Waves, Fish, Rabbit, Turtle, Leaf,
+  Rabbit, Turtle, Leaf,
   CloudRain, CloudSnow, CloudFog, Zap, AlertTriangle, CheckCircle2,
-  Plane, Camera, Eye, Moon, Sunset, Compass, Sliders, Play, RotateCcw
+  Plane, Moon, Sunset
 } from 'lucide-react';
-import { GlassCard, SectionTitle, CircularProgress, Badge, Tooltip, Slider, WildlifeCanvas } from '@/components/ui';
+import { GlassCard, SectionTitle, Badge, Tooltip, Slider, WildlifeCanvas } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
-import { CONTROLS, METRIC_META, type ControlKey, type MetricKey } from '@/data/environment';
-import { computeMetrics, computeHealthScore } from '@/lib/advisorEngine';
+import { CONTROLS, type ControlKey, type MetricKey } from '@/data/environment';
+import { computeMetrics } from '@/lib/advisorEngine';
 
 type DayCycle = 'sunrise' | 'day' | 'sunset' | 'night';
 type Season   = 'spring' | 'summer' | 'autumn' | 'winter';
@@ -58,8 +58,7 @@ export default function Simulation() {
   const [wildlifeMode, setWildlifeMode]   = useState<WildlifeMode>('none');
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const metrics     = useMemo(() => computeMetrics(controls), [controls]);
-  const healthScore = useMemo(() => computeHealthScore(metrics), [metrics]);
+  const metrics = useMemo(() => computeMetrics(controls), [controls]);
 
   const updateControl = (key: ControlKey, value: number) => {
     setControls((prev) => prev.map((c) => (c.key === key ? { ...c, value } : c)));
@@ -129,7 +128,6 @@ export default function Simulation() {
                   weather={weather}
                   droneMode={droneMode}
                   droneAltitude={droneAltitude}
-                  wildlifeMode={wildlifeMode}
                   treeDensity={treeDensity}
                   factoryLevel={factoryLevel}
                   solarLevel={solarLevel}
@@ -357,7 +355,6 @@ function EcosystemViewport({
   weather,
   droneMode,
   droneAltitude,
-  wildlifeMode,
   treeDensity,
   factoryLevel,
   solarLevel,
@@ -370,7 +367,6 @@ function EcosystemViewport({
   weather: Weather;
   droneMode: boolean;
   droneAltitude: number;
-  wildlifeMode: WildlifeMode;
   treeDensity: number;
   factoryLevel: number;
   solarLevel: number;
@@ -481,7 +477,20 @@ function EcosystemViewport({
         />
       </div>
 
-      {/* Forest Trees */}
+      {/* Industrial Factory Smoke */}
+      {factoryLevel > 30 && (
+        <div className="absolute bottom-[33%] right-[10%] flex flex-col items-center">
+          <div className="w-8 h-10 bg-slate-700 border border-slate-600 rounded-t-sm shadow-lg flex items-center justify-center text-[10px] font-mono text-slate-400">🏭</div>
+          {Array.from({ length: Math.round((factoryLevel / 100) * 3) }).map((_, i) => (
+            <motion.div
+              key={`smoke-${i}`}
+              className="absolute -top-6 w-5 h-5 rounded-full bg-slate-400/40 blur-sm"
+              animate={{ y: [-10, -40], opacity: [0.6, 0], scale: [0.8, 1.8] }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.8 }}
+            />
+          ))}
+        </div>
+      )}
       {Array.from({ length: numTrees }).map((_, i) => (
         <motion.div
           key={`tree-${i}`}

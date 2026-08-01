@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Flame, Droplets, Trees, Waves, Wind, Sun, AlertTriangle, Activity,
-  Globe, ShieldAlert, Satellite, Eye, RefreshCw, Layers, CheckCircle2,
-  TrendingUp, Radio, Compass, BarChart3, ThermometerSun
+  Flame, Droplets, Trees, Waves, Wind, Sun,
+  ShieldAlert, Satellite, Eye, RefreshCw, Layers, CheckCircle2,
+  Radio, Compass, ThermometerSun
 } from 'lucide-react';
 import { GlassCard, SectionTitle, Badge, CircularProgress } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';

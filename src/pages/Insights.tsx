@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  AlertTriangle, Cloud, Bird, Zap,
+  AlertTriangle, Cloud, Bird,
   Droplets, Trees, Wind, TrendingUp,
   BarChart3, Activity, Waves, ThermometerSun
 } from 'lucide-react';
