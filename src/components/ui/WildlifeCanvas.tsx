@@ -24,6 +24,11 @@ interface Creature {
   jumpProgress?: number;
   headAngle?: number;
   legCycle?: number;
+  deerVariant?: 'buck' | 'doe' | 'fawn' | 'alert_doe' | 'young_buck' | 'bg_doe';
+  scale?: number;
+  antlerPoints?: number;
+  facing?: number;
+  baseY?: number;
 }
 
 interface Bubble {
@@ -46,6 +51,337 @@ interface Flower {
   color: string;
   size: number;
   petalCount: number;
+}
+
+/* ── Realistically Rendered Articulated Deer ── */
+function drawRealisticDeer(
+  ctx: CanvasRenderingContext2D,
+  c: Creature,
+  t: number,
+  height: number,
+  width: number,
+  speedMultiplier: number
+) {
+  if (!c.deerState) {
+    c.deerState = 'walking';
+    c.deerTimer = 80 + Math.floor(Math.random() * 100);
+    c.jumpProgress = 0;
+    c.headAngle = 0;
+    c.legCycle = Math.random() * Math.PI * 2;
+  }
+
+  const scale = c.scale || 1.0;
+  const isFawn = c.deerVariant === 'fawn';
+  const isBuck = (c.antlerPoints || 0) > 0;
+  const isBg = c.deerVariant === 'bg_doe';
+
+  // State Machine Timers & Transitions
+  c.deerTimer = c.deerTimer! - 1 * speedMultiplier;
+  if (c.deerTimer <= 0) {
+    const states: Array<'walking' | 'running' | 'jumping' | 'grazing' | 'looking' | 'idle'> = [
+      'walking', 'walking', 'grazing', 'grazing', 'looking', 'idle', 'running', 'jumping'
+    ];
+    c.deerState = states[Math.floor(Math.random() * states.length)];
+    c.deerTimer = c.deerState === 'jumping' ? 45 : c.deerState === 'grazing' ? 140 : 90 + Math.floor(Math.random() * 110);
+    if (c.deerState === 'jumping') c.jumpProgress = 0;
+  }
+
+  // Speed and Pose variables
+  let moveSpeed = 0;
+  let yOffset = 0;
+  let headTargetAngle = 0;
+
+  if (c.deerState === 'walking') {
+    moveSpeed = 0.55 * scale * speedMultiplier;
+    c.legCycle = (c.legCycle! + 0.1 * speedMultiplier) % (Math.PI * 2);
+    headTargetAngle = Math.sin(t * 3) * 0.06;
+  } else if (c.deerState === 'running') {
+    moveSpeed = 1.8 * scale * speedMultiplier;
+    c.legCycle = (c.legCycle! + 0.22 * speedMultiplier) % (Math.PI * 2);
+    headTargetAngle = 0.12;
+  } else if (c.deerState === 'jumping') {
+    moveSpeed = 1.5 * scale * speedMultiplier;
+    c.jumpProgress = Math.min(1, c.jumpProgress! + 0.025 * speedMultiplier);
+    yOffset = -Math.sin(c.jumpProgress! * Math.PI) * 28 * scale;
+    c.legCycle = (c.legCycle! + 0.18) % (Math.PI * 2);
+    headTargetAngle = -0.15;
+  } else if (c.deerState === 'grazing') {
+    moveSpeed = 0.03 * scale;
+    headTargetAngle = 0.85; // Head lowered to grass
+  } else if (c.deerState === 'looking') {
+    moveSpeed = 0;
+    headTargetAngle = -0.4 + Math.sin(t * 1.5) * 0.18; // Head raised alert
+  } else {
+    // Idle / standing
+    moveSpeed = 0;
+    headTargetAngle = Math.sin(t * 2) * 0.04;
+  }
+
+  // Facing direction movement
+  const facing = c.facing || 1;
+  c.x += moveSpeed * facing;
+  if (facing > 0 && c.x > width + 60) c.x = -60;
+  if (facing < 0 && c.x < -60) c.x = width + 60;
+
+  // Smooth lerp for head angle
+  c.headAngle = c.headAngle! + (headTargetAngle - c.headAngle!) * 0.08;
+
+  // Ground Y contact point
+  const groundY = (c.baseY || (height - 28)) + yOffset;
+  const bodyBob = c.deerState === 'walking' || c.deerState === 'running'
+    ? Math.abs(Math.sin(c.legCycle! * 2)) * 1.8 * scale
+    : 0;
+  const breathing = Math.sin(t * 2.5 + c.x) * 0.5;
+
+  ctx.save();
+  ctx.translate(c.x, groundY);
+  ctx.scale(facing * scale, scale);
+
+  // Colors
+  const mainColor   = isFawn ? '#B87333' : isBg ? '#7A4B24' : '#8C532B';
+  const darkColor   = isFawn ? '#8C4D1D' : isBg ? '#573316' : '#5E381A';
+  const bellyColor  = isFawn ? '#FDF6EE' : '#F2E6D8';
+  const hoofColor   = '#231810';
+  const shadowLegCol = '#422610';
+
+  // LEGS
+  const legCycle = c.legCycle!;
+  let legA1 = 0, legA2 = 0, legA3 = 0, legA4 = 0;
+  if (c.deerState === 'walking' || c.deerState === 'running') {
+    legA1 = Math.sin(legCycle) * 0.38;
+    legA2 = Math.sin(legCycle + Math.PI) * 0.38;
+    legA3 = Math.sin(legCycle + Math.PI) * 0.38;
+    legA4 = Math.sin(legCycle) * 0.38;
+  } else if (c.deerState === 'jumping') {
+    const jp = c.jumpProgress!;
+    legA1 = -0.5 + jp * 0.8;
+    legA2 = -0.6 + jp * 0.9;
+    legA3 = 0.5 - jp * 0.8;
+    legA4 = 0.6 - jp * 0.9;
+  } else if (c.deerState === 'grazing') {
+    legA1 = 0.05; legA2 = -0.05; legA3 = 0.15; legA4 = 0.08;
+  }
+
+  // Draw 1 Leg Helper
+  const drawLeg = (hipX: number, hipY: number, isFore: boolean, legAngle: number, color: string) => {
+    ctx.save();
+    ctx.translate(hipX, hipY);
+    ctx.rotate(legAngle);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isFawn ? 2.0 : 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const upperLen = 13;
+    const lowerLen = 14;
+    const jointBend = isFore ? -0.25 - Math.max(0, legAngle * 0.4) : 0.35 + Math.max(0, -legAngle * 0.4);
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    const jx = Math.sin(jointBend) * upperLen;
+    const jy = Math.cos(jointBend) * upperLen;
+    ctx.lineTo(jx, jy);
+
+    const fx = jx + Math.sin(jointBend * 0.3) * lowerLen;
+    const fy = jy + Math.cos(jointBend * 0.3) * lowerLen;
+    ctx.lineTo(fx, fy);
+    ctx.stroke();
+
+    // Dark Hoof tip
+    ctx.fillStyle = hoofColor;
+    ctx.beginPath();
+    ctx.arc(fx, fy, isFawn ? 1.2 : 1.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  // 1. FAR LEGS (Background Hind & Fore)
+  drawLeg(-14, -24 + bodyBob, false, legA1, shadowLegCol);
+  drawLeg(12, -24 + bodyBob, true, legA3, shadowLegCol);
+
+  // 2. MAIN TORSO & BODY
+  ctx.save();
+  ctx.translate(0, -28 + bodyBob + breathing * 0.3);
+
+  // Body Path
+  ctx.fillStyle = mainColor;
+  ctx.beginPath();
+  ctx.moveTo(-20, -6);
+  ctx.quadraticCurveTo(-26, 0, -22, 8);
+  ctx.quadraticCurveTo(0, 14, 18, 6);
+  ctx.quadraticCurveTo(24, -2, 18, -10);
+  ctx.quadraticCurveTo(0, -14, -20, -6);
+  ctx.closePath();
+  ctx.fill();
+
+  // Darker Back Saddle Shading
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.moveTo(-20, -6);
+  ctx.quadraticCurveTo(0, -14, 18, -10);
+  ctx.quadraticCurveTo(10, -5, -18, -2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Lighter Cream Belly Patch
+  ctx.fillStyle = bellyColor;
+  ctx.beginPath();
+  ctx.moveTo(-16, 4);
+  ctx.quadraticCurveTo(0, 12, 16, 5);
+  ctx.quadraticCurveTo(2, 4, -14, 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Fawn Spots
+  if (isFawn) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    const spots = [
+      { x: -14, y: -4 }, { x: -8, y: -6 }, { x: -2, y: -5 },
+      { x: 4, y: -6 }, { x: 10, y: -4 }, { x: -10, y: -1 },
+      { x: -4, y: -1 }, { x: 3, y: -1 }, { x: 8, y: 0 }
+    ];
+    spots.forEach(sp => {
+      ctx.beginPath();
+      ctx.arc(sp.x, sp.y, 1.1, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // Tail Flick
+  const tailFlick = Math.sin(t * 5 + c.x) * 0.25;
+  ctx.save();
+  ctx.translate(-22, -4);
+  ctx.rotate(tailFlick);
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.ellipse(-3, -2, 4, 2.5, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
+  ctx.ellipse(-3, 0, 3.5, 2, -0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // 3. NECK AND HEAD
+  ctx.save();
+  ctx.translate(14, -6);
+  ctx.rotate(c.headAngle!);
+
+  // Neck
+  ctx.fillStyle = mainColor;
+  ctx.beginPath();
+  ctx.moveTo(-4, -2);
+  ctx.quadraticCurveTo(0, -14, 6, -20);
+  ctx.lineTo(14, -16);
+  ctx.quadraticCurveTo(6, -4, 0, 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // White Throat Stripe
+  ctx.fillStyle = bellyColor;
+  ctx.beginPath();
+  ctx.moveTo(2, -8);
+  ctx.quadraticCurveTo(8, -14, 12, -15);
+  ctx.quadraticCurveTo(6, -8, 2, -4);
+  ctx.closePath();
+  ctx.fill();
+
+  // Head Base & Snout
+  ctx.save();
+  ctx.translate(8, -19);
+
+  ctx.fillStyle = mainColor;
+  ctx.beginPath();
+  ctx.moveTo(-6, -4);
+  ctx.quadraticCurveTo(2, -5, 10, -1);
+  ctx.lineTo(11, 2);
+  ctx.quadraticCurveTo(4, 5, -4, 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Dark Snout Tip (Nose)
+  ctx.fillStyle = '#1F130B';
+  ctx.beginPath();
+  ctx.arc(10.5, 0.5, 1.6, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Dark Eye with Glint
+  ctx.fillStyle = '#120B05';
+  ctx.beginPath();
+  ctx.ellipse(3, -2, 1.8, 1.4, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
+  ctx.arc(3.4, -2.4, 0.6, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Ears
+  const earTwitch = Math.sin(t * 7 + c.x) * 0.12;
+  ctx.fillStyle = darkColor;
+  ctx.beginPath();
+  ctx.ellipse(-5, -6 + earTwitch * 2, 4, 1.8, -0.7 + earTwitch, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = mainColor;
+  ctx.beginPath();
+  ctx.ellipse(-3, -7 + earTwitch * 2, 4.5, 2, -0.6 + earTwitch, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#E8D0C0';
+  ctx.beginPath();
+  ctx.ellipse(-3, -7 + earTwitch * 2, 3, 1.2, -0.6 + earTwitch, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Antlers (For Bucks)
+  if (isBuck) {
+    const pts = c.antlerPoints || 6;
+    ctx.strokeStyle = '#D6C7B2';
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(-1, -5);
+    ctx.quadraticCurveTo(-1, -15, 6, -24);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(1, -12);
+    ctx.lineTo(6, -15);
+    ctx.stroke();
+
+    if (pts >= 4) {
+      ctx.beginPath();
+      ctx.moveTo(3, -19);
+      ctx.lineTo(8, -21);
+      ctx.stroke();
+    }
+    if (pts >= 6) {
+      ctx.beginPath();
+      ctx.moveTo(4, -22);
+      ctx.lineTo(2, -26);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#A89985';
+    ctx.beginPath();
+    ctx.moveTo(-3, -5);
+    ctx.quadraticCurveTo(-5, -14, 1, -22);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-3, -11);
+    ctx.lineTo(1, -14);
+    ctx.stroke();
+  }
+
+  ctx.restore(); // Head Base
+  ctx.restore(); // Neck
+  ctx.restore(); // Torso
+
+  // 3. NEAR LEGS (Foreground Hind & Fore)
+  drawLeg(-14, -24 + bodyBob, false, legA2, mainColor);
+  drawLeg(12, -24 + bodyBob, true, legA4, mainColor);
+
+  ctx.restore(); // Ground & Scale
 }
 
 export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className = '', speedMultiplier = 1 }) => {
@@ -131,34 +467,66 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
         initialY = (height || 320) - 45; // Strictly ground level
       }
 
-      creatures.push({
-        x: Math.random() * (width || 600),
-        y: initialY,
-        vx,
-        vy,
-        size: isTurtle ? 22 : isFish ? 13 : type === 'deer' ? 30 : 8,
-        wingAngle: Math.random() * Math.PI * 2,
-        color:
-          type === 'butterfly'
-            ? ['#F59E0B', '#38BDF8', '#7C3AED', '#00E5A8'][i % 4]
-            : type === 'bee'
-            ? '#F59E0B'
-            : type === 'bird'
-            ? '#00E5A8'
-            : type === 'fish'
-            ? i % 2 === 0 ? '#38BDF8' : '#00E5A8'
-            : type === 'turtle'
-            ? '#059669'
-            : '#D97706',
-        secondaryColor:
-          type === 'fish'
-            ? i % 2 === 0 ? '#0284C7' : '#059669'
-            : type === 'turtle'
-            ? '#10B981'
-            : '#B45309',
-        targetAngle: initialAngle,
-        currentAngle: initialAngle,
-      });
+      if (type === 'deer') {
+        const deerConfigs = [
+          { variant: 'buck' as const, scale: 1.12, antlers: 6, facing: 1, baseY: (height || 320) - 26, xPct: 0.15 },
+          { variant: 'doe' as const, scale: 1.0, antlers: 0, facing: 1, baseY: (height || 320) - 28, xPct: 0.38 },
+          { variant: 'fawn' as const, scale: 0.65, antlers: 0, facing: 1, baseY: (height || 320) - 25, xPct: 0.46 },
+          { variant: 'alert_doe' as const, scale: 0.95, antlers: 0, facing: -1, baseY: (height || 320) - 27, xPct: 0.62 },
+          { variant: 'young_buck' as const, scale: 0.88, antlers: 3, facing: 1, baseY: (height || 320) - 29, xPct: 0.78 },
+          { variant: 'bg_doe' as const, scale: 0.75, antlers: 0, facing: 1, baseY: (height || 320) - 36, xPct: 0.28 },
+        ];
+        const cfg = deerConfigs[i % deerConfigs.length];
+        creatures.push({
+          x: cfg.xPct * (width || 600),
+          y: cfg.baseY,
+          vx: 0,
+          vy: 0,
+          size: 30,
+          wingAngle: 0,
+          color: '#8C532B',
+          secondaryColor: '#5E381A',
+          targetAngle: 0,
+          currentAngle: 0,
+          deerState: i === 0 ? 'walking' : i === 1 ? 'grazing' : i === 3 ? 'looking' : 'idle',
+          deerTimer: 60 + Math.floor(Math.random() * 120),
+          jumpProgress: 0,
+          headAngle: 0,
+          legCycle: i * 1.2,
+          deerVariant: cfg.variant,
+          scale: cfg.scale,
+          antlerPoints: cfg.antlers,
+          facing: cfg.facing,
+          baseY: cfg.baseY,
+        });
+      } else {
+        creatures.push({
+          x: Math.random() * (width || 600),
+          y: initialY,
+          vx,
+          vy,
+          size: isTurtle ? 22 : isFish ? 13 : 8,
+          wingAngle: Math.random() * Math.PI * 2,
+          color:
+            type === 'butterfly'
+              ? ['#F59E0B', '#38BDF8', '#7C3AED', '#00E5A8'][i % 4]
+              : type === 'bee'
+              ? '#F59E0B'
+              : type === 'bird'
+              ? '#00E5A8'
+              : type === 'fish'
+              ? i % 2 === 0 ? '#38BDF8' : '#00E5A8'
+              : '#059669',
+          secondaryColor:
+            type === 'fish'
+              ? i % 2 === 0 ? '#0284C7' : '#059669'
+              : type === 'turtle'
+              ? '#10B981'
+              : '#B45309',
+          targetAngle: initialAngle,
+          currentAngle: initialAngle,
+        });
+      }
     }
 
     const render = () => {
@@ -369,178 +737,8 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
         }
 
         // --- DEER HERD PHYSICS & ANIMATION ---
-        creatures.forEach((c, idx) => {
-          // Initialize state machine properties if absent
-          if (!c.deerState) {
-            c.deerState = idx === 0 ? 'walking' : idx === 1 ? 'grazing' : 'idle';
-            c.deerTimer = 60 + Math.floor(Math.random() * 120);
-            c.jumpProgress = 0;
-            c.headAngle = 0;
-            c.legCycle = idx * 1.2;
-          }
-
-          // State Machine Transition Logic
-          c.deerTimer = c.deerTimer! - 1;
-          if (c.deerTimer <= 0) {
-            const states: Array<'walking' | 'running' | 'jumping' | 'grazing' | 'looking' | 'idle'> = [
-              'walking', 'walking', 'grazing', 'grazing', 'looking', 'idle', 'running', 'jumping'
-            ];
-            c.deerState = states[Math.floor(Math.random() * states.length)];
-            c.deerTimer = c.deerState === 'jumping' ? 45 : c.deerState === 'grazing' ? 140 : 80 + Math.floor(Math.random() * 100);
-            if (c.deerState === 'jumping') c.jumpProgress = 0 as number;
-          }
-
-          // Herd Separation & Cohesion (Avoid Collision / Overlapping)
-          creatures.forEach((other, oIdx) => {
-            if (idx !== oIdx) {
-              const distX = Math.abs(c.x - other.x);
-              if (distX < 45) {
-                c.x += c.x > other.x ? 0.6 : -0.6;
-              }
-            }
-          });
-
-          // State Behaviors
-          let moveSpeed = 0;
-          let yOffset = 0;
-          let headTargetAngle = 0;
-
-          if (c.deerState === 'walking') {
-            moveSpeed = 0.75 * speedMultiplier;
-            c.legCycle = c.legCycle! + 0.12 * speedMultiplier;
-            headTargetAngle = Math.sin(t * 3 + idx) * 0.08;
-          } else if (c.deerState === 'running') {
-            moveSpeed = 2.2 * speedMultiplier;
-            c.legCycle = c.legCycle! + 0.25 * speedMultiplier;
-            headTargetAngle = 0.15;
-          } else if (c.deerState === 'jumping') {
-            moveSpeed = 1.8 * speedMultiplier;
-            c.jumpProgress = Math.min(1, c.jumpProgress! + 0.025 * speedMultiplier);
-            yOffset = -Math.sin(c.jumpProgress * Math.PI) * 32;
-            c.legCycle = c.legCycle! + 0.2;
-            headTargetAngle = -0.2;
-          } else if (c.deerState === 'grazing') {
-            moveSpeed = 0.05;
-            headTargetAngle = 0.75; // Head lowered to grass
-          } else if (c.deerState === 'looking') {
-            moveSpeed = 0;
-            headTargetAngle = -0.35 + Math.sin(t * 1.5) * 0.25; // Looking up & around
-          } else {
-            // Idle
-            moveSpeed = 0;
-            headTargetAngle = Math.sin(t * 2 + idx) * 0.05;
-          }
-
-          c.x += moveSpeed;
-          if (c.x > width + 50) c.x = -50;
-
-          // Head Angle Lerp
-          c.headAngle = c.headAngle! + (headTargetAngle - c.headAngle!) * 0.1;
-
-          // Draw Articulated Deer Body
-          ctx.save();
-          const baseGroundY = height - 32 + yOffset;
-          const breathingScale = 1 + Math.sin(t * 2.5 + idx) * 0.02;
-          ctx.translate(c.x, baseGroundY);
-          ctx.scale(breathingScale, breathingScale);
-
-          // 1. Articulated Legs (4 Legs with Knee/Hock Joints)
-          ctx.strokeStyle = '#D97706'; // Warm Cervid Brown
-          ctx.lineWidth = 2.4;
-          ctx.lineCap = 'round';
-
-          const legSwing1 = Math.sin(c.legCycle!) * 12;
-          const legSwing2 = Math.sin(c.legCycle! + Math.PI) * 12;
-
-          // Hind Legs (Back Left & Right)
-          ctx.beginPath();
-          ctx.moveTo(-10, 6);
-          ctx.lineTo(-12 - legSwing1 * 0.5, 15);
-          ctx.lineTo(-10 - legSwing1, 24);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(-4, 6);
-          ctx.lineTo(-6 - legSwing2 * 0.5, 15);
-          ctx.lineTo(-4 - legSwing2, 24);
-          ctx.stroke();
-
-          // Fore Legs (Front Left & Right)
-          ctx.beginPath();
-          ctx.moveTo(8, 6);
-          ctx.lineTo(10 + legSwing2 * 0.5, 15);
-          ctx.lineTo(8 + legSwing2, 24);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(14, 6);
-          ctx.lineTo(16 + legSwing1 * 0.5, 15);
-          ctx.lineTo(14 + legSwing1, 24);
-          ctx.stroke();
-
-          // 2. Main Deer Body (Torso & Flank)
-          ctx.fillStyle = c.color || '#B45309';
-          ctx.beginPath();
-          ctx.ellipse(0, 0, 18, 10, 0, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Underbelly Highlight
-          ctx.fillStyle = '#FDE68A';
-          ctx.beginPath();
-          ctx.ellipse(-2, 3, 12, 5, 0, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Tail Flick
-          const tailFlick = Math.sin(t * 4 + idx) * 0.4;
-          ctx.fillStyle = '#FFFFFF';
-          ctx.beginPath();
-          ctx.ellipse(-18, -3 + tailFlick * 2, 4, 3, -0.4 + tailFlick, 0, Math.PI * 2);
-          ctx.fill();
-
-          // 3. Neck & Articulated Head (Rotates on headAngle)
-          ctx.save();
-          ctx.translate(14, -6);
-          ctx.rotate(c.headAngle!);
-
-          // Neck
-          ctx.fillStyle = c.color || '#B45309';
-          ctx.beginPath();
-          ctx.ellipse(4, -6, 5, 9, 0.4, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Head & Snout
-          ctx.beginPath();
-          ctx.ellipse(9, -12, 6, 4.5, 0.2, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Eye
-          ctx.fillStyle = '#0F172A';
-          ctx.beginPath();
-          ctx.arc(10, -13.5, 1.2, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Twitching Ears
-          const earTwitch = Math.sin(t * 6 + idx) * 0.15;
-          ctx.fillStyle = c.secondaryColor || '#78350F';
-          ctx.beginPath();
-          ctx.ellipse(6, -17 + earTwitch * 3, 3, 1.5, -0.8 + earTwitch, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Branching Antlers (For Bucks)
-          if (idx % 2 === 0) {
-            ctx.strokeStyle = '#78350F';
-            ctx.lineWidth = 1.6;
-            ctx.beginPath();
-            ctx.moveTo(7, -15);
-            ctx.lineTo(10, -24);
-            ctx.lineTo(14, -22);
-            ctx.moveTo(10, -24);
-            ctx.lineTo(8, -28);
-            ctx.stroke();
-          }
-
-          ctx.restore(); // End Head Transform
-          ctx.restore(); // End Deer Body Transform
+        creatures.forEach((c) => {
+          drawRealisticDeer(ctx, c, t, height, width, speedMultiplier);
         });
       }
 
@@ -849,41 +1047,7 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
           ctx.restore();
         });
       } else if (type === 'deer') {
-        // Walking Deer Silhouettes (Strictly Ground Level)
-        creatures.forEach((c, idx) => {
-          c.x += 0.8;
-          if (c.x > width + 40) c.x = -40;
-
-          ctx.save();
-          ctx.translate(c.x, height - 45 + Math.sin(t * 2 + idx) * 1.5);
-          ctx.fillStyle = c.color;
-          // Body
-          ctx.beginPath();
-          ctx.ellipse(0, 0, 18, 10, 0, 0, Math.PI * 2);
-          ctx.fill();
-          // Head & Neck
-          ctx.beginPath();
-          ctx.ellipse(14, -10, 6, 8, 0.3, 0, Math.PI * 2);
-          ctx.fill();
-          // Antlers
-          ctx.strokeStyle = c.secondaryColor;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(16, -16); ctx.lineTo(19, -24); ctx.lineTo(22, -22);
-          ctx.moveTo(19, -24); ctx.lineTo(16, -28);
-          ctx.stroke();
-          // Animated Legs
-          const legMove = Math.sin(t * 4 + idx) * 6;
-          ctx.strokeStyle = c.secondaryColor;
-          ctx.lineWidth = 2.2;
-          ctx.beginPath();
-          ctx.moveTo(-10, 8); ctx.lineTo(-10 + legMove, 22);
-          ctx.moveTo(-4, 8);  ctx.lineTo(-4 - legMove, 22);
-          ctx.moveTo(8, 8);   ctx.lineTo(8 + legMove, 22);
-          ctx.moveTo(14, 8);  ctx.lineTo(14 - legMove, 22);
-          ctx.stroke();
-          ctx.restore();
-        });
+        // Deer herd master rendering handled in backdrop woodland section
       }
 
       animationFrameId = requestAnimationFrame(render);
