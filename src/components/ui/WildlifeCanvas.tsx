@@ -380,14 +380,14 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
           }
 
           // State Machine Transition Logic
-          c.deerTimer -= 1;
+          c.deerTimer = c.deerTimer! - 1;
           if (c.deerTimer <= 0) {
             const states: Array<'walking' | 'running' | 'jumping' | 'grazing' | 'looking' | 'idle'> = [
               'walking', 'walking', 'grazing', 'grazing', 'looking', 'idle', 'running', 'jumping'
             ];
             c.deerState = states[Math.floor(Math.random() * states.length)];
             c.deerTimer = c.deerState === 'jumping' ? 45 : c.deerState === 'grazing' ? 140 : 80 + Math.floor(Math.random() * 100);
-            if (c.deerState === 'jumping') c.jumpProgress = 0;
+            if (c.deerState === 'jumping') c.jumpProgress = 0 as number;
           }
 
           // Herd Separation & Cohesion (Avoid Collision / Overlapping)
@@ -407,17 +407,17 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
 
           if (c.deerState === 'walking') {
             moveSpeed = 0.75 * speedMultiplier;
-            c.legCycle += 0.12 * speedMultiplier;
+            c.legCycle = c.legCycle! + 0.12 * speedMultiplier;
             headTargetAngle = Math.sin(t * 3 + idx) * 0.08;
           } else if (c.deerState === 'running') {
             moveSpeed = 2.2 * speedMultiplier;
-            c.legCycle += 0.25 * speedMultiplier;
+            c.legCycle = c.legCycle! + 0.25 * speedMultiplier;
             headTargetAngle = 0.15;
           } else if (c.deerState === 'jumping') {
             moveSpeed = 1.8 * speedMultiplier;
-            c.jumpProgress = Math.min(1, c.jumpProgress + 0.025 * speedMultiplier);
+            c.jumpProgress = Math.min(1, c.jumpProgress! + 0.025 * speedMultiplier);
             yOffset = -Math.sin(c.jumpProgress * Math.PI) * 32;
-            c.legCycle += 0.2;
+            c.legCycle = c.legCycle! + 0.2;
             headTargetAngle = -0.2;
           } else if (c.deerState === 'grazing') {
             moveSpeed = 0.05;
@@ -435,7 +435,7 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
           if (c.x > width + 50) c.x = -50;
 
           // Head Angle Lerp
-          c.headAngle += (headTargetAngle - c.headAngle) * 0.1;
+          c.headAngle = c.headAngle! + (headTargetAngle - c.headAngle!) * 0.1;
 
           // Draw Articulated Deer Body
           ctx.save();
@@ -449,8 +449,8 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
           ctx.lineWidth = 2.4;
           ctx.lineCap = 'round';
 
-          const legSwing1 = Math.sin(c.legCycle) * 12;
-          const legSwing2 = Math.sin(c.legCycle + Math.PI) * 12;
+          const legSwing1 = Math.sin(c.legCycle!) * 12;
+          const legSwing2 = Math.sin(c.legCycle! + Math.PI) * 12;
 
           // Hind Legs (Back Left & Right)
           ctx.beginPath();
@@ -500,7 +500,7 @@ export const WildlifeCanvas: React.FC<WildlifeCanvasProps> = ({ type, className 
           // 3. Neck & Articulated Head (Rotates on headAngle)
           ctx.save();
           ctx.translate(14, -6);
-          ctx.rotate(c.headAngle);
+          ctx.rotate(c.headAngle!);
 
           // Neck
           ctx.fillStyle = c.color || '#B45309';
