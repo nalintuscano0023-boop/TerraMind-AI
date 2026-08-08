@@ -74,7 +74,98 @@ function treeSway(weather: Weather): { angle: number; duration: number } {
   return { angle: 2, duration: 3.5 };
 }
 
-/* ── Deterministic pseudo-random ── */
+/* ── Deterministic PRNG for natural star generation ── */
+function createPRNG(seed: number) {
+  let s = seed;
+  return function () {
+    s |= 0;
+    s = (s + 0x6d2b79f5) | 0;
+    let imul = Math.imul(s ^ (s >>> 15), s | 1);
+    imul = (imul + Math.imul(imul ^ (imul >>> 7), imul | 61)) ^ imul;
+    return ((imul ^ (imul >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+interface StarSpec {
+  top: string;
+  left: string;
+  size: number;
+  baseOpacity: number;
+  minOpacity: number;
+  duration: string;
+  delay: string;
+  boxShadow?: string;
+}
+
+function generateNightStars(): StarSpec[] {
+  const rng = createPRNG(9876543);
+  const stars: StarSpec[] = [];
+  const targetCount = 170;
+
+  const getDensity = (x: number, y: number) => {
+    const wave1 = Math.sin(x * 0.07 + y * 0.09);
+    const wave2 = Math.cos(x * 0.13 - y * 0.05);
+    const wave3 = Math.sin(x * 0.03 + y * 0.04);
+    return 0.52 + 0.22 * wave1 + 0.16 * wave2 + 0.10 * wave3;
+  };
+
+  let attempts = 0;
+  while (stars.length < targetCount && attempts < 2500) {
+    attempts++;
+    const left = 1 + rng() * 97.5;
+    const top = 2 + rng() * 52;
+
+    if (top >= 6 && top <= 18 && left >= 81 && left <= 93) {
+      continue;
+    }
+
+    const density = getDensity(left, top);
+    if (rng() > density) {
+      continue;
+    }
+
+    const r = rng();
+    let size: number;
+    let baseOpacity: number;
+    let minOpacity: number;
+    let boxShadow: string | undefined;
+
+    if (r < 0.76) {
+      size = 0.8 + rng() * 0.5;
+      baseOpacity = 0.22 + rng() * 0.32;
+      minOpacity = 0.05 + rng() * 0.12;
+      boxShadow = 'none';
+    } else if (r < 0.96) {
+      size = 1.4 + rng() * 0.6;
+      baseOpacity = 0.55 + rng() * 0.22;
+      minOpacity = 0.18 + rng() * 0.18;
+      boxShadow = '0 0 2px rgba(255,255,255,0.45)';
+    } else {
+      size = 2.2 + rng() * 0.7;
+      baseOpacity = 0.78 + rng() * 0.20;
+      minOpacity = 0.30 + rng() * 0.20;
+      boxShadow = '0 0 3px rgba(255,255,255,0.7), 0 0 6px rgba(255,255,255,0.25)';
+    }
+
+    const duration = `${(2.2 + rng() * 4.3).toFixed(2)}s`;
+    const delay = `${(rng() * 4.5).toFixed(2)}s`;
+
+    stars.push({
+      top: `${top.toFixed(2)}%`,
+      left: `${left.toFixed(2)}%`,
+      size,
+      baseOpacity,
+      minOpacity,
+      duration,
+      delay,
+      boxShadow,
+    });
+  }
+
+  return stars;
+}
+
+/* ── Deterministic pseudo-random helper ── */
 function seededVal(seed: number, offset = 0): number {
   return ((Math.sin(seed * 9.721 + offset * 3.14) + 1) / 2);
 }
@@ -103,14 +194,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
   const windMW     = Math.round((windLevel / 100) * 150 * (weather === 'storm' ? 0.8 : weather === 'rain' ? 0.9 : 1.0));
 
   /* Stars for night */
-  const stars = useMemo(() => Array.from({ length: 28 }, (_, i) => ({
-    top:      `${seededVal(i, 1) * 55}%`,
-    left:     `${seededVal(i, 2) * 98}%`,
-    size:     1 + seededVal(i, 3) * 2.5,
-    delay:    `${seededVal(i, 4) * 3}s`,
-    opacity:  0.4 + seededVal(i, 5) * 0.6,
-    duration: `${1.8 + seededVal(i, 6) * 2.2}s`,
-  })), []);
+  const stars = useMemo(() => generateNightStars(), []);
 
   /* Trees */
   const trees = useMemo(() => Array.from({ length: numTrees }, (_, i) => {
@@ -172,16 +256,17 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
                 style={{
                   top: star.top,
                   left: star.left,
-                  width: star.size,
-                  height: star.size,
-                  opacity: star.opacity,
-                  boxShadow: `0 0 ${star.size * 3}px rgba(255,255,255,0.8)`,
-                  animationName: 'pulseDot',
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  boxShadow: star.boxShadow,
+                  animationName: 'starTwinkle',
                   animationDuration: star.duration,
                   animationDelay: star.delay,
                   animationIterationCount: 'infinite',
                   animationTimingFunction: 'ease-in-out',
-                }}
+                  ['--star-base-opacity' as any]: star.baseOpacity,
+                  ['--star-min-opacity' as any]: star.minOpacity,
+                } as React.CSSProperties}
               />
             ))}
             {/* Moon */}
