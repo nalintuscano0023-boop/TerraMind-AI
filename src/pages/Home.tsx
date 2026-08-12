@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight, Trees, Droplets, Wind, Sun, Cloud, Bird,
   Satellite, Target, BarChart3, Sparkles, Activity, Globe2, Zap,
-  ChevronDown, TrendingUp, Shield, Leaf,
+  ChevronDown, TrendingUp, Shield, Leaf, Github, Linkedin, Mail,
 } from 'lucide-react';
 import { GlassCard, SectionTitle, StatCounter, Badge } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
@@ -677,47 +677,126 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== CTA ===== */}
-      <section className="relative py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-            <Badge variant="primary" className="mb-6">
-              <Globe2 className="w-3 h-3" /> Open Environmental Intelligence
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold font-display text-balance leading-tight">
-              Ready to save the{' '}
-              <span className="text-aurora">planet</span>?
-            </h2>
-            <p className="mt-4 text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
-              Join TerraMind and explore what Earth could become with the right decisions. Every
-              simulation matters. Every choice counts.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4 justify-center">
-              <Link to="/simulation">
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(0,229,168,0.5)' }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-ink font-bold shadow-glow text-base"
+      {/* ===== CLOSING / CONNECT SECTION (HOME ONLY) ===== */}
+      <section className="relative py-16">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="glass border border-white/10 rounded-[2rem] p-8 md:p-12 lg:p-16 backdrop-blur-md bg-[#040d1a]/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+              <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="flex flex-wrap items-center gap-3 mb-8"
                 >
-                  Start Simulation <ArrowRight className="w-5 h-5" />
-                </motion.button>
-              </Link>
-              <Link to="/insights">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full glass font-semibold border border-primary/20 text-base"
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-white">TERRAMIND AI</span>
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.1em] text-[var(--text-muted)] font-mono flex items-center gap-1.5">
+                    <Activity className="w-3 h-3 text-primary/70" />
+                    PLANETARY INTELLIGENCE SYSTEM
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
                 >
-                  <Activity className="w-4 h-4 text-primary" /> View Insights
-                </motion.button>
-              </Link>
+                  <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-4 leading-tight tracking-tight">
+                    THE PLANET IS OUR <br className="hidden md:block" />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500">SHARED SYSTEM.</span>
+                  </h2>
+                  <div className="text-lg md:text-xl font-medium text-white/90 mb-6 font-display tracking-wide">
+                    Understand it. Simulate it. Protect it.
+                  </div>
+                </motion.div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="text-[var(--text-muted)] text-sm md:text-base max-w-md leading-relaxed font-light mb-8"
+                >
+                  TerraMind AI transforms environmental data into immersive simulations, predictive insights, and actionable intelligence for a more resilient planet.
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Link to="/simulation" className="inline-block">
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="group relative flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-primary/30 text-white font-medium overflow-hidden transition-all shadow-glow hover:border-primary/60 hover:shadow-[0_0_20px_rgba(52,211,153,0.3)]"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <span className="relative z-10 tracking-wide text-sm font-semibold">EXPLORE TERRAMIND</span>
+                      <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
+                  </Link>
+                </motion.div>
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-col lg:items-end justify-center h-full space-y-12 lg:pl-12 mt-10 lg:mt-0"
+              >
+                <div className="w-full max-w-sm">
+                  <div className="text-[10px] font-mono tracking-[0.2em] text-[var(--text-muted)] mb-4 font-semibold uppercase">
+                    CONNECT WITH TERRAMIND
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <motion.a
+                      whileHover={{ y: -3, scale: 1.02 }}
+                      href="https://github.com/nalintuscano0023-boop/TerraMind-AI"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl glass border border-white/5 hover:border-white/20 hover:bg-white/5 transition-all group"
+                    >
+                      <Github className="w-5 h-5 text-[var(--text-muted)] group-hover:text-white transition-colors" />
+                      <span className="text-[10px] font-medium text-[var(--text-muted)] group-hover:text-white transition-colors">GitHub</span>
+                    </motion.a>
+                    <motion.a
+                      whileHover={{ y: -3, scale: 1.02 }}
+                      href="https://linkedin.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl glass border border-white/5 hover:border-[#0A66C2]/40 hover:bg-[#0A66C2]/10 transition-all group"
+                    >
+                      <Linkedin className="w-5 h-5 text-[var(--text-muted)] group-hover:text-[#0A66C2] transition-colors" />
+                      <span className="text-[10px] font-medium text-[var(--text-muted)] group-hover:text-white transition-colors">LinkedIn</span>
+                    </motion.a>
+                    <motion.a
+                      whileHover={{ y: -3, scale: 1.02 }}
+                      href="mailto:contact@terramind.ai"
+                      className="flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-xl glass border border-white/5 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all group"
+                    >
+                      <Mail className="w-5 h-5 text-[var(--text-muted)] group-hover:text-emerald-400 transition-colors" />
+                      <span className="text-[10px] font-medium text-[var(--text-muted)] group-hover:text-white transition-colors">Email</span>
+                    </motion.a>
+                  </div>
+                </div>
+
+                <div className="w-full max-w-sm pt-6 border-t border-white/5">
+                  <div className="text-[9px] sm:text-[10px] font-mono tracking-[0.2em] text-[var(--text-muted)] leading-relaxed lg:text-right uppercase">
+                    AI FOR EARTH • ENVIRONMENTAL INTELLIGENCE • PLANETARY FUTURES
+                  </div>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
