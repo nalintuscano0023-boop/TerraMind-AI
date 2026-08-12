@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame, Droplets, Trees, Waves, Wind, Sun,
   ShieldAlert, Satellite, Eye, CheckCircle2,
-  Radio, ThermometerSun, Loader2, AlertCircle
+  Radio, ThermometerSun, Loader2, AlertCircle, X,
+  Activity, Cpu, Terminal, Check, RotateCcw
 } from 'lucide-react';
 import { GlassCard, Badge, CircularProgress } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
@@ -26,9 +27,109 @@ interface ClimateModule {
   recommendedAction: string;
 }
 
-type ProtocolStatus = 'idle' | 'executing' | 'success' | 'error';
+type ProtocolPhase = 'idle' | 'executing' | 'completed' | 'error';
 
-const CLIMATE_MODULES: ClimateModule[] = [
+interface ProtocolStage {
+  id: string;
+  title: string;
+  description: string;
+  progressTarget: number;
+  duration: number;
+  logMessage: string;
+  subsystemUpdate?: Partial<SubsystemHealth>;
+}
+
+interface ExecutionLogEntry {
+  id: string;
+  timestamp: string;
+  stageId: string;
+  text: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+}
+
+interface SubsystemHealth {
+  telemetry: 'STANDBY' | 'ONLINE' | 'SYNCHRONIZED';
+  aiAnalysis: 'STANDBY' | 'COMPUTING' | 'OPTIMAL';
+  emergency: 'STANDBY' | 'ALERT LEVEL 1' | 'COORDINATED';
+  aerialResponse: 'STANDBY' | 'DISPATCHED' | 'ACTIVE';
+  evacuation: 'STANDBY' | 'ENFORCING' | 'ACTIVE';
+}
+
+const PROTOCOL_STAGES: ProtocolStage[] = [
+  {
+    id: 'init',
+    title: 'Initializing planetary response system',
+    description: 'Establishing encrypted orbital link with Terra & Aqua constellations.',
+    progressTarget: 12,
+    duration: 800,
+    logMessage: 'Encrypted downlink established with satellite const. 142-Beta',
+    subsystemUpdate: { telemetry: 'ONLINE', aiAnalysis: 'STANDBY' },
+  },
+  {
+    id: 'verify',
+    title: 'Verifying wildfire telemetry',
+    description: 'Validating IR thermal hotspots and SAR ground displacement telemetry.',
+    progressTarget: 25,
+    duration: 900,
+    logMessage: 'Satellite thermal anomaly confirmed. Hotspot perimeter verified.',
+    subsystemUpdate: { telemetry: 'SYNCHRONIZED', aiAnalysis: 'COMPUTING' },
+  },
+  {
+    id: 'analyze',
+    title: 'Analyzing satellite thermal data',
+    description: 'Synthesizing neural wind vector & smoke plume spread prediction models.',
+    progressTarget: 40,
+    duration: 1000,
+    logMessage: 'Neural AI propagation vector calculated.',
+    subsystemUpdate: { aiAnalysis: 'OPTIMAL', emergency: 'ALERT LEVEL 1' },
+  },
+  {
+    id: 'calculate',
+    title: 'Calculating wildfire containment strategy',
+    description: 'Computing optimal retardant drop vectors & barrier boundaries.',
+    progressTarget: 55,
+    duration: 950,
+    logMessage: 'Firebreak corridor locked: Vector 48° N / 14° W.',
+    subsystemUpdate: { emergency: 'COORDINATED' },
+  },
+  {
+    id: 'coordinate',
+    title: 'Coordinating emergency response',
+    description: 'Dispatching ground tactical fire response & regional emergency command.',
+    progressTarget: 70,
+    duration: 900,
+    logMessage: 'Tactical ground units & amphibious strike teams mobilized.',
+    subsystemUpdate: { aerialResponse: 'DISPATCHED' },
+  },
+  {
+    id: 'deploy',
+    title: 'Deploying aerial fire-retardant response',
+    description: 'Launching 12 autonomous fire-retardant drone swarms to canopy boundary.',
+    progressTarget: 85,
+    duration: 1100,
+    logMessage: 'Autonomous aerial retardant drone swarm deployed over target zone.',
+    subsystemUpdate: { aerialResponse: 'ACTIVE', evacuation: 'ENFORCING' },
+  },
+  {
+    id: 'evacuate',
+    title: 'Activating emergency evacuation zones',
+    description: 'Broadcasting automated emergency alerts & locking perimeter roadways.',
+    progressTarget: 98,
+    duration: 850,
+    logMessage: 'Evacuation Zone Alpha & Bravo perimeter lockdown activated.',
+    subsystemUpdate: { evacuation: 'ACTIVE' },
+  },
+  {
+    id: 'completed',
+    title: 'Protocol execution completed',
+    description: 'All 8 planetary policy directives active. Live orbital telemetry monitoring engaged.',
+    progressTarget: 100,
+    duration: 600,
+    logMessage: 'Planetary Policy Protocol Executed Successfully. Telemetry monitoring live.',
+  },
+];
+
+const INITIAL_CLIMATE_MODULES: ClimateModule[] = [
   {
     id: 'wildfire',
     name: 'Wildfire Monitoring',
@@ -233,59 +334,141 @@ const CLIMATE_MODULES: ClimateModule[] = [
 
 export default function Challenges() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [activeModule, setActiveModule] = useState<ClimateModule | null>(CLIMATE_MODULES[0]);
+  const [modulesData, setModulesData] = useState<ClimateModule[]>(INITIAL_CLIMATE_MODULES);
+  const [activeModuleId, setActiveModuleId] = useState<string>(INITIAL_CLIMATE_MODULES[0].id);
   const [searchTerm, setSearchTerm] = useState('');
-  const [moduleProtocolStatus, setModuleProtocolStatus] = useState<Record<string, ProtocolStatus>>({});
+
+  // Protocol Execution State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [executionPhase, setExecutionPhase] = useState<ProtocolPhase>('idle');
+  const [currentStageIndex, setCurrentStageIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [logs, setLogs] = useState<ExecutionLogEntry[]>([]);
+  const [subsystemHealth, setSubsystemHealth] = useState<SubsystemHealth>({
+    telemetry: 'STANDBY',
+    aiAnalysis: 'STANDBY',
+    emergency: 'STANDBY',
+    aerialResponse: 'STANDBY',
+    evacuation: 'STANDBY',
+  });
+  const [executedProtocols, setExecutedProtocols] = useState<Record<string, { time: string }>>({});
   const [protocolError, setProtocolError] = useState<string | null>(null);
 
-  const handleExecuteProtocol = async () => {
-    if (!activeModule) return;
-    const moduleId = activeModule.id;
-    const currentStatus = moduleProtocolStatus[moduleId] || 'idle';
+  const activeModule = useMemo(() => {
+    return modulesData.find((m) => m.id === activeModuleId) || modulesData[0];
+  }, [modulesData, activeModuleId]);
 
-    if (currentStatus === 'executing') return;
+  const filteredModules = useMemo(() => {
+    return modulesData.filter((m) => {
+      const matchesCategory = selectedCategory === 'all' || m.category === selectedCategory;
+      const matchesSearch =
+        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.location.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [modulesData, selectedCategory, searchTerm]);
 
-    setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'executing' }));
+  const avgSeverity = useMemo(() => {
+    return Math.round(modulesData.reduce((acc, m) => acc + m.severity, 0) / modulesData.length);
+  }, [modulesData]);
+
+  const runProtocolExecution = async (moduleToExecute: ClimateModule) => {
+    setIsModalOpen(true);
+    setExecutionPhase('executing');
+    setCurrentStageIndex(0);
+    setProgress(0);
     setProtocolError(null);
+    setLogs([]);
+    setSubsystemHealth({
+      telemetry: 'STANDBY',
+      aiAnalysis: 'STANDBY',
+      emergency: 'STANDBY',
+      aerialResponse: 'STANDBY',
+      evacuation: 'STANDBY',
+    });
+
+    const startTimeStr = new Date().toLocaleTimeString();
+
+    const initialLog: ExecutionLogEntry = {
+      id: Date.now().toString(),
+      timestamp: startTimeStr,
+      stageId: 'start',
+      text: `[SYSTEM INITIATION] Protocol execution requested for ${moduleToExecute.name} (${moduleToExecute.location})`,
+      type: 'info',
+    };
+    setLogs([initialLog]);
 
     try {
-      // Simulate protocol execution delay
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 1600);
-      });
+      for (let i = 0; i < PROTOCOL_STAGES.length; i++) {
+        const stage = PROTOCOL_STAGES[i];
+        setCurrentStageIndex(i);
+        setProgress(stage.progressTarget);
 
-      setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'success' }));
+        if (stage.subsystemUpdate) {
+          setSubsystemHealth((prev) => ({
+            ...prev,
+            ...stage.subsystemUpdate,
+          }));
+        }
 
-      // Automatically reset status after 3.5 seconds
-      setTimeout(() => {
-        setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'idle' }));
-      }, 3500);
+        const logTime = new Date().toLocaleTimeString();
+        const newLog: ExecutionLogEntry = {
+          id: `${Date.now()}-${i}`,
+          timestamp: logTime,
+          stageId: stage.id,
+          text: stage.logMessage,
+          type: i === PROTOCOL_STAGES.length - 1 ? 'success' : 'info',
+        };
+        setLogs((prev) => [...prev, newLog]);
+
+        await new Promise((resolve) => setTimeout(resolve, stage.duration));
+      }
+
+      setExecutionPhase('completed');
+      setExecutedProtocols((prev) => ({
+        ...prev,
+        [moduleToExecute.id]: { time: new Date().toLocaleTimeString() },
+      }));
+
+      // Dynamically mutate hazard telemetry & dashboard risk state
+      setModulesData((prev) =>
+        prev.map((m) => {
+          if (m.id === moduleToExecute.id) {
+            return {
+              ...m,
+              severity: Math.max(15, Math.round(m.severity * 0.45)),
+              status: 'stable',
+              trend: 'Action Deployed (-55% Risk)',
+              metricValue: 'CONTAINMENT ACTIVE',
+              telemetry: [
+                { label: 'Protocol Status', val: 'DEPLOYS ACTIVE' },
+                { label: 'Response Units', val: '12 Drones Dispatched' },
+                { label: 'Protection Perimeter', val: 'EVAC ZONE ENFORCED' },
+              ],
+              recommendedAction: `PROTOCOL ENFORCED — Autonomous response active across ${m.location}. Telemetry synchronized.`,
+            };
+          }
+          return m;
+        })
+      );
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Protocol execution failed. Please try again.';
-      setProtocolError(message);
-      setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'error' }));
-
-      setTimeout(() => {
-        setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'idle' }));
-        setProtocolError(null);
-      }, 4000);
+      setExecutionPhase('error');
+      const errorMsg = err instanceof Error ? err.message : 'Telemetry link failed during protocol transmission.';
+      setProtocolError(errorMsg);
+      setLogs((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          timestamp: new Date().toLocaleTimeString(),
+          stageId: 'error',
+          text: `[EXECUTION CRITICAL FAILURE] ${errorMsg}`,
+          type: 'error',
+        },
+      ]);
     }
   };
 
-  const filteredModules = useMemo(() => {
-    return CLIMATE_MODULES.filter((m) => {
-      const matchesCategory = selectedCategory === 'all' || m.category === selectedCategory;
-      const matchesSearch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            m.location.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
-  }, [selectedCategory, searchTerm]);
-
-  const avgSeverity = useMemo(() => {
-    return Math.round(CLIMATE_MODULES.reduce((acc, m) => acc + m.severity, 0) / CLIMATE_MODULES.length);
-  }, []);
+  const isExecuted = !!executedProtocols[activeModule.id];
 
   return (
     <div className="relative min-h-screen">
@@ -367,7 +550,7 @@ export default function Challenges() {
             return (
               <GlassCard
                 key={module.id}
-                onClick={() => setActiveModule(module)}
+                onClick={() => setActiveModuleId(module.id)}
                 className={`cursor-pointer transition-all duration-300 relative group overflow-hidden ${
                   isSelected ? 'border-primary/60 bg-primary/5 shadow-glow-sm' : 'hover:border-white/20'
                 }`}
@@ -476,87 +659,51 @@ export default function Challenges() {
                   {/* Recommended Action Card */}
                   <div className="glass rounded-2xl p-5 border border-primary/20 flex flex-col justify-between bg-primary/5">
                     <div>
-                      <div className="flex items-center gap-2 text-xs font-semibold text-primary mb-2">
-                        <CheckCircle2 className="w-4 h-4" />
-                        AI Action Plan
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+                          <CheckCircle2 className="w-4 h-4" />
+                          AI Action Plan
+                        </div>
+                        {isExecuted && (
+                          <Badge variant="success" className="text-[9px] py-0.5 px-2 font-mono">
+                            PROTOCOL LIVE
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-xs text-white font-medium leading-relaxed">
                         {activeModule.recommendedAction}
                       </p>
                     </div>
 
-                    <div>
-                      {(() => {
-                        const status = moduleProtocolStatus[activeModule.id] || 'idle';
-                        const isExecuting = status === 'executing';
-                        const isSuccess = status === 'success';
-                        const isError = status === 'error';
-
-                        return (
+                    <div className="mt-4">
+                      <button
+                        onClick={() => runProtocolExecution(activeModule)}
+                        disabled={executionPhase === 'executing'}
+                        className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                          executionPhase === 'executing'
+                            ? 'bg-gradient-to-r from-primary/80 to-secondary/80 text-ink shadow-glow opacity-90 cursor-not-allowed'
+                            : isExecuted
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-ink shadow-glow hover:opacity-95'
+                            : 'bg-gradient-to-r from-primary to-secondary text-ink shadow-glow hover:opacity-90'
+                        }`}
+                      >
+                        {executionPhase === 'executing' ? (
                           <>
-                            <button
-                              onClick={handleExecuteProtocol}
-                              disabled={isExecuting}
-                              className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                                isExecuting
-                                  ? 'bg-gradient-to-r from-primary/80 to-secondary/80 text-ink shadow-glow opacity-90 cursor-not-allowed'
-                                  : isSuccess
-                                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-ink shadow-glow'
-                                  : isError
-                                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-glow'
-                                  : 'bg-gradient-to-r from-primary to-secondary text-ink shadow-glow hover:opacity-90'
-                              }`}
-                            >
-                              {isExecuting ? (
-                                <>
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                  Executing Planetary Policy Protocol...
-                                </>
-                              ) : isSuccess ? (
-                                <>
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
-                                  Planetary Policy Protocol Executed
-                                </>
-                              ) : isError ? (
-                                <>
-                                  <AlertCircle className="w-3.5 h-3.5" />
-                                  Execution Failed — Click to Retry
-                                </>
-                              ) : (
-                                <>
-                                  <Radio className="w-3.5 h-3.5" />
-                                  Execute Planetary Policy Protocol
-                                </>
-                              )}
-                            </button>
-
-                            <AnimatePresence>
-                              {isSuccess && (
-                                <motion.div
-                                  initial={{ opacity: 0, y: -4 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -4 }}
-                                  className="mt-2 text-[11px] font-mono text-emerald-400 flex items-center gap-1.5 justify-center"
-                                >
-                                  <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
-                                  <span>Protocol active for {activeModule.name}</span>
-                                </motion.div>
-                              )}
-                              {isError && (
-                                <motion.div
-                                  initial={{ opacity: 0, y: -4 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -4 }}
-                                  className="mt-2 text-[11px] font-mono text-red-400 flex items-center gap-1.5 justify-center"
-                                >
-                                  <AlertCircle className="w-3 h-3 flex-shrink-0" />
-                                  <span>{protocolError || 'Execution failed'}</span>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Executing Planetary Policy Protocol...
                           </>
-                        );
-                      })()}
+                        ) : isExecuted ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Planetary Policy Protocol Executed (View Details)
+                          </>
+                        ) : (
+                          <>
+                            <Radio className="w-3.5 h-3.5" />
+                            Execute Planetary Policy Protocol
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -565,6 +712,268 @@ export default function Challenges() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Protocol Execution Overlay Modal */}
+      <AnimatePresence>
+        {isModalOpen && activeModule && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 md:p-6"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="glass rounded-3xl border border-primary/40 max-w-4xl w-full p-6 md:p-8 max-h-[92vh] overflow-y-auto shadow-2xl relative bg-slate-950/95 text-white"
+            >
+              {/* Modal Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-white/10 mb-6">
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center border border-white/15 shadow-glow"
+                    style={{ backgroundColor: `${activeModule.color}25`, color: activeModule.color }}
+                  >
+                    <activeModule.icon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                        EMERGENCY PROTOCOL COMMAND CENTER
+                      </span>
+                      <Badge
+                        variant={
+                          executionPhase === 'completed'
+                            ? 'success'
+                            : executionPhase === 'error'
+                            ? 'danger'
+                            : 'primary'
+                        }
+                        className="text-[10px]"
+                      >
+                        {executionPhase === 'executing'
+                          ? 'EXECUTING PROTOCOL'
+                          : executionPhase === 'completed'
+                          ? 'PROTOCOL ACTIVATED'
+                          : executionPhase === 'error'
+                          ? 'FAILED'
+                          : 'STANDBY'}
+                      </Badge>
+                    </div>
+                    <h2 className="text-xl font-bold font-display text-white mt-0.5">
+                      Planetary Policy Protocol — {activeModule.name}
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-8 h-8 rounded-xl glass flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors border border-white/10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Progress & Current Operation Box */}
+              <div className="glass rounded-2xl p-5 border border-primary/30 bg-primary/5 mb-6">
+                <div className="flex items-center justify-between mb-2 font-mono text-xs">
+                  <span className="text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+                    {executionPhase === 'executing' && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
+                    {executionPhase === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+                    {executionPhase === 'error' && <AlertCircle className="w-3.5 h-3.5 text-red-400" />}
+                    Current Operation:
+                  </span>
+                  <span className="font-bold text-primary font-mono text-sm">{progress}%</span>
+                </div>
+
+                <div className="text-sm font-bold text-white mb-3 font-display">
+                  {PROTOCOL_STAGES[currentStageIndex]?.title || 'Protocol Execution Completed'}
+                </div>
+
+                <div className="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-white/10 p-0.5">
+                  <motion.div
+                    className={`h-full rounded-full ${
+                      executionPhase === 'completed'
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-300 shadow-glow'
+                        : executionPhase === 'error'
+                        ? 'bg-red-500'
+                        : 'bg-gradient-to-r from-primary via-teal-400 to-emerald-400 shadow-glow'
+                    }`}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.4 }}
+                  />
+                </div>
+              </div>
+
+              {/* Dual Column Layout */}
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                {/* Left Column: Stage Checklist & Subsystems */}
+                <div className="space-y-6">
+                  {/* Checklist */}
+                  <div className="glass rounded-2xl p-4 border border-white/10">
+                    <h3 className="text-xs font-bold font-mono uppercase text-primary mb-3 flex items-center gap-2">
+                      <Activity className="w-3.5 h-3.5" />
+                      Multi-Stage Directive Checklist
+                    </h3>
+
+                    <div className="space-y-2">
+                      {PROTOCOL_STAGES.map((stage, idx) => {
+                        const isDone = idx < currentStageIndex || executionPhase === 'completed';
+                        const isCurrent = idx === currentStageIndex && executionPhase === 'executing';
+
+                        return (
+                          <div
+                            key={stage.id}
+                            className={`flex items-start gap-2.5 p-2 rounded-xl text-xs transition-all ${
+                              isCurrent
+                                ? 'bg-primary/15 border border-primary/40 text-white'
+                                : isDone
+                                ? 'text-emerald-300'
+                                : 'text-[var(--text-muted)] opacity-60'
+                            }`}
+                          >
+                            <div className="mt-0.5 flex-shrink-0">
+                              {isDone ? (
+                                <div className="w-4 h-4 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400">
+                                  <Check className="w-2.5 h-2.5" />
+                                </div>
+                              ) : isCurrent ? (
+                                <div className="w-4 h-4 rounded-full border border-primary flex items-center justify-center text-primary animate-pulse">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                </div>
+                              ) : (
+                                <div className="w-4 h-4 rounded-full border border-white/20 flex items-center justify-center">
+                                  <span className="text-[8px] font-mono">{idx + 1}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold">{stage.title}</div>
+                              {isCurrent && (
+                                <div className="text-[10px] font-mono text-[var(--text-muted)] mt-0.5">
+                                  {stage.description}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Subsystem Health Grid */}
+                  <div className="glass rounded-2xl p-4 border border-white/10">
+                    <h3 className="text-xs font-bold font-mono uppercase text-primary mb-3 flex items-center gap-2">
+                      <Cpu className="w-3.5 h-3.5" />
+                      Subsystem Response Grid
+                    </h3>
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                      {Object.entries(subsystemHealth).map(([key, val]) => (
+                        <div key={key} className="glass p-2 rounded-xl border border-white/5 flex justify-between items-center">
+                          <span className="capitalize text-[var(--text-muted)]">{key.replace(/([A-Z])/g, ' $1')}</span>
+                          <span
+                            className={`font-bold text-[10px] px-1.5 py-0.5 rounded ${
+                              val.includes('ACTIVE') || val.includes('ONLINE') || val.includes('OPTIMAL') || val.includes('SYNCHRONIZED')
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : val.includes('DISPATCHED') || val.includes('ALERT') || val.includes('COMPUTING')
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                : 'bg-white/5 text-[var(--text-muted)]'
+                            }`}
+                          >
+                            {val}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Terminal Event Log */}
+                <div className="glass rounded-2xl p-4 border border-white/10 flex flex-col h-full min-h-[320px] bg-black/40 font-mono">
+                  <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-3 text-xs">
+                    <span className="text-primary font-bold flex items-center gap-2">
+                      <Terminal className="w-3.5 h-3.5" />
+                      LIVE SYSTEM EXECUTION LOG
+                    </span>
+                    <span className="text-[10px] text-[var(--text-muted)]">LOG STREAM ACTIVE</span>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto space-y-2 text-[11px] pr-1 scrollbar-thin max-h-[340px]">
+                    {logs.map((log) => (
+                      <div
+                        key={log.id}
+                        className={`p-2 rounded-lg leading-relaxed ${
+                          log.type === 'success'
+                            ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                            : log.type === 'error'
+                            ? 'bg-red-500/10 text-red-300 border border-red-500/20'
+                            : 'bg-white/5 text-slate-300'
+                        }`}
+                      >
+                        <span className="text-[10px] text-primary/80 mr-2">[{log.timestamp}]</span>
+                        <span>{log.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer Controls */}
+              <div className="pt-4 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="text-xs text-[var(--text-muted)] font-mono">
+                  {executionPhase === 'executing' && 'Executing automated protocol directives... Please standby.'}
+                  {executionPhase === 'completed' && 'Protocol executed successfully. Hazards mitigated.'}
+                  {executionPhase === 'error' && (protocolError || 'Execution halted due to telemetry error.')}
+                </div>
+
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  {executionPhase === 'completed' && (
+                    <>
+                      <button
+                        onClick={() => setIsModalOpen(false)}
+                        className="flex-1 md:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-ink font-bold text-xs shadow-glow hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        Inspect Updated Telemetry
+                      </button>
+                      <button
+                        onClick={() => runProtocolExecution(activeModule)}
+                        className="px-4 py-2.5 rounded-xl glass text-xs font-semibold text-white hover:bg-white/10 transition-all border border-white/10 flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Re-Run
+                      </button>
+                    </>
+                  )}
+
+                  {executionPhase === 'error' && (
+                    <button
+                      onClick={() => runProtocolExecution(activeModule)}
+                      className="flex-1 md:flex-none px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold text-xs shadow-glow hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Retry Protocol
+                    </button>
+                  )}
+
+                  {executionPhase === 'executing' && (
+                    <button
+                      disabled
+                      className="w-full md:w-auto px-6 py-2.5 rounded-xl bg-primary/20 text-primary border border-primary/30 font-bold text-xs cursor-not-allowed opacity-80 flex items-center justify-center gap-2"
+                    >
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Protocol Execution In Progress...
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>
