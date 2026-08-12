@@ -861,117 +861,131 @@ function WindTurbineGraphic({ speedSec, nightGlow, showLabel, powerMW }: WindTur
     <div className="relative flex flex-col items-center">
       {/* Tapered Vertical Tower (Stationary) */}
       <div
-        className="relative shadow-md"
+        className="relative shadow-lg"
         style={{
-          width: 4,
-          height: 56,
-          background: 'linear-gradient(to bottom, #f8fafc 0%, #cbd5e1 50%, #64748b 100%)',
+          width: 5,
+          height: 60,
+          background: 'linear-gradient(to bottom, #ffffff 0%, #cbd5e1 55%, #475569 100%)',
           clipPath: 'polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%)',
-          boxShadow: nightGlow ? '0 0 8px rgba(56,189,248,0.5)' : 'none',
+          boxShadow: nightGlow ? '0 0 10px rgba(56,189,248,0.6)' : '0 2px 6px rgba(0,0,0,0.4)',
         }}
       />
       {/* Tower Foundation */}
-      <div className="w-3.5 h-1 bg-slate-800 rounded-sm -mt-0.5" />
+      <div className="w-4 h-1.5 bg-slate-800 rounded-sm -mt-0.5" />
 
       {/* Nacelle & Rotor Hub Assembly at Top (Fixed Position at Top of Tower) */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center">
         {/* Stationary Nacelle Generator Box */}
         <div
-          className="absolute z-[1] rounded-sm bg-gradient-to-r from-slate-200 to-slate-400 border border-slate-500/80 shadow-md"
+          className="absolute z-[1] rounded-sm bg-gradient-to-r from-slate-100 via-slate-300 to-slate-500 border border-slate-700 shadow-lg"
           style={{
-            width: 9,
-            height: 5,
-            top: -2.5,
-            left: -4.5,
-            boxShadow: nightGlow ? '0 0 8px rgba(56,189,248,0.7)' : 'none',
+            width: 13,
+            height: 7,
+            top: -3.5,
+            left: -6.5,
+            boxShadow: nightGlow ? '0 0 10px rgba(56,189,248,0.8)' : '0 2px 4px rgba(0,0,0,0.5)',
           }}
         >
           {/* Red Aviation Warning Obstacle Light */}
-          <div className="absolute -top-1 right-0.5 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_4px_#ef4444] animate-pulse" />
+          <div className="absolute -top-1 right-0.5 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_#ef4444] animate-pulse" />
         </div>
 
-        {/* Rotatable 3-Blade SVG Rotor Fan Assembly (Rotates around central hub at 27, 27) */}
-        <div className="absolute z-[2]" style={{ top: -27, left: -27 }}>
+        {/* Rotatable 3-Blade Large Aerodynamic Rotor Assembly (80x80 SVG canvas centered at 40, 40) */}
+        <div className="absolute z-[2]" style={{ top: -40, left: -40, width: 80, height: 80 }}>
           {isStopped ? (
-            <svg width="54" height="54" viewBox="0 0 54 54">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <defs>
+                <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="60%" stopColor="#f1f5f9" />
+                  <stop offset="100%" stopColor="#cbd5e1" />
+                </linearGradient>
+              </defs>
               <g id="static-rotor">
                 {/* Blade 1 (0 deg - Up) */}
-                <g transform="rotate(0, 27, 27)">
+                <g transform="rotate(0, 40, 40)">
                   <path
-                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
-                    fill="#f8fafc"
-                    stroke="#334155"
-                    strokeWidth="0.8"
-                    style={{ filter: nightGlow ? 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                    d="M 40 38 C 36 28, 29 16, 36 5 C 38 3, 42 3, 44 5 C 51 16, 44 28, 40 38 Z"
+                    fill="url(#bladeGrad)"
+                    stroke="#0f172a"
+                    strokeWidth="1.2"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 6px rgba(255,255,255,0.95))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                   />
                 </g>
                 {/* Blade 2 (120 deg) */}
-                <g transform="rotate(120, 27, 27)">
+                <g transform="rotate(120, 40, 40)">
                   <path
-                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
-                    fill="#e2e8f0"
-                    stroke="#334155"
-                    strokeWidth="0.8"
-                    style={{ filter: nightGlow ? 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                    d="M 40 38 C 36 28, 29 16, 36 5 C 38 3, 42 3, 44 5 C 51 16, 44 28, 40 38 Z"
+                    fill="url(#bladeGrad)"
+                    stroke="#0f172a"
+                    strokeWidth="1.2"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 6px rgba(255,255,255,0.95))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                   />
                 </g>
                 {/* Blade 3 (240 deg) */}
-                <g transform="rotate(240, 27, 27)">
+                <g transform="rotate(240, 40, 40)">
                   <path
-                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
-                    fill="#f8fafc"
-                    stroke="#334155"
-                    strokeWidth="0.8"
-                    style={{ filter: nightGlow ? 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                    d="M 40 38 C 36 28, 29 16, 36 5 C 38 3, 42 3, 44 5 C 51 16, 44 28, 40 38 Z"
+                    fill="url(#bladeGrad)"
+                    stroke="#0f172a"
+                    strokeWidth="1.2"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 6px rgba(255,255,255,0.95))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                   />
                 </g>
-                {/* Central Rotor Hub Nose Cone */}
-                <circle cx="27" cy="27" r="3.5" fill="#475569" stroke="#cbd5e1" strokeWidth="1" />
-                <circle cx="27" cy="27" r="1.5" fill="#ffffff" />
+                {/* Central Prominent Hub Nose Cone */}
+                <circle cx="40" cy="40" r="5.5" fill="#334155" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="40" cy="40" r="2.5" fill="#ffffff" />
               </g>
             </svg>
           ) : (
             <motion.svg
-              width="54" height="54"
-              viewBox="0 0 54 54"
+              width="80" height="80"
+              viewBox="0 0 80 80"
               animate={{ rotate: 360 }}
               transition={{ duration: speedSec, repeat: Infinity, ease: 'linear' }}
-              style={{ transformOrigin: '27px 27px' }}
+              style={{ transformOrigin: '40px 40px' }}
             >
+              <defs>
+                <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="60%" stopColor="#f1f5f9" />
+                  <stop offset="100%" stopColor="#cbd5e1" />
+                </linearGradient>
+              </defs>
               <g id="animated-rotor">
                 {/* Blade 1 (0 deg - Up) */}
-                <g transform="rotate(0, 27, 27)">
+                <g transform="rotate(0, 40, 40)">
                   <path
-                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
-                    fill="#f8fafc"
-                    stroke="#334155"
-                    strokeWidth="0.8"
-                    style={{ filter: nightGlow ? 'drop-shadow(0 0 5px rgba(255,255,255,0.9))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                    d="M 40 38 C 36 28, 29 16, 36 5 C 38 3, 42 3, 44 5 C 51 16, 44 28, 40 38 Z"
+                    fill="url(#bladeGrad)"
+                    stroke="#0f172a"
+                    strokeWidth="1.2"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 7px rgba(255,255,255,0.95))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                   />
                 </g>
                 {/* Blade 2 (120 deg) */}
-                <g transform="rotate(120, 27, 27)">
+                <g transform="rotate(120, 40, 40)">
                   <path
-                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
-                    fill="#e2e8f0"
-                    stroke="#334155"
-                    strokeWidth="0.8"
-                    style={{ filter: nightGlow ? 'drop-shadow(0 0 5px rgba(255,255,255,0.9))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                    d="M 40 38 C 36 28, 29 16, 36 5 C 38 3, 42 3, 44 5 C 51 16, 44 28, 40 38 Z"
+                    fill="url(#bladeGrad)"
+                    stroke="#0f172a"
+                    strokeWidth="1.2"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 7px rgba(255,255,255,0.95))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                   />
                 </g>
                 {/* Blade 3 (240 deg) */}
-                <g transform="rotate(240, 27, 27)">
+                <g transform="rotate(240, 40, 40)">
                   <path
-                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
-                    fill="#f8fafc"
-                    stroke="#334155"
-                    strokeWidth="0.8"
-                    style={{ filter: nightGlow ? 'drop-shadow(0 0 5px rgba(255,255,255,0.9))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                    d="M 40 38 C 36 28, 29 16, 36 5 C 38 3, 42 3, 44 5 C 51 16, 44 28, 40 38 Z"
+                    fill="url(#bladeGrad)"
+                    stroke="#0f172a"
+                    strokeWidth="1.2"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 7px rgba(255,255,255,0.95))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))' }}
                   />
                 </g>
-                {/* Central Rotor Hub Nose Cone */}
-                <circle cx="27" cy="27" r="3.5" fill="#475569" stroke="#cbd5e1" strokeWidth="1" />
-                <circle cx="27" cy="27" r="1.5" fill="#ffffff" />
+                {/* Central Prominent Hub Nose Cone */}
+                <circle cx="40" cy="40" r="5.5" fill="#334155" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="40" cy="40" r="2.5" fill="#ffffff" />
               </g>
             </motion.svg>
           )}
