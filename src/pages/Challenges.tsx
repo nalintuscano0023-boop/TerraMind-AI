@@ -555,45 +555,45 @@ export default function Challenges() {
                   isSelected ? 'border-primary/60 bg-primary/5 shadow-glow-sm' : 'hover:border-white/20'
                 }`}
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10"
+                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 flex-shrink-0"
                       style={{ backgroundColor: `${module.color}15`, color: module.color }}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-5 h-5 flex-shrink-0" />
                     </div>
-                    <div>
-                      <h3 className="text-base font-bold font-display text-white group-hover:text-primary transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base font-bold font-display text-white group-hover:text-primary transition-colors truncate">
                         {module.name}
                       </h3>
-                      <span className="text-[10px] font-mono text-[var(--text-muted)]">{module.location}</span>
+                      <span className="text-[10px] font-mono text-[var(--text-muted)] block truncate">{module.location}</span>
                     </div>
                   </div>
 
-                  <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border ${statusColor}`}>
+                  <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 whitespace-nowrap ${statusColor}`}>
                     {module.status}
                   </span>
                 </div>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-[var(--text-muted)] font-mono">{module.metricLabel}</span>
-                    <span className="font-bold font-mono text-white">{module.metricValue}</span>
+                <div className="space-y-2 mb-4 min-w-0">
+                  <div className="flex justify-between items-center text-xs gap-2 min-w-0">
+                    <span className="text-[var(--text-muted)] font-mono truncate min-w-0 flex-1">{module.metricLabel}</span>
+                    <span className="font-bold font-mono text-white flex-shrink-0 whitespace-nowrap pl-1">{module.metricValue}</span>
                   </div>
 
                   <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-500"
+                      className="h-full rounded-full transition-all duration-500 max-w-full"
                       style={{ width: `${module.severity}%`, backgroundColor: module.color }}
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] font-mono pt-3 border-t border-white/5">
-                  <span className="text-xs">{module.trend}</span>
-                  <span className="flex items-center gap-1 text-primary group-hover:translate-x-1 transition-transform">
-                    Inspect Telemetry <Eye className="w-3 h-3" />
+                <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] font-mono pt-3 border-t border-white/5 gap-2 min-w-0">
+                  <span className="text-xs truncate min-w-0 flex-1">{module.trend}</span>
+                  <span className="flex items-center gap-1 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0 whitespace-nowrap">
+                    Inspect Telemetry <Eye className="w-3 h-3 flex-shrink-0" />
                   </span>
                 </div>
               </GlassCard>
