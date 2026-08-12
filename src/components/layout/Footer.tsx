@@ -1,6 +1,5 @@
-import { Globe, Github, Linkedin, Mail, ArrowUp, Sparkles, Heart } from 'lucide-react';
+import { Globe, ArrowUp, Sparkles, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 export function Footer() {
   const scrollToTop = () => {
@@ -16,7 +15,7 @@ export function Footer() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
           {/* Column 1 & 2: Brand Info */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
@@ -51,41 +50,6 @@ export function Footer() {
               <li><Link to="/challenges" className="text-[var(--text-muted)] hover:text-primary transition-colors">Climate Action Hub</Link></li>
               <li><Link to="/insights" className="text-[var(--text-muted)] hover:text-primary transition-colors">Insights & Analytics</Link></li>
             </ul>
-          </div>
-
-          {/* Column 4: Connect With TerraMind */}
-          <div>
-            <div className="text-xs font-bold uppercase tracking-widest text-primary mb-4 font-mono">Connect With TerraMind</div>
-            <div className="flex flex-col gap-2.5">
-              <motion.a
-                whileHover={{ x: 3 }}
-                href="https://github.com/nalintuscano0023-boop/TerraMind-AI"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl glass border border-white/5 hover:border-white/20 text-xs text-[var(--text-muted)] hover:text-white transition-all group"
-              >
-                <Github className="w-4 h-4 text-[var(--text-muted)] group-hover:text-white transition-colors" />
-                <span>GitHub</span>
-              </motion.a>
-              <motion.a
-                whileHover={{ x: 3 }}
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl glass border border-white/5 hover:border-[#0A66C2]/40 text-xs text-[var(--text-muted)] hover:text-[#0A66C2] transition-all group"
-              >
-                <Linkedin className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[#0A66C2] transition-colors" />
-                <span>LinkedIn</span>
-              </motion.a>
-              <motion.a
-                whileHover={{ x: 3 }}
-                href="mailto:contact@terramind.ai"
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl glass border border-white/5 hover:border-emerald-500/40 text-xs text-[var(--text-muted)] hover:text-emerald-400 transition-all group"
-              >
-                <Mail className="w-4 h-4 text-[var(--text-muted)] group-hover:text-emerald-400 transition-colors" />
-                <span>Email</span>
-              </motion.a>
-            </div>
           </div>
         </div>
 
