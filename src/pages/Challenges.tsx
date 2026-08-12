@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame, Droplets, Trees, Waves, Wind, Sun,
-  ShieldAlert, Satellite, Eye, RefreshCw, Layers, CheckCircle2,
-  Radio, Compass, ThermometerSun
+  ShieldAlert, Satellite, Eye, CheckCircle2,
+  Radio, ThermometerSun, Loader2, AlertCircle
 } from 'lucide-react';
-import { GlassCard, SectionTitle, Badge, CircularProgress } from '@/components/ui';
+import { GlassCard, Badge, CircularProgress } from '@/components/ui';
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 
@@ -25,6 +25,8 @@ interface ClimateModule {
   telemetry: { label: string; val: string }[];
   recommendedAction: string;
 }
+
+type ProtocolStatus = 'idle' | 'executing' | 'success' | 'error';
 
 const CLIMATE_MODULES: ClimateModule[] = [
   {
@@ -233,6 +235,44 @@ export default function Challenges() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activeModule, setActiveModule] = useState<ClimateModule | null>(CLIMATE_MODULES[0]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [moduleProtocolStatus, setModuleProtocolStatus] = useState<Record<string, ProtocolStatus>>({});
+  const [protocolError, setProtocolError] = useState<string | null>(null);
+
+  const handleExecuteProtocol = async () => {
+    if (!activeModule) return;
+    const moduleId = activeModule.id;
+    const currentStatus = moduleProtocolStatus[moduleId] || 'idle';
+
+    if (currentStatus === 'executing') return;
+
+    setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'executing' }));
+    setProtocolError(null);
+
+    try {
+      // Simulate protocol execution delay
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1600);
+      });
+
+      setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'success' }));
+
+      // Automatically reset status after 3.5 seconds
+      setTimeout(() => {
+        setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'idle' }));
+      }, 3500);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Protocol execution failed. Please try again.';
+      setProtocolError(message);
+      setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'error' }));
+
+      setTimeout(() => {
+        setModuleProtocolStatus((prev) => ({ ...prev, [moduleId]: 'idle' }));
+        setProtocolError(null);
+      }, 4000);
+    }
+  };
 
   const filteredModules = useMemo(() => {
     return CLIMATE_MODULES.filter((m) => {
@@ -253,180 +293,132 @@ export default function Challenges() {
       <Particles count={15} />
 
       <div className="mx-auto max-w-7xl px-6 py-10">
-        <SectionTitle
-          eyebrow="Global Climate Action Hub"
-          title="Real-Time Planetary Telemetry & Risk Intelligence"
-          description="Live satellite monitoring across 10 critical climate crisis domains. AI-driven risk modeling, early detection, and automated policy recommendations."
-          className="mb-8"
-        />
-
-        {/* Global Risk Overview Banner */}
-        <GlassCard className="p-6 mb-8 border-primary/20 bg-gradient-to-r from-[#0a1628]/90 via-[#0f2442]/70 to-[#0a1628]/90">
-          <div className="grid md:grid-cols-4 gap-6 items-center">
-            <div className="md:col-span-2 flex items-center gap-4">
-              <div className="relative flex-shrink-0">
-                <CircularProgress value={avgSeverity} size={90} strokeWidth={8} color="#EF4444" label={`${avgSeverity}%`} sublabel="Risk" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="danger">
-                    <Radio className="w-3 h-3 animate-ping text-danger" />
-                    LIVE SATELLITE FEED
-                  </Badge>
-                  <span className="text-xs font-mono text-[var(--text-muted)]">142 Orbital Nodes Active</span>
-                </div>
-                <h2 className="text-xl font-bold font-display text-white">Global Climate Emergency Grid</h2>
-                <p className="text-xs text-[var(--text-muted)] mt-1">
-                  Synthetic Aperture Radar (SAR) and multispectral optical imaging scanning 10 planetary crisis indicators in real time.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="glass rounded-xl p-3 border border-white/5">
-                <div className="text-[var(--text-muted)] text-[10px] uppercase font-mono">Critical Zones</div>
-                <div className="text-lg font-bold font-display text-danger mt-0.5">5 Domains</div>
-                <div className="text-[10px] text-danger/80">Immediate Action</div>
-              </div>
-              <div className="glass rounded-xl p-3 border border-white/5">
-                <div className="text-[var(--text-muted)] text-[10px] uppercase font-mono">Warning Status</div>
-                <div className="text-lg font-bold font-display text-warning mt-0.5">4 Domains</div>
-                <div className="text-[10px] text-warning/80">High Risk</div>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center items-end">
-              <button
-                onClick={() => {
-                  setSelectedCategory('all');
-                  setSearchTerm('');
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl glass text-xs font-semibold text-primary hover:bg-primary/10 transition-all border border-primary/20"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Reset Grid Filter
-              </button>
-            </div>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <Badge variant="primary" className="mb-3">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              GLOBAL CLIMATE CHALLENGES
+            </Badge>
+            <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight text-white">
+              Climate Action <span className="text-gradient font-black">Hub</span>
+            </h1>
+            <p className="text-sm text-[var(--text-muted)] max-w-2xl mt-2 font-normal">
+              Real-time planetary hazards telemetry, neural satellite analysis, and automated action plan deployment.
+            </p>
           </div>
-        </GlassCard>
+
+          <div className="flex items-center gap-4 glass px-5 py-3 rounded-2xl border border-white/10">
+            <div className="text-right">
+              <div className="text-[10px] text-[var(--text-muted)] uppercase font-mono">Global Risk Index</div>
+              <div className="text-xl font-bold font-mono text-warning">{avgSeverity} / 100</div>
+            </div>
+            <CircularProgress value={avgSeverity} size={48} strokeWidth={5} color="var(--warning)" />
+          </div>
+        </div>
 
         {/* Filter Controls & Search */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
             {[
-              { id: 'all', label: 'All 10 Domains', icon: Layers },
-              { id: 'disaster', label: 'Extreme Events', icon: Flame },
-              { id: 'ecosystem', label: 'Ecosystems', icon: Trees },
-              { id: 'atmospheric', label: 'Atmosphere', icon: Wind },
-              { id: 'resource', label: 'Water & Soil', icon: Droplets },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = selectedCategory === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setSelectedCategory(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                    isActive
-                      ? 'glass border border-primary/30 text-primary shadow-glow bg-primary/10'
-                      : 'glass text-[var(--text-muted)] hover:text-white'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {tab.label}
-                </button>
-              );
-            })}
+              { id: 'all', label: 'All Domains' },
+              { id: 'disaster', label: 'Disasters' },
+              { id: 'ecosystem', label: 'Ecosystems' },
+              { id: 'atmospheric', label: 'Atmospheric' },
+              { id: 'resource', label: 'Resources' },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  selectedCategory === cat.id
+                    ? 'bg-primary text-ink shadow-glow'
+                    : 'glass text-[var(--text-muted)] hover:text-white border border-white/5'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
 
-          <div className="w-full sm:w-64 relative">
+          <div className="relative w-full md:w-72">
             <input
               type="text"
-              placeholder="Search region or hazard..."
+              placeholder="Search by hazard or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full glass rounded-xl px-4 py-2 text-xs text-white placeholder-[var(--text-muted)] border border-white/10 focus:border-primary focus:outline-none transition-all"
+              className="w-full glass px-4 py-2.5 rounded-xl text-xs text-white placeholder-[var(--text-muted)] border border-white/10 focus:outline-none focus:border-primary/50 transition-colors"
             />
           </div>
         </div>
 
-        {/* Grid of 10 Domain Modules */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {filteredModules.map((mod) => {
-            const Icon = mod.icon;
-            const isSelected = activeModule?.id === mod.id;
+        {/* Modules Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {filteredModules.map((module) => {
+            const Icon = module.icon;
+            const isSelected = activeModule?.id === module.id;
+            const statusColor =
+              module.status === 'critical'
+                ? 'text-danger border-danger/30 bg-danger/10'
+                : module.status === 'warning'
+                ? 'text-warning border-warning/30 bg-warning/10'
+                : 'text-success border-success/30 bg-success/10';
 
             return (
-              <motion.div
-                key={mod.id}
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setActiveModule(mod)}
-                className="cursor-pointer"
+              <GlassCard
+                key={module.id}
+                onClick={() => setActiveModule(module)}
+                className={`cursor-pointer transition-all duration-300 relative group overflow-hidden ${
+                  isSelected ? 'border-primary/60 bg-primary/5 shadow-glow-sm' : 'hover:border-white/20'
+                }`}
               >
-                <GlassCard
-                  className={`p-6 relative overflow-hidden transition-all duration-300 ${
-                    isSelected ? 'border-primary ring-1 ring-primary/40 shadow-glow' : 'hover:border-primary/30'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 shadow-inner"
-                        style={{ backgroundColor: `${mod.color}15`, color: mod.color }}
-                      >
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold font-display text-sm text-white">{mod.name}</h3>
-                        <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1 mt-0.5">
-                          <Compass className="w-3 h-3 text-primary" />
-                          {mod.location}
-                        </span>
-                      </div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10"
+                      style={{ backgroundColor: `${module.color}15`, color: module.color }}
+                    >
+                      <Icon className="w-5 h-5" />
                     </div>
-
-                    <Badge variant={mod.status === 'critical' ? 'danger' : mod.status === 'warning' ? 'warning' : 'success'}>
-                      {mod.status.toUpperCase()}
-                    </Badge>
-                  </div>
-
-                  <p className="text-xs text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
-                    {mod.description}
-                  </p>
-
-                  {/* Telemetry Metric Bar */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-xs font-mono">
-                      <span className="text-[var(--text-muted)]">{mod.metricLabel}</span>
-                      <span className="font-bold text-white" style={{ color: mod.color }}>{mod.metricValue}</span>
-                    </div>
-
-                    {/* Progress fill */}
-                    <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ backgroundColor: mod.color, width: `${mod.severity}%` }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${mod.severity}%` }}
-                        transition={{ duration: 0.8 }}
-                      />
+                    <div>
+                      <h3 className="text-base font-bold font-display text-white group-hover:text-primary transition-colors">
+                        {module.name}
+                      </h3>
+                      <span className="text-[10px] font-mono text-[var(--text-muted)]">{module.location}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono text-[var(--text-muted)] pt-3 border-t border-white/5">
-                    <span>Trend: <strong className="text-white">{mod.trend}</strong></span>
-                    <span className="text-primary hover:underline flex items-center gap-1 font-semibold">
-                      Telemetry <Eye className="w-3 h-3" />
-                    </span>
+                  <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border ${statusColor}`}>
+                    {module.status}
+                  </span>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[var(--text-muted)] font-mono">{module.metricLabel}</span>
+                    <span className="font-bold font-mono text-white">{module.metricValue}</span>
                   </div>
-                </GlassCard>
-              </motion.div>
+
+                  <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${module.severity}%`, backgroundColor: module.color }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] font-mono pt-3 border-t border-white/5">
+                  <span className="text-xs">{module.trend}</span>
+                  <span className="flex items-center gap-1 text-primary group-hover:translate-x-1 transition-transform">
+                    Inspect Telemetry <Eye className="w-3 h-3" />
+                  </span>
+                </div>
+              </GlassCard>
             );
           })}
         </div>
 
-        {/* Selected Module Detail Modal / Banner */}
+        {/* Selected Module Detail Panel */}
         <AnimatePresence mode="wait">
           {activeModule && (
             <motion.div
@@ -434,9 +426,9 @@ export default function Challenges() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
             >
-              <GlassCard className="p-6 md:p-8 border-primary/30 relative overflow-hidden bg-gradient-to-br from-[#0a1628]/95 to-[#0f2442]/90">
+              <GlassCard className="p-6 md:p-8 border-primary/30 relative overflow-hidden">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
                   <div className="flex items-center gap-4">
                     <div
@@ -493,10 +485,79 @@ export default function Challenges() {
                       </p>
                     </div>
 
-                    <button className="mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-ink font-bold text-xs shadow-glow hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                      <Radio className="w-3.5 h-3.5" />
-                      Execute Planetary Policy Protocol
-                    </button>
+                    <div>
+                      {(() => {
+                        const status = moduleProtocolStatus[activeModule.id] || 'idle';
+                        const isExecuting = status === 'executing';
+                        const isSuccess = status === 'success';
+                        const isError = status === 'error';
+
+                        return (
+                          <>
+                            <button
+                              onClick={handleExecuteProtocol}
+                              disabled={isExecuting}
+                              className={`mt-4 w-full py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                isExecuting
+                                  ? 'bg-gradient-to-r from-primary/80 to-secondary/80 text-ink shadow-glow opacity-90 cursor-not-allowed'
+                                  : isSuccess
+                                  ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-ink shadow-glow'
+                                  : isError
+                                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-glow'
+                                  : 'bg-gradient-to-r from-primary to-secondary text-ink shadow-glow hover:opacity-90'
+                              }`}
+                            >
+                              {isExecuting ? (
+                                <>
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  Executing Planetary Policy Protocol...
+                                </>
+                              ) : isSuccess ? (
+                                <>
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  Planetary Policy Protocol Executed
+                                </>
+                              ) : isError ? (
+                                <>
+                                  <AlertCircle className="w-3.5 h-3.5" />
+                                  Execution Failed — Click to Retry
+                                </>
+                              ) : (
+                                <>
+                                  <Radio className="w-3.5 h-3.5" />
+                                  Execute Planetary Policy Protocol
+                                </>
+                              )}
+                            </button>
+
+                            <AnimatePresence>
+                              {isSuccess && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -4 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -4 }}
+                                  className="mt-2 text-[11px] font-mono text-emerald-400 flex items-center gap-1.5 justify-center"
+                                >
+                                  <CheckCircle2 className="w-3 h-3 flex-shrink-0" />
+                                  <span>Protocol active for {activeModule.name}</span>
+                                </motion.div>
+                              )}
+                              {isError && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -4 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -4 }}
+                                  className="mt-2 text-[11px] font-mono text-red-400 flex items-center gap-1.5 justify-center"
+                                >
+                                  <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                                  <span>{protocolError || 'Execution failed'}</span>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
               </GlassCard>
