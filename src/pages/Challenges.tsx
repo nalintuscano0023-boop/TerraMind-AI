@@ -551,7 +551,7 @@ export default function Challenges() {
               <GlassCard
                 key={module.id}
                 onClick={() => setActiveModuleId(module.id)}
-                className={`cursor-pointer transition-all duration-300 relative group overflow-hidden ${
+                className={`p-5 sm:p-6 cursor-pointer transition-all duration-300 relative group overflow-hidden border border-white/10 ${
                   isSelected ? 'border-primary/60 bg-primary/5 shadow-glow-sm' : 'hover:border-white/20'
                 }`}
               >
@@ -579,7 +579,7 @@ export default function Challenges() {
                 <div className="space-y-2 mb-4 min-w-0">
                   <div className="flex justify-between items-center text-xs gap-2 min-w-0">
                     <span className="text-[var(--text-muted)] font-mono truncate min-w-0 flex-1">{module.metricLabel}</span>
-                    <span className="font-bold font-mono text-white flex-shrink-0 whitespace-nowrap pl-1">{module.metricValue}</span>
+                    <span className="font-bold font-mono text-white flex-shrink-0 max-w-[50%] truncate text-right pl-1">{module.metricValue}</span>
                   </div>
 
                   <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
