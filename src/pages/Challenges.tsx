@@ -475,34 +475,34 @@ export default function Challenges() {
       <FloatingShapes />
       <Particles count={15} />
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-10">
           <div>
-            <Badge variant="primary" className="mb-3">
+            <Badge variant="primary" className="mb-2 sm:mb-3 text-xs">
               <ShieldAlert className="w-3.5 h-3.5" />
               GLOBAL CLIMATE CHALLENGES
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight text-white">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black font-display tracking-tight text-white leading-tight">
               Climate Action <span className="text-gradient font-black">Hub</span>
             </h1>
-            <p className="text-sm text-[var(--text-muted)] max-w-2xl mt-2 font-normal">
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-2xl mt-1.5 sm:mt-2 font-normal leading-relaxed">
               Real-time planetary hazards telemetry, neural satellite analysis, and automated action plan deployment.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 glass px-5 py-3 rounded-2xl border border-white/10">
+          <div className="flex items-center gap-3 sm:gap-4 glass px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl border border-white/10 self-start md:self-auto">
             <div className="text-right">
-              <div className="text-[10px] text-[var(--text-muted)] uppercase font-mono">Global Risk Index</div>
-              <div className="text-xl font-bold font-mono text-warning">{avgSeverity} / 100</div>
+              <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] uppercase font-mono">Global Risk Index</div>
+              <div className="text-lg sm:text-xl font-bold font-mono text-warning">{avgSeverity} / 100</div>
             </div>
-            <CircularProgress value={avgSeverity} size={48} strokeWidth={5} color="var(--warning)" />
+            <CircularProgress value={avgSeverity} size={44} strokeWidth={4.5} color="var(--warning)" />
           </div>
         </div>
 
         {/* Filter Controls & Search */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 no-scrollbar">
             {[
               { id: 'all', label: 'All Domains' },
               { id: 'disaster', label: 'Disasters' },
@@ -513,7 +513,7 @@ export default function Challenges() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                   selectedCategory === cat.id
                     ? 'bg-primary text-ink shadow-glow'
                     : 'glass text-[var(--text-muted)] hover:text-white border border-white/5'
@@ -527,16 +527,16 @@ export default function Challenges() {
           <div className="relative w-full md:w-72">
             <input
               type="text"
-              placeholder="Search by hazard or location..."
+              placeholder="Search hazard or location..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full glass px-4 py-2.5 rounded-xl text-xs text-white placeholder-[var(--text-muted)] border border-white/10 focus:outline-none focus:border-primary/50 transition-colors"
+              className="w-full glass px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs text-white placeholder-[var(--text-muted)] border border-white/10 focus:outline-none focus:border-primary/50 transition-colors"
             />
           </div>
         </div>
 
         {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {filteredModules.map((module) => {
             const Icon = module.icon;
             const isSelected = activeModule?.id === module.id;
@@ -551,35 +551,35 @@ export default function Challenges() {
               <GlassCard
                 key={module.id}
                 onClick={() => setActiveModuleId(module.id)}
-                className={`p-5 sm:p-6 cursor-pointer transition-all duration-300 relative group overflow-hidden border border-white/10 ${
+                className={`p-4 sm:p-5 cursor-pointer transition-all duration-300 relative group overflow-hidden border border-white/10 ${
                   isSelected ? 'border-primary/60 bg-primary/5 shadow-glow-sm' : 'hover:border-white/20'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3 mb-4 min-w-0">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2 min-w-0">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center border border-white/10 flex-shrink-0"
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border border-white/10 flex-shrink-0"
                       style={{ backgroundColor: `${module.color}15`, color: module.color }}
                     >
-                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-bold font-display text-white group-hover:text-primary transition-colors truncate">
+                      <h3 className="text-sm sm:text-base font-bold font-display text-white group-hover:text-primary transition-colors truncate">
                         {module.name}
                       </h3>
                       <span className="text-[10px] font-mono text-[var(--text-muted)] block truncate">{module.location}</span>
                     </div>
                   </div>
 
-                  <span className={`text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border flex-shrink-0 whitespace-nowrap ${statusColor}`}>
+                  <span className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase px-1.5 sm:px-2 py-0.5 rounded-full border flex-shrink-0 whitespace-nowrap ${statusColor}`}>
                     {module.status}
                   </span>
                 </div>
 
-                <div className="space-y-2 mb-4 min-w-0">
+                <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4 min-w-0">
                   <div className="flex justify-between items-center text-xs gap-2 min-w-0">
-                    <span className="text-[var(--text-muted)] font-mono truncate min-w-0 flex-1">{module.metricLabel}</span>
-                    <span className="font-bold font-mono text-white flex-shrink-0 max-w-[50%] truncate text-right pl-1">{module.metricValue}</span>
+                    <span className="text-[var(--text-muted)] font-mono text-[11px] sm:text-xs truncate min-w-0 flex-1">{module.metricLabel}</span>
+                    <span className="font-bold font-mono text-white text-xs flex-shrink-0">{module.metricValue}</span>
                   </div>
 
                   <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
@@ -590,8 +590,8 @@ export default function Challenges() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] font-mono pt-3 border-t border-white/5 gap-2 min-w-0">
-                  <span className="text-xs truncate min-w-0 flex-1">{module.trend}</span>
+                <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-[var(--text-muted)] font-mono pt-2.5 sm:pt-3 border-t border-white/5 gap-2 min-w-0">
+                  <span className="text-[11px] sm:text-xs truncate min-w-0 flex-1">{module.trend}</span>
                   <span className="flex items-center gap-1 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0 whitespace-nowrap">
                     Inspect Telemetry <Eye className="w-3 h-3 flex-shrink-0" />
                   </span>
@@ -611,25 +611,25 @@ export default function Challenges() {
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.25 }}
             >
-              <GlassCard className="p-6 md:p-8 border-primary/30 relative overflow-hidden">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
-                  <div className="flex items-center gap-4">
+              <GlassCard className="p-4 sm:p-6 md:p-8 border-primary/30 relative overflow-hidden">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 pb-4 border-b border-white/10">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center border border-white/15 shadow-glow"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center border border-white/15 shadow-glow flex-shrink-0"
                       style={{ backgroundColor: `${activeModule.color}25`, color: activeModule.color }}
                     >
-                      <activeModule.icon className="w-6 h-6" />
+                      <activeModule.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono uppercase tracking-widest text-primary font-semibold">
+                        <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-primary font-semibold">
                           Domain Telemetry Protocol
                         </span>
-                        <Badge variant={activeModule.status === 'critical' ? 'danger' : 'warning'}>
+                        <Badge variant={activeModule.status === 'critical' ? 'danger' : 'warning'} className="text-[10px] sm:text-xs">
                           {activeModule.status.toUpperCase()}
                         </Badge>
                       </div>
-                      <h2 className="text-2xl font-bold font-display text-white mt-0.5">{activeModule.name}</h2>
+                      <h2 className="text-xl sm:text-2xl font-bold font-display text-white mt-0.5">{activeModule.name}</h2>
                     </div>
                   </div>
 
@@ -638,30 +638,30 @@ export default function Challenges() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-6 mb-6">
-                  <div className="md:col-span-2 space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                  <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                     <h3 className="text-sm font-semibold text-white font-display">AI Orbital Analysis Summary</h3>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                       {activeModule.description} Automated deep learning models synthesize thermal infrared, SAR phase displacement, and optical spectral signatures every 90 minutes.
                     </p>
 
                     {/* Telemetry Grid */}
-                    <div className="grid grid-cols-3 gap-3 pt-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-2">
                       {activeModule.telemetry.map((t, idx) => (
-                        <div key={idx} className="glass rounded-xl p-3 border border-white/5">
-                          <div className="text-[10px] text-[var(--text-muted)] uppercase font-mono">{t.label}</div>
-                          <div className="text-sm font-bold font-mono text-white mt-1">{t.val}</div>
+                        <div key={idx} className="glass rounded-xl p-2.5 sm:p-3 border border-white/5">
+                          <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] uppercase font-mono">{t.label}</div>
+                          <div className="text-xs sm:text-sm font-bold font-mono text-white mt-0.5 sm:mt-1 truncate">{t.val}</div>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Recommended Action Card */}
-                  <div className="glass rounded-2xl p-5 border border-primary/20 flex flex-col justify-between bg-primary/5">
+                  <div className="glass rounded-2xl p-4 sm:p-5 border border-primary/20 flex flex-col justify-between bg-primary/5">
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-                          <CheckCircle2 className="w-4 h-4" />
+                          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                           AI Action Plan
                         </div>
                         {isExecuted && (
@@ -689,18 +689,18 @@ export default function Challenges() {
                       >
                         {executionPhase === 'executing' ? (
                           <>
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            Executing Planetary Policy Protocol...
+                            <Loader2 className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
+                            <span>Executing Planetary Policy Protocol...</span>
                           </>
                         ) : isExecuted ? (
                           <>
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Planetary Policy Protocol Executed (View Details)
+                            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span>Planetary Policy Protocol Executed</span>
                           </>
                         ) : (
                           <>
-                            <Radio className="w-3.5 h-3.5" />
-                            Execute Planetary Policy Protocol
+                            <Radio className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span>Execute Planetary Policy Protocol</span>
                           </>
                         )}
                       </button>
@@ -720,27 +720,27 @@ export default function Challenges() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 md:p-6"
+            className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 md:p-6"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="glass rounded-3xl border border-primary/40 max-w-4xl w-full p-6 md:p-8 max-h-[92vh] overflow-y-auto shadow-2xl relative bg-slate-950/95 text-white"
+              className="glass rounded-3xl border border-primary/40 max-w-4xl w-full p-4 sm:p-6 md:p-8 max-h-[92vh] overflow-y-auto shadow-2xl relative bg-slate-950/95 text-white"
             >
               {/* Modal Header */}
-              <div className="flex items-start justify-between pb-4 border-b border-white/10 mb-6">
-                <div className="flex items-center gap-3.5">
+              <div className="flex items-start justify-between pb-3 sm:pb-4 border-b border-white/10 mb-4 sm:mb-6 gap-2">
+                <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                   <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center border border-white/15 shadow-glow"
+                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center border border-white/15 shadow-glow flex-shrink-0"
                     style={{ backgroundColor: `${activeModule.color}25`, color: activeModule.color }}
                   >
-                    <activeModule.icon className="w-6 h-6" />
+                    <activeModule.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                      <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-primary font-bold">
                         EMERGENCY PROTOCOL COMMAND CENTER
                       </span>
                       <Badge
@@ -751,7 +751,7 @@ export default function Challenges() {
                             ? 'danger'
                             : 'primary'
                         }
-                        className="text-[10px]"
+                        className="text-[9px] sm:text-[10px]"
                       >
                         {executionPhase === 'executing'
                           ? 'EXECUTING PROTOCOL'
@@ -762,7 +762,7 @@ export default function Challenges() {
                           : 'STANDBY'}
                       </Badge>
                     </div>
-                    <h2 className="text-xl font-bold font-display text-white mt-0.5">
+                    <h2 className="text-base sm:text-xl font-bold font-display text-white mt-0.5 truncate">
                       Planetary Policy Protocol — {activeModule.name}
                     </h2>
                   </div>
@@ -770,29 +770,29 @@ export default function Challenges() {
 
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="w-8 h-8 rounded-xl glass flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors border border-white/10"
+                  className="w-8 h-8 rounded-xl glass flex items-center justify-center text-[var(--text-muted)] hover:text-white transition-colors border border-white/10 flex-shrink-0"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Progress & Current Operation Box */}
-              <div className="glass rounded-2xl p-5 border border-primary/30 bg-primary/5 mb-6">
+              <div className="glass rounded-2xl p-4 sm:p-5 border border-primary/30 bg-primary/5 mb-4 sm:mb-6">
                 <div className="flex items-center justify-between mb-2 font-mono text-xs">
                   <span className="text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
-                    {executionPhase === 'executing' && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
-                    {executionPhase === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
-                    {executionPhase === 'error' && <AlertCircle className="w-3.5 h-3.5 text-red-400" />}
+                    {executionPhase === 'executing' && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary flex-shrink-0" />}
+                    {executionPhase === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
+                    {executionPhase === 'error' && <AlertCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />}
                     Current Operation:
                   </span>
-                  <span className="font-bold text-primary font-mono text-sm">{progress}%</span>
+                  <span className="font-bold text-primary font-mono text-xs sm:text-sm">{progress}%</span>
                 </div>
 
-                <div className="text-sm font-bold text-white mb-3 font-display">
+                <div className="text-xs sm:text-sm font-bold text-white mb-2 sm:mb-3 font-display">
                   {PROTOCOL_STAGES[currentStageIndex]?.title || 'Protocol Execution Completed'}
                 </div>
 
-                <div className="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-white/10 p-0.5">
+                <div className="w-full bg-slate-900 rounded-full h-2 sm:h-2.5 overflow-hidden border border-white/10 p-0.5">
                   <motion.div
                     className={`h-full rounded-full ${
                       executionPhase === 'completed'
@@ -808,7 +808,7 @@ export default function Challenges() {
               </div>
 
               {/* Dual Column Layout */}
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 {/* Left Column: Stage Checklist & Subsystems */}
                 <div className="space-y-6">
                   {/* Checklist */}

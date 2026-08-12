@@ -74,47 +74,49 @@ export default function Simulation() {
       <FloatingShapes />
       <Particles count={15} />
 
-      <div className="mx-auto max-w-7xl px-6 py-10 space-y-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-12">
         <SectionTitle
           eyebrow="Environmental Simulation Engine"
           title="Simulate Earth's Ecological Future"
           description="Interactive dual-engine digital twin platform: Environment & Climate Simulator and Species Habitat Simulator."
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         />
 
         {/* =========================================================
            SCREEN 1 — ENVIRONMENT SIMULATOR
            ========================================================= */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
+        <section className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-2xl font-bold font-display text-white flex items-center gap-2">
-                <Sun className="w-6 h-6 text-primary" />
-                Screen 1 — Planetary Environment Simulator
+              <h2 className="text-xl sm:text-2xl font-bold font-display text-white flex items-center gap-2">
+                <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0" />
+                <span>Screen 1 — Planetary Environment Simulator</span>
               </h2>
-              <p className="text-xs text-[var(--text-muted)] mt-1">
+              <p className="text-xs text-[var(--text-muted)] mt-1 max-w-xl">
                 Controls planetary lighting, seasonal transitions, and atmospheric weather protocols in real time.
               </p>
             </div>
-            <Badge variant={isPolluted ? 'danger' : 'success'}>
-              {isPolluted ? <AlertTriangle className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-              {Math.round(ecosystemHealth)}% Planetary Health
-            </Badge>
+            <div className="self-start sm:self-auto">
+              <Badge variant={isPolluted ? 'danger' : 'success'} className="text-xs font-mono">
+                {isPolluted ? <AlertTriangle className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                {Math.round(ecosystemHealth)}% Planetary Health
+              </Badge>
+            </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Environment Canvas Box */}
             <div className="lg:col-span-2 space-y-6">
-              <GlassCard className="p-6 relative overflow-hidden min-h-[440px] border-primary/20" ref={sectionRef}>
-                <div className="flex items-center justify-between mb-4 relative z-10">
-                  <h3 className="text-base font-bold font-display text-white">Planetary Climate Viewport</h3>
-                  <div className="text-xs font-mono text-primary">
+              <GlassCard className="p-4 sm:p-6 relative overflow-hidden min-h-[380px] sm:min-h-[440px] border-primary/20" ref={sectionRef}>
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1 mb-3 sm:mb-4 relative z-10">
+                  <h3 className="text-sm sm:text-base font-bold font-display text-white">Planetary Climate Viewport</h3>
+                  <div className="text-[11px] sm:text-xs font-mono text-primary">
                     {dayCycle.toUpperCase()} | {season.toUpperCase()} | {weather.toUpperCase()}
                   </div>
                 </div>
 
                 {/* Environment Canvas Viewport */}
-                <div className="relative h-[340px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <div className="relative h-[260px] xs:h-[300px] sm:h-[340px] md:h-[380px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                   <EnvironmentScene
                     dayCycle={dayCycle}
                     season={season}
@@ -130,31 +132,31 @@ export default function Simulation() {
                   />
 
                   {/* Active Environment Telemetry Status Badge */}
-                  <div className="absolute top-3 left-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/15 text-[11px] font-mono font-bold text-white flex items-center gap-2 shadow-xl">
-                    <span>{dayCycle === 'night' ? '🌙' : dayCycle === 'sunset' ? '🌇' : dayCycle === 'sunrise' ? '🌅' : '☀️'} {DAY_CYCLES.find((d) => d.key === dayCycle)?.label}</span>
+                  <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 z-30 bg-black/75 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-white/15 text-[10px] sm:text-[11px] font-mono font-bold text-white flex items-center gap-1.5 sm:gap-2 shadow-xl max-w-[90%] sm:max-w-none overflow-hidden">
+                    <span className="truncate">{dayCycle === 'night' ? '🌙' : dayCycle === 'sunset' ? '🌇' : dayCycle === 'sunrise' ? '🌅' : '☀️'} {DAY_CYCLES.find((d) => d.key === dayCycle)?.label}</span>
                     <span className="text-white/30">|</span>
-                    <span>{season === 'winter' ? '❄️' : season === 'autumn' ? '🍂' : season === 'summer' ? '☀️' : '🌸'} {SEASONS.find((s) => s.key === season)?.label}</span>
+                    <span className="truncate">{season === 'winter' ? '❄️' : season === 'autumn' ? '🍂' : season === 'summer' ? '☀️' : '🌸'} {SEASONS.find((s) => s.key === season)?.label}</span>
                     <span className="text-white/30">|</span>
-                    <span>{weather === 'storm' ? '⚡' : weather === 'rain' ? '🌧️' : weather === 'snow' ? '❄️' : weather === 'fog' ? '🌫️' : '☀️'} {WEATHERS.find((w) => w.key === weather)?.label}</span>
+                    <span className="truncate">{weather === 'storm' ? '⚡' : weather === 'rain' ? '🌧️' : weather === 'snow' ? '❄️' : weather === 'fog' ? '🌫️' : '☀️'} {WEATHERS.find((w) => w.key === weather)?.label}</span>
                   </div>
 
                   {/* Drone Telemetry Overlay */}
                   {droneMode && (
-                    <div className="absolute top-3 right-3 z-30 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-secondary/40 text-[11px] font-mono text-secondary flex items-center gap-2">
+                    <div className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3 z-30 bg-black/75 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-secondary/40 text-[10px] sm:text-[11px] font-mono text-secondary flex items-center gap-1.5">
                       <Plane className="w-3.5 h-3.5 animate-pulse" />
-                      DRONE ALTITUDE: <strong>{droneAltitude}m</strong> (Use WASD / Arrow Keys)
+                      <span>ALT: <strong>{droneAltitude}m</strong></span>
                     </div>
                   )}
                 </div>
 
                 {/* Day / Season / Weather Controls */}
-                <div className="mt-5 space-y-3 relative z-10">
+                <div className="mt-4 sm:mt-5 space-y-3 relative z-10">
                   {/* Day Cycle Selector */}
                   <div>
                     <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
                       1. Time of Day Lighting
                     </div>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-1.5 sm:gap-2 flex-wrap">
                       {DAY_CYCLES.map((d) => {
                         const Icon = d.icon;
                         const isActive = dayCycle === d.key;
@@ -162,7 +164,7 @@ export default function Simulation() {
                           <button
                             key={d.key}
                             onClick={() => setDayCycle(d.key)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
+                            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-xs font-semibold transition-all border ${
                               isActive
                                 ? 'bg-primary/20 text-primary border-primary/40 shadow-glow'
                                 : 'glass text-[var(--text-muted)] hover:text-white border-white/5'
@@ -177,12 +179,12 @@ export default function Simulation() {
                   </div>
 
                   {/* Seasons + Weather Selectors */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
                         2. Season Phase
                       </div>
-                      <div className="flex gap-1.5 flex-wrap">
+                      <div className="flex gap-1 sm:gap-1.5 flex-wrap">
                         {SEASONS.map((s) => {
                           const Icon = s.icon;
                           const isActive = season === s.key;
@@ -208,7 +210,7 @@ export default function Simulation() {
                       <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-1.5 font-mono font-semibold">
                         3. Weather Protocol
                       </div>
-                      <div className="flex gap-1.5 flex-wrap">
+                      <div className="flex gap-1 sm:gap-1.5 flex-wrap">
                         {WEATHERS.map((w) => {
                           const Icon = w.icon;
                           const isActive = weather === w.key;
@@ -243,7 +245,7 @@ export default function Simulation() {
                     }`}
                   >
                     <Plane className="w-4 h-4" />
-                    {droneMode ? '🎥 Cinematic Drone Camera Active (WASD Flight)' : '🚁 Engage Cinematic Drone Flight'}
+                    {droneMode ? '🎥 Drone Flight Active (WASD/Arrows)' : '🚁 Engage Drone Camera Flight'}
                   </button>
                 </div>
               </GlassCard>
@@ -251,9 +253,9 @@ export default function Simulation() {
 
             {/* Policy Controls Panel */}
             <div>
-              <GlassCard className="p-6 sticky top-24">
+              <GlassCard className="p-4 sm:p-6 lg:sticky lg:top-24">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold font-display text-white">Policy Controls</h3>
+                  <h3 className="text-base sm:text-lg font-bold font-display text-white">Policy Controls</h3>
                   <button
                     onClick={resetControls}
                     className="text-xs text-[var(--text-muted)] hover:text-primary transition-colors px-3 py-1 rounded-xl glass border border-white/10 font-semibold"

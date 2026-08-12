@@ -95,39 +95,39 @@ export function Navbar() {
 
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? 'py-2' : 'py-4'
+          scrolled ? 'py-1.5 sm:py-2' : 'py-2.5 sm:py-4'
         }`}
       >
-        <nav className="mx-auto max-w-7xl px-4 md:px-6">
+        <nav className="mx-auto max-w-7xl px-3 sm:px-4 md:px-6">
           <div
-            className={`glass-deep rounded-2xl px-4 md:px-6 flex items-center justify-between transition-all duration-500 ${
+            className={`glass-deep rounded-2xl px-3 sm:px-4 md:px-6 flex items-center justify-between transition-all duration-500 ${
               scrolled
                 ? 'py-2 shadow-2xl border-primary/25 bg-[#020811]/92 backdrop-blur-3xl'
-                : 'py-3 border-white/08'
+                : 'py-2.5 sm:py-3 border-white/08'
             }`}
           >
             {/* Branding */}
-            <NavLink to="/" className="flex items-center gap-2.5 group flex-shrink-0" aria-label="TerraMind AI home">
+            <NavLink to="/" className="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0" aria-label="TerraMind AI home">
               <motion.div
-                className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 shadow-glow"
+                className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 shadow-glow"
                 whileHover={{ rotate: 360, scale: 1.08 }}
                 transition={{ duration: 0.8 }}
               >
-                <Globe className="w-5 h-5 text-ink" strokeWidth={2.5} />
+                <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-ink" strokeWidth={2.5} />
                 <motion.div
                   className="absolute inset-0 rounded-xl bg-primary opacity-35 blur-md pointer-events-none"
                   animate={{ opacity: [0.35, 0.65, 0.35] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
               </motion.div>
-              <div className="hidden sm:block">
-                <div className="font-display font-bold text-base leading-none tracking-tight text-white flex items-center gap-1.5">
+              <div className="block">
+                <div className="font-display font-bold text-sm sm:text-base leading-none tracking-tight text-white flex items-center gap-1 sm:gap-1.5">
                   TerraMind{' '}
-                  <span className="text-primary font-mono text-[11px] px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 leading-none">
+                  <span className="text-primary font-mono text-[10px] sm:text-[11px] px-1 sm:px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 leading-none">
                     AI
                   </span>
                 </div>
-                <div className="text-[9px] text-[var(--text-muted)] tracking-[0.2em] uppercase font-mono mt-0.5 leading-none">
+                <div className="hidden xs:block text-[8px] sm:text-[9px] text-[var(--text-muted)] tracking-[0.2em] uppercase font-mono mt-0.5 leading-none">
                   Digital Twin Platform
                 </div>
               </div>
@@ -147,7 +147,7 @@ export function Navbar() {
             </div>
 
             {/* Right controls */}
-            <div className="flex items-center gap-2.5 flex-shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
               {/* Earth health pill */}
               <div className="hidden sm:flex items-center gap-2 glass rounded-full px-3 py-1.5 text-xs border border-primary/18 shadow-glow-sm">
                 <span className="status-dot-live" />
@@ -158,7 +158,7 @@ export function Navbar() {
               {/* Theme toggle */}
               <button
                 onClick={toggleTheme}
-                className="w-9 h-9 rounded-full glass flex items-center justify-center hover:text-primary transition-colors border border-primary/18 shadow-sm flex-shrink-0"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-full glass flex items-center justify-center hover:text-primary transition-colors border border-primary/18 shadow-sm flex-shrink-0"
                 aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
                 <AnimatePresence mode="wait">
@@ -177,18 +177,18 @@ export function Navbar() {
               {/* Mobile menu */}
               <button
                 onClick={() => setMobileOpen((o) => !o)}
-                className="lg:hidden w-9 h-9 rounded-full glass flex items-center justify-center border border-primary/18 flex-shrink-0"
+                className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-full glass flex items-center justify-center border border-primary/18 flex-shrink-0"
                 aria-label="Toggle navigation menu"
                 aria-expanded={mobileOpen}
               >
                 <AnimatePresence mode="wait">
                   {mobileOpen ? (
                     <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                      <X className="w-5 h-5" />
+                      <X className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.div>
                   ) : (
-                    <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
-                      <Menu className="w-5 h-5" />
+                    <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                      <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -205,11 +205,11 @@ export function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 lg:hidden"
+            className="fixed inset-0 z-40 lg:hidden overflow-y-auto"
           >
-            <div className="absolute inset-0 bg-[#020811]/96 backdrop-blur-2xl" />
+            <div className="fixed inset-0 bg-[#020811]/96 backdrop-blur-2xl" onClick={() => setMobileOpen(false)} />
             <motion.nav
-              className="relative h-full flex flex-col items-center justify-center gap-6 px-6"
+              className="relative min-h-full flex flex-col items-center justify-center gap-4 sm:gap-6 px-6 py-24"
               initial="closed"
               animate="open"
               variants={{
@@ -217,6 +217,19 @@ export function Navbar() {
                 closed: {},
               }}
             >
+              {/* Planetary status in mobile menu */}
+              <motion.div
+                variants={{
+                  open:   { opacity: 1, y: 0 },
+                  closed: { opacity: 0, y: 20 },
+                }}
+                className="flex items-center gap-2 glass rounded-full px-4 py-2 border border-primary/20 shadow-glow-sm mb-4"
+              >
+                <span className="status-dot-live" />
+                <Activity className="w-4 h-4 text-primary" />
+                <span className="font-mono font-bold text-primary text-xs">PLANETARY HEALTH: 62%</span>
+              </motion.div>
+
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -226,17 +239,21 @@ export function Navbar() {
                       open:   { opacity: 1, y: 0 },
                       closed: { opacity: 0, y: 30 },
                     }}
+                    className="w-full max-w-xs"
                   >
                     <NavLink
                       to={item.to}
                       end={item.to === '/'}
+                      onClick={() => setMobileOpen(false)}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 text-2xl font-display font-semibold transition-colors ${
-                          isActive ? 'text-primary' : 'text-[var(--text-muted)]'
+                        `flex items-center gap-3.5 px-6 py-3.5 rounded-2xl text-lg sm:text-xl font-display font-semibold transition-all border ${
+                          isActive
+                            ? 'bg-primary/15 text-primary border-primary/30 shadow-glow-sm'
+                            : 'glass border-white/5 text-[var(--text-muted)] hover:text-white hover:border-white/20'
                         }`
                       }
                     >
-                      <Icon className="w-6 h-6 text-primary" />
+                      <Icon className="w-5 h-5 text-primary" />
                       {item.label}
                     </NavLink>
                   </motion.div>

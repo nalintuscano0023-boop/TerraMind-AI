@@ -74,7 +74,11 @@
     box-sizing: border-box;
   }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
 
   body {
     background-color: var(--bg);
@@ -83,12 +87,24 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+    position: relative;
     transition: background-color 0.5s ease, color 0.5s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  img, video, canvas, svg {
+    max-width: 100%;
+    height: auto;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Grotesk', 'Inter', sans-serif;
     line-height: 1.15;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .font-mono, code, pre { font-family: 'JetBrains Mono', monospace; }

@@ -212,37 +212,37 @@ export default function CommandCenter() {
         )}
       </AnimatePresence>
 
-      <div className="mx-auto max-w-7xl px-6 py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
         <SectionTitle
           eyebrow="Command Center"
           title="Environmental Intelligence Hub"
           description="Monitor Earth from orbit. Run satellite scans. Consult the rule-based AI advisor. Execute planetary policy protocols."
-          className="mb-10"
+          className="mb-6 sm:mb-10"
         />
 
         {/* Stat pills */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 mb-6 sm:mb-8">
           <StatPill icon={Activity}      label="Earth Health"   value={`${healthScore}%`}                color="#00E5A8" />
           <StatPill icon={Signal}        label="Active Scans"   value={activeScan ? '1' : '0'}           color="#38BDF8" />
           <StatPill icon={AlertTriangle} label="Alerts"         value={`${insights.filter((i) => i.severity === 'high').length}`} color="#FF4D6D" />
           <StatPill icon={Target}        label="Year Projected" value={scenario.year.toString()}          color="#A78BFA" />
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* ── SATELLITE SCANNER ── */}
-          <GlassCard className="p-6">
+          <GlassCard className="p-4 sm:p-6">
             <div className="flex items-center gap-2 mb-1">
-              <Satellite className="w-5 h-5 text-secondary animate-pulse" />
-              <h3 className="text-lg font-semibold font-display font-orbitron tracking-wide">Satellite Scanner</h3>
-              <Badge variant="secondary" className="ml-auto">
+              <Satellite className="w-5 h-5 text-secondary animate-pulse flex-shrink-0" />
+              <h3 className="text-base sm:text-lg font-semibold font-display font-orbitron tracking-wide">Satellite Scanner</h3>
+              <Badge variant="secondary" className="ml-auto text-[10px] sm:text-xs font-mono">
                 <span className="status-dot-live mr-1.5" />
                 LIVE
               </Badge>
             </div>
-            <p className="text-xs text-[var(--text-muted)] mb-4">Select a target for orbital spectral analysis</p>
+            <p className="text-xs text-[var(--text-muted)] mb-3 sm:mb-4">Select a target for orbital spectral analysis</p>
 
             {/* Scanner viewport */}
-            <div className="relative h-[300px] rounded-2xl overflow-hidden glass mb-4 border border-[var(--glass-border)]">
+            <div className="relative h-[260px] xs:h-[300px] sm:h-[320px] rounded-2xl overflow-hidden glass mb-4 border border-[var(--glass-border)]">
               <div className="absolute inset-0 nasa-grid opacity-40" />
               <div className="scanner-overlay absolute inset-0" />
 
@@ -472,20 +472,20 @@ export default function CommandCenter() {
           </GlassCard>
 
           {/* ── AI ADVISOR ── */}
-          <GlassCard className="p-6 glow-primary">
+          <GlassCard className="p-4 sm:p-6 glow-primary">
             <div className="flex items-center gap-2 mb-1">
-              <Brain className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold font-display">AI Environmental Advisor</h3>
-              <Badge variant="primary" className="ml-auto">Rule-Based</Badge>
+              <Brain className="w-5 h-5 text-primary flex-shrink-0" />
+              <h3 className="text-base sm:text-lg font-semibold font-display">AI Environmental Advisor</h3>
+              <Badge variant="primary" className="ml-auto text-[10px] sm:text-xs font-mono">Rule-Based</Badge>
             </div>
-            <p className="text-xs text-[var(--text-muted)] mb-5">Explainable expert system — fully transparent, no black boxes</p>
+            <p className="text-xs text-[var(--text-muted)] mb-4 sm:mb-5">Explainable expert system — fully transparent, no black boxes</p>
 
             <div className="space-y-3 max-h-[360px] overflow-y-auto no-scrollbar pr-1">
               <AnimatePresence mode="wait">
                 {insights.length === 0 ? (
-                  <motion.div key="healthy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-10">
+                  <motion.div key="healthy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-8 sm:py-10">
                     <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-                      <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-3" />
+                      <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-primary mx-auto mb-3" />
                     </motion.div>
                     <p className="text-sm font-semibold">All systems nominal</p>
                     <p className="text-xs text-[var(--text-muted)] mt-1">No critical environmental alerts detected</p>
@@ -501,17 +501,17 @@ export default function CommandCenter() {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.08 }}
-                        className="glass rounded-xl p-4 relative overflow-hidden"
+                        className="glass rounded-xl p-3.5 sm:p-4 relative overflow-hidden"
                         style={{ borderLeft: `3px solid ${borderColor}` }}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <Badge variant={sev.variant}>
+                          <Badge variant={sev.variant} className="text-[10px] sm:text-xs">
                             <SevIcon className="w-3 h-3" />
                             {insight.severity.toUpperCase()}
                           </Badge>
-                          <span className="text-xs text-[var(--text-muted)] capitalize font-mono">{insight.metric}</span>
+                          <span className="text-[11px] sm:text-xs text-[var(--text-muted)] capitalize font-mono">{insight.metric}</span>
                         </div>
-                        <p className="text-sm font-semibold mb-2 leading-snug">{insight.problem}</p>
+                        <p className="text-xs sm:text-sm font-semibold mb-2 leading-snug">{insight.problem}</p>
                         <div className="space-y-1.5 text-xs text-[var(--text-muted)]">
                           <p><span className="text-[var(--text)] font-medium">Cause: </span>{insight.cause}</p>
                           <p><span className="text-[var(--text)] font-medium">Impact: </span>{insight.impact}</p>
@@ -540,7 +540,7 @@ export default function CommandCenter() {
                     onClick={executePolicy}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="policy-btn w-full bg-gradient-to-r from-primary/20 to-secondary/15 text-primary border border-primary/30 hover:border-primary/55 hover:bg-primary/25 shadow-glow-sm transition-all"
+                    className="policy-btn w-full bg-gradient-to-r from-primary/20 to-secondary/15 text-primary border border-primary/30 hover:border-primary/55 hover:bg-primary/25 shadow-glow-sm transition-all text-xs sm:text-sm py-2.5 sm:py-3"
                   >
                     <Shield className="w-4 h-4 flex-shrink-0" />
                     Execute Planetary Policy Protocol
@@ -559,11 +559,11 @@ export default function CommandCenter() {
                       <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                       Confirm: Execute all 6 environmental protocols?
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <motion.button
                         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                         onClick={executePolicy}
-                        className="flex-1 policy-btn bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30"
+                        className="flex-1 policy-btn bg-primary/20 text-primary border border-primary/40 hover:bg-primary/30 text-xs py-2 sm:py-2.5"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Confirm Activation
@@ -571,7 +571,7 @@ export default function CommandCenter() {
                       <motion.button
                         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                         onClick={() => setPolicyPhase('idle')}
-                        className="flex-1 policy-btn glass text-[var(--text-muted)] border border-white/10 hover:text-white"
+                        className="flex-1 policy-btn glass text-[var(--text-muted)] border border-white/10 hover:text-white text-xs py-2 sm:py-2.5"
                       >
                         Cancel
                       </motion.button>
@@ -597,7 +597,7 @@ export default function CommandCenter() {
                         }`}>
                           {policyStep > si && <CheckCircle2 className="w-3 h-3 text-ink" />}
                         </div>
-                        <span className={`text-[10px] font-mono transition-colors ${
+                        <span className={`text-[10px] sm:text-xs font-mono transition-colors truncate ${
                           policyStep > si ? 'text-primary' : policyStep === si ? 'text-white' : 'text-[var(--text-muted)]'
                         }`}>{step}</span>
                       </div>
@@ -620,11 +620,11 @@ export default function CommandCenter() {
                     className="glass rounded-2xl p-4 border border-primary/30 bg-primary/8"
                   >
                     <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle2 className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-bold text-white">Policy Protocol Activated</span>
-                      <span className="text-[9px] font-mono text-primary ml-auto">ALL METRICS UPDATED</span>
+                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-bold text-white">Policy Protocol Activated</span>
+                      <span className="text-[9px] font-mono text-primary ml-auto hidden xs:inline">ALL METRICS UPDATED</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-1.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                       {POLICY_EFFECTS.map((effect) => {
                         const Icon = effect.icon;
                         return (
@@ -655,16 +655,16 @@ export default function CommandCenter() {
         </div>
 
         {/* ── FUTURE TIMELINE ── */}
-        <div className="mt-8">
-          <GlassCard className="p-6 md:p-8">
+        <div className="mt-6 sm:mt-8">
+          <GlassCard className="p-4 sm:p-6 md:p-8">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-5 h-5 text-accent" />
-              <h3 className="text-lg font-semibold font-display">Future Timeline</h3>
-              <Badge variant="default" className="ml-auto">2026 → 2100</Badge>
+              <TrendingUp className="w-5 h-5 text-accent flex-shrink-0" />
+              <h3 className="text-base sm:text-lg font-semibold font-display">Future Timeline</h3>
+              <Badge variant="default" className="ml-auto text-[10px] sm:text-xs font-mono">2026 → 2100</Badge>
             </div>
-            <p className="text-xs text-[var(--text-muted)] mb-6">Visual Earth evolution — how decisions shape our planet over decades</p>
+            <p className="text-xs text-[var(--text-muted)] mb-5 sm:mb-6">Visual Earth evolution — how decisions shape our planet over decades</p>
 
-            <div className="flex gap-2 mb-8 overflow-x-auto no-scrollbar pb-1">
+            <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto no-scrollbar pb-2">
               {TIMELINE_YEARS.map((year, i) => {
                 const yearScenario = TIMELINE_SCENARIOS[i];
                 const avgHealth = Object.values(yearScenario.metrics).reduce((a, b) => a + b, 0) / 6;
@@ -676,15 +676,15 @@ export default function CommandCenter() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
                     className={[
-                      'relative px-5 min-h-[60px] rounded-2xl text-sm font-medium transition-all whitespace-nowrap flex-shrink-0',
+                      'relative px-4 sm:px-5 min-h-[54px] sm:min-h-[60px] rounded-2xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0',
                       'inline-flex flex-col items-center justify-center gap-1',
                       isSelected
                         ? 'bg-accent/20 text-accent border border-accent/30 shadow-glow'
                         : 'glass text-[var(--text-muted)] hover:text-[var(--text)] border border-white/5',
                     ].join(' ')}
                   >
-                    <div className="font-bold font-orbitron text-sm leading-none">{year}</div>
-                    <div className="h-1 rounded-full bg-[var(--glass-border)] overflow-hidden w-16 mt-1">
+                    <div className="font-bold font-orbitron text-xs sm:text-sm leading-none">{year}</div>
+                    <div className="h-1 rounded-full bg-[var(--glass-border)] overflow-hidden w-12 sm:w-16 mt-1">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{
@@ -705,14 +705,14 @@ export default function CommandCenter() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.35 }}
-                className="grid md:grid-cols-[1fr_1.5fr] gap-8 items-start"
+                className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr] gap-6 sm:gap-8 items-start"
               >
                 <div>
-                  <Badge variant="secondary" className="mb-3 font-orbitron">{scenario.year}</Badge>
-                  <h4 className="text-2xl font-bold font-display mb-2">{scenario.title}</h4>
-                  <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-6">{scenario.description}</p>
+                  <Badge variant="secondary" className="mb-2 sm:mb-3 font-orbitron text-xs">{scenario.year}</Badge>
+                  <h4 className="text-xl sm:text-2xl font-bold font-display mb-2">{scenario.title}</h4>
+                  <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed mb-5 sm:mb-6">{scenario.description}</p>
 
-                  <div className="relative h-40 rounded-2xl overflow-hidden">
+                  <div className="relative h-36 sm:h-40 rounded-2xl overflow-hidden">
                     {(() => {
                       const avgHealth = Object.values(scenario.metrics).reduce((a, b) => a + b, 0) / 6;
                       const forestVal = scenario.metrics.forest / 100;
@@ -724,8 +724,8 @@ export default function CommandCenter() {
                           {Array.from({ length: Math.max(1, Math.round(forestVal * 10)) }).map((_, ti) => (
                             <div key={ti} className="absolute bottom-6 flex flex-col items-center"
                               style={{ left: `${4 + ti * (88 / Math.max(1, Math.round(forestVal * 10)))}%` }}>
-                              <div className="w-4 h-5 rounded-t-full" style={{ background: avgHealth > 60 ? '#22c55e' : '#78716c' }} />
-                              <div className="w-0.5 h-3 bg-amber-900" />
+                              <div className="w-3.5 sm:w-4 h-4 sm:h-5 rounded-t-full" style={{ background: avgHealth > 60 ? '#22c55e' : '#78716c' }} />
+                              <div className="w-0.5 h-2.5 sm:h-3 bg-amber-900" />
                             </div>
                           ))}
                           {scenario.metrics.carbon < 40 && (
@@ -734,8 +734,8 @@ export default function CommandCenter() {
                               <div className="absolute bottom-0 left-0 right-0 h-3 bg-white/15 rounded-b-2xl" />
                             </>
                           )}
-                          <div className="absolute top-2 left-3 text-white/80 font-bold font-orbitron text-sm">{scenario.year}</div>
-                          <div className="absolute bottom-2 right-3 text-[10px] font-mono text-white/60">
+                          <div className="absolute top-2 left-3 text-white/80 font-bold font-orbitron text-xs sm:text-sm">{scenario.year}</div>
+                          <div className="absolute bottom-2 right-3 text-[9px] sm:text-[10px] font-mono text-white/60">
                             Health: {Math.round(avgHealth)}%
                           </div>
                         </>
@@ -781,14 +781,14 @@ function StatPill({ icon: Icon, label, value, color }: { icon: typeof Activity; 
     <motion.div
       whileHover={{ scale: 1.03, y: -2 }}
       transition={{ type: 'spring', stiffness: 300 }}
-      className="glass-card p-4 flex items-center gap-3"
+      className="glass-card p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3"
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${color}15` }}>
-        <Icon className="w-5 h-5" style={{ color }} />
+      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${color}15` }}>
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
       </div>
-      <div>
-        <div className="text-lg font-bold font-display font-orbitron leading-none">{value}</div>
-        <div className="text-xs text-[var(--text-muted)] mt-1 leading-none">{label}</div>
+      <div className="min-w-0 flex-1">
+        <div className="text-base sm:text-lg font-bold font-display font-orbitron leading-none truncate">{value}</div>
+        <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-1 leading-none truncate">{label}</div>
       </div>
     </motion.div>
   );
@@ -807,15 +807,15 @@ function ScanResult({ target, metrics }: { target: typeof SCAN_TARGETS[number]; 
     <motion.div
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="glass rounded-xl px-4 py-2.5 flex items-center gap-3 border border-white/10 shadow-lg"
+      className="glass rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-3 border border-white/10 shadow-lg max-w-[95%] sm:max-w-none"
     >
-      <target.icon className="w-5 h-5 flex-shrink-0" style={{ color: target.color }} />
+      <target.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: target.color }} />
       <div>
-        <div className="text-xl font-bold font-orbitron leading-none" style={{ color: target.color }}>{val}%</div>
-        <div className="text-[9px] font-mono mt-0.5" style={{ color: statusColor }}>{status}</div>
+        <div className="text-lg sm:text-xl font-bold font-orbitron leading-none" style={{ color: target.color }}>{val}%</div>
+        <div className="text-[8px] sm:text-[9px] font-mono mt-0.5" style={{ color: statusColor }}>{status}</div>
       </div>
-      <div className="w-px h-8 bg-white/10 mx-1" />
-      <div className="text-[9px] font-mono text-[var(--text-muted)] max-w-[100px] leading-tight">
+      <div className="w-px h-6 sm:h-8 bg-white/10 mx-1 flex-shrink-0" />
+      <div className="text-[8px] sm:text-[9px] font-mono text-[var(--text-muted)] max-w-[90px] sm:max-w-[100px] leading-tight truncate">
         {target.desc}
       </div>
     </motion.div>

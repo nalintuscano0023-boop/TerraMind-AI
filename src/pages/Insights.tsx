@@ -176,8 +176,7 @@ export default function Insights() {
       <FloatingShapes />
       <Particles count={15} />
 
-      <div className="mx-auto max-w-7xl px-6 py-10 space-y-16">
-
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10 space-y-10 sm:space-y-16">
         {/* ── PROBLEM STATEMENT ── */}
         <section>
           <SectionTitle
@@ -185,7 +184,7 @@ export default function Insights() {
             title="Earth's systems are failing — and decisions are blind"
             description="Climate change, ocean degradation, and biodiversity loss are accelerating. TerraMind translates complex environmental science into real-time decision intelligence."
           />
-          <div className="mt-8 grid md:grid-cols-3 gap-4">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {[
               { icon: AlertTriangle, title: '75% of ecosystems degraded',     desc: 'UN reports find terrestrial ecosystems in rapid decline. Urgent intervention required.', color: '#FF4D6D' },
               { icon: Cloud,         title: 'CO₂ at 421+ ppm',                desc: 'Highest atmospheric concentration in human history, rising annually. Dangerous tipping points.', color: '#FFB830' },
@@ -194,9 +193,9 @@ export default function Insights() {
               const Icon = item.icon;
               return (
                 <motion.div key={item.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                  <motion.div whileHover={{ scale: 1.03, y: -4 }} className="glass-card p-6 h-full card-hover" style={{ borderLeft: `3px solid ${item.color}55` }}>
-                    <Icon className="w-8 h-8 mb-3" style={{ color: item.color }} />
-                    <h3 className="font-bold font-display mb-1.5 text-base text-white">{item.title}</h3>
+                  <motion.div whileHover={{ scale: 1.03, y: -4 }} className="glass-card p-5 sm:p-6 h-full card-hover" style={{ borderLeft: `3px solid ${item.color}55` }}>
+                    <Icon className="w-7 h-7 sm:w-8 sm:h-8 mb-2.5 sm:mb-3" style={{ color: item.color }} />
+                    <h3 className="font-bold font-display mb-1.5 text-sm sm:text-base text-white">{item.title}</h3>
                     <p className="text-xs text-[var(--text-muted)] leading-relaxed">{item.desc}</p>
                   </motion.div>
                 </motion.div>
@@ -212,28 +211,28 @@ export default function Insights() {
             title="Global Environmental Risk Monitor"
             description="Real-time risk indices across six planetary systems — continuously updated from satellite telemetry."
           />
-          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {RISK_METRICS.map((m, i) => {
               const Icon = m.icon;
               const riskLabel = m.value > 70 ? 'CRITICAL' : m.value > 50 ? 'HIGH' : 'MODERATE';
               const riskBadge = m.value > 70 ? 'danger' as const : m.value > 50 ? 'warning' as const : 'default' as const;
               return (
                 <motion.div key={m.label} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
-                  <motion.div whileHover={{ scale: 1.03, y: -4 }} className="glass-card p-5 relative overflow-hidden">
+                  <motion.div whileHover={{ scale: 1.03, y: -4 }} className="glass-card p-4 sm:p-5 relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: `linear-gradient(90deg, transparent, ${m.color}, transparent)` }} />
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${m.color}18` }}>
-                        <Icon className="w-5 h-5" style={{ color: m.color }} />
+                    <div className="flex items-start justify-between mb-2.5 sm:mb-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${m.color}18` }}>
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: m.color }} />
                       </div>
-                      <Badge variant={riskBadge}>
+                      <Badge variant={riskBadge} className="text-[10px] sm:text-xs">
                         {m.trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <Activity className="w-3 h-3" />}
                         {riskLabel}
                       </Badge>
                     </div>
-                    <div className="text-2xl font-bold font-orbitron mb-1" style={{ color: m.color }}>{m.value}%</div>
-                    <div className="font-semibold font-display text-sm mb-1 text-white">{m.label}</div>
-                    <div className="text-xs text-[var(--text-muted)] mb-3">{m.desc}</div>
-                    <div className="h-2 rounded-full bg-[var(--glass-border)] overflow-hidden">
+                    <div className="text-xl sm:text-2xl font-bold font-orbitron mb-1" style={{ color: m.color }}>{m.value}%</div>
+                    <div className="font-semibold font-display text-xs sm:text-sm mb-1 text-white">{m.label}</div>
+                    <div className="text-[11px] sm:text-xs text-[var(--text-muted)] mb-2.5 sm:mb-3">{m.desc}</div>
+                    <div className="h-1.5 sm:h-2 rounded-full bg-[var(--glass-border)] overflow-hidden">
                       <motion.div
                         className="h-full rounded-full"
                         style={{ background: `linear-gradient(90deg, ${m.color}, ${m.color}99)` }}
@@ -251,7 +250,7 @@ export default function Insights() {
         </section>
 
         {/* ══════════════════════════════════════════════════
-            ── EARTH RECOVERY TIMELINE (replaces Before/After slider) ──
+            ── EARTH RECOVERY TIMELINE ──
         ══════════════════════════════════════════════════ */}
         <section>
           <SectionTitle
@@ -260,17 +259,17 @@ export default function Insights() {
             description="Select a year to see how sustained environmental action transforms planetary health across seven key dimensions."
           />
 
-          <div className="mt-8">
-            <GlassCard className="p-6 md:p-8 relative overflow-hidden border-primary/20" style={{ background: 'linear-gradient(135deg, rgba(6,15,30,0.92) 0%, rgba(9,24,38,0.80) 100%)' }}>
+          <div className="mt-6 sm:mt-8">
+            <GlassCard className="p-4 sm:p-6 md:p-8 relative overflow-hidden border-primary/20" style={{ background: 'linear-gradient(135deg, rgba(6,15,30,0.92) 0%, rgba(9,24,38,0.80) 100%)' }}>
               {/* Decorative glow */}
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,229,168,0.08) 0%, transparent 70%)' }} />
               <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,194,255,0.06) 0%, transparent 70%)' }} />
 
               {/* Timeline selector */}
-              <div className="relative flex items-center gap-0 mb-8 overflow-x-auto no-scrollbar pb-1">
+              <div className="relative flex items-center gap-0 mb-6 sm:mb-8 overflow-x-auto no-scrollbar pb-2">
                 {/* Connector line */}
-                <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent pointer-events-none -translate-y-1/2 z-0" />
-                <div className="flex items-center gap-3 w-full justify-between relative z-10">
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent pointer-events-none -translate-y-1/2 z-0 hidden sm:block" />
+                <div className="flex items-center gap-2 sm:gap-3 w-full justify-start sm:justify-between relative z-10">
                   {RECOVERY_YEARS.map((year) => {
                     const scenario = RECOVERY_DATA[year];
                     const isActive = recoveryYear === year;
@@ -281,7 +280,7 @@ export default function Insights() {
                         whileHover={{ scale: 1.06, y: -2 }}
                         whileTap={{ scale: 0.95 }}
                         className={[
-                          'relative flex flex-col items-center gap-1.5 px-4 min-h-[68px] rounded-2xl flex-1',
+                          'relative flex flex-col items-center gap-1.5 px-3 sm:px-4 min-h-[60px] sm:min-h-[68px] rounded-2xl flex-shrink-0 sm:flex-1 min-w-[76px] sm:min-w-0',
                           'inline-flex justify-center transition-all duration-300',
                           'text-xs font-semibold leading-none whitespace-nowrap',
                           isActive
@@ -294,11 +293,11 @@ export default function Insights() {
                           boxShadow: `0 0 20px ${scenario.statusColor}30`,
                         } : {}}
                       >
-                        <span className="font-orbitron font-bold text-base leading-none" style={{ color: isActive ? scenario.statusColor : undefined }}>
+                        <span className="font-orbitron font-bold text-sm sm:text-base leading-none" style={{ color: isActive ? scenario.statusColor : undefined }}>
                           {year}
                         </span>
                         <span
-                          className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full"
+                          className="text-[8px] sm:text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full"
                           style={{
                             background: `${scenario.statusColor}22`,
                             color: scenario.statusColor,
@@ -331,12 +330,12 @@ export default function Insights() {
                   transition={{ duration: 0.4, ease: 'easeOut' }}
                 >
                   {/* Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-5 sm:mb-6">
                     <div>
-                      <div className="text-2xl font-bold font-display text-white">{recoveryScenario.title}</div>
-                      <div className="text-sm text-[var(--text-muted)] mt-0.5">{recoveryScenario.subtitle}</div>
+                      <div className="text-xl sm:text-2xl font-bold font-display text-white">{recoveryScenario.title}</div>
+                      <div className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">{recoveryScenario.subtitle}</div>
                     </div>
-                    <div className="sm:ml-auto">
+                    <div className="sm:ml-auto self-start sm:self-auto">
                       <span
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold font-mono"
                         style={{
@@ -352,7 +351,7 @@ export default function Insights() {
                   </div>
 
                   {/* Metric cards grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-3">
                     {RECOVERY_METRICS.map((rm, mi) => {
                       const value = recoveryScenario[rm.key];
                       const Icon = rm.icon;
@@ -362,14 +361,14 @@ export default function Insights() {
                           initial={{ opacity: 0, scale: 0.88, y: 10 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           transition={{ delay: mi * 0.05, duration: 0.4, ease: 'easeOut' }}
-                          className="glass rounded-2xl p-3 border border-white/6 flex flex-col items-center text-center relative overflow-hidden"
+                          className="glass rounded-2xl p-2.5 sm:p-3 border border-white/6 flex flex-col items-center text-center relative overflow-hidden"
                         >
                           <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl" style={{ background: `linear-gradient(90deg, transparent, ${rm.color}, transparent)` }} />
-                          <div className="w-8 h-8 rounded-xl flex items-center justify-center mb-2" style={{ background: `${rm.color}18` }}>
-                            <Icon className="w-4 h-4" style={{ color: rm.color }} />
+                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center mb-1.5 sm:mb-2" style={{ background: `${rm.color}18` }}>
+                            <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: rm.color }} />
                           </div>
                           <motion.div
-                            className="text-xl font-bold font-orbitron leading-none mb-1"
+                            className="text-lg sm:text-xl font-bold font-orbitron leading-none mb-1"
                             style={{ color: rm.color }}
                             key={`${rm.key}-${recoveryYear}`}
                             initial={{ scale: 0.7, opacity: 0 }}
@@ -380,7 +379,7 @@ export default function Insights() {
                           </motion.div>
                           <div className="text-[9px] text-[var(--text-muted)] font-mono leading-tight">{rm.label}</div>
                           {/* Mini progress bar */}
-                          <div className="w-full h-1 rounded-full bg-white/8 overflow-hidden mt-2">
+                          <div className="w-full h-1 rounded-full bg-white/8 overflow-hidden mt-1.5 sm:mt-2">
                             <motion.div
                               className="h-full rounded-full"
                               style={{ background: rm.color }}
@@ -389,7 +388,7 @@ export default function Insights() {
                             />
                           </div>
                           {/* Recovery indicator arrow */}
-                          <div className="mt-1.5 text-[8px] font-mono" style={{ color: rm.color }}>
+                          <div className="mt-1 sm:mt-1.5 text-[8px] font-mono" style={{ color: rm.color }}>
                             {value >= 80 ? '▲ THRIVING' : value >= 60 ? '▲ RECOVERING' : value >= 40 ? '→ MODERATE' : '▼ CRITICAL'}
                           </div>
                         </motion.div>
@@ -404,27 +403,27 @@ export default function Insights() {
 
         {/* ── OCEAN CLEANUP SIMULATOR ── */}
         <section>
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
             <div>
-              <Badge variant="secondary" className="mb-3"><Waves className="w-3 h-3" /> Marine Ecosystem</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-balance mb-4 text-white">
+              <Badge variant="secondary" className="mb-2 sm:mb-3 text-xs"><Waves className="w-3 h-3" /> Marine Ecosystem</Badge>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-balance mb-3 sm:mb-4 text-white">
                 Ocean Plastic &amp; <span className="gradient-text">Ecosystem Health</span>
               </h2>
-              <p className="text-[var(--text-muted)] leading-relaxed mb-6 text-sm">
+              <p className="text-[var(--text-muted)] leading-relaxed mb-5 sm:mb-6 text-xs sm:text-sm">
                 Over 11 million tonnes of waste enter ocean gyres annually. Adjust cleanup deployment vectors to watch marine life recover and plastic density drop in real time.
               </p>
-              <div className="space-y-3">
+              <div className="space-y-2.5 sm:space-y-3">
                 {PLASTIC_DATA.map((p, i) => {
                   const currentLevel = Math.max(0, p.level - Math.round(plasticReduction * 0.65));
                   return (
                     <motion.div key={p.region} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-xs sm:text-sm mb-1">
                         <span className="font-medium text-white">{p.region}</span>
                         <span className="font-mono font-bold" style={{ color: currentLevel > 60 ? '#FF4D6D' : currentLevel > 30 ? '#FFB830' : '#00E5A8' }}>
                           {currentLevel}% Density
                         </span>
                       </div>
-                      <div className="h-2.5 rounded-full bg-[var(--glass-border)] overflow-hidden">
+                      <div className="h-2 sm:h-2.5 rounded-full bg-[var(--glass-border)] overflow-hidden">
                         <motion.div
                           className="h-full rounded-full"
                           style={{ background: currentLevel > 60 ? '#FF4D6D' : currentLevel > 30 ? '#FFB830' : '#00E5A8' }}
@@ -438,30 +437,30 @@ export default function Insights() {
               </div>
             </div>
 
-            <GlassCard className="p-6 glow-secondary border-primary/20 relative overflow-hidden" style={{ background: 'linear-gradient(to b, rgba(10,22,40,1), rgba(4,13,26,1))' }}>
-              <div className="flex items-center justify-between mb-4">
+            <GlassCard className="p-4 sm:p-6 glow-secondary border-primary/20 relative overflow-hidden" style={{ background: 'linear-gradient(to b, rgba(10,22,40,1), rgba(4,13,26,1))' }}>
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center gap-2">
-                  <Waves className="w-5 h-5 text-secondary animate-pulse" />
-                  <h3 className="font-bold font-display text-base text-white">Ocean Cleanup Simulator</h3>
+                  <Waves className="w-5 h-5 text-secondary animate-pulse flex-shrink-0" />
+                  <h3 className="font-bold font-display text-sm sm:text-base text-white">Ocean Cleanup Simulator</h3>
                 </div>
-                <Badge variant={plasticReduction > 60 ? 'success' : plasticReduction > 30 ? 'warning' : 'danger'}>
+                <Badge variant={plasticReduction > 60 ? 'success' : plasticReduction > 30 ? 'warning' : 'danger'} className="text-[10px] sm:text-xs">
                   {plasticReduction > 60 ? 'RECOVERING' : plasticReduction > 30 ? 'MODERATE' : 'CRITICAL'}
                 </Badge>
               </div>
-              <div className="relative h-56 rounded-2xl overflow-hidden mb-5 border border-sky-500/20 shadow-inner bg-slate-950">
+              <div className="relative h-48 sm:h-56 rounded-2xl overflow-hidden mb-4 sm:mb-5 border border-sky-500/20 shadow-inner bg-slate-950">
                 <OceanHealthCanvas plasticReduction={plasticReduction} activeDroneCount={activeDroneCount} />
-                <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md rounded-xl px-3 py-1 text-[11px] font-mono text-white/90 border border-white/10 z-10">
+                <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 bg-black/75 backdrop-blur-md rounded-xl px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-mono text-white/90 border border-white/10 z-10 max-w-[95%] truncate">
                   Plastic: <strong className="text-secondary">{Math.round(88 - plasticReduction * 0.75)} items/km²</strong> | Recovery: <strong className="text-primary">{Math.round(20 + plasticReduction * 0.75)}%</strong>
                 </div>
               </div>
-              <div className="mb-4">
+              <div className="mb-3 sm:mb-4">
                 <div className="flex justify-between text-xs mb-1 font-mono">
                   <span className="text-[var(--text-muted)]">Cleanup Deployment Vector</span>
                   <span className="font-bold text-secondary">{plasticReduction}% Active</span>
                 </div>
                 <Slider min={0} max={100} value={plasticReduction} onChange={(v) => setPlasticReduction(v)} accentColor="#38BDF8" aria-label="Ocean Cleanup Intensity" />
               </div>
-              <div className="grid grid-cols-4 gap-2 mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                 {[
                   { label: 'Baseline', val: 0,   drones: 1 },
                   { label: '+Drones',  val: 35,  drones: 3 },
@@ -483,17 +482,17 @@ export default function Insights() {
                 ))}
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="glass rounded-xl p-2.5 border border-white/5">
-                  <div className="font-bold text-secondary font-mono text-sm">{(11 - (plasticReduction * 0.085)).toFixed(1)}M</div>
-                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">tonnes/yr waste</div>
+                <div className="glass rounded-xl p-2 sm:p-2.5 border border-white/5">
+                  <div className="font-bold text-secondary font-mono text-xs sm:text-sm">{(11 - (plasticReduction * 0.085)).toFixed(1)}M</div>
+                  <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] mt-0.5">tonnes/yr</div>
                 </div>
-                <div className="glass rounded-xl p-2.5 border border-white/5">
-                  <div className="font-bold text-primary font-mono text-sm">{Math.round(25 + plasticReduction * 0.68)}%</div>
-                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Marine Recovery</div>
+                <div className="glass rounded-xl p-2 sm:p-2.5 border border-white/5">
+                  <div className="font-bold text-primary font-mono text-xs sm:text-sm">{Math.round(25 + plasticReduction * 0.68)}%</div>
+                  <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] mt-0.5">Recovery</div>
                 </div>
-                <div className="glass rounded-xl p-2.5 border border-white/5">
-                  <div className="font-bold text-accent font-mono text-sm">{(plasticReduction * 18.5).toFixed(0)}k</div>
-                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">Species Saved</div>
+                <div className="glass rounded-xl p-2 sm:p-2.5 border border-white/5">
+                  <div className="font-bold text-accent font-mono text-xs sm:text-sm">{(plasticReduction * 18.5).toFixed(0)}k</div>
+                  <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] mt-0.5">Saved</div>
                 </div>
               </div>
             </GlassCard>
@@ -502,23 +501,23 @@ export default function Insights() {
 
         {/* ── ANIMATED CLIMATE PROJECTION GRAPH ── */}
         <section>
-          <GlassCard className="p-8 relative overflow-hidden border-primary/20" style={{ background: 'linear-gradient(135deg, rgba(10,22,40,0.95) 0%, rgba(15,36,66,0.85) 50%, rgba(10,22,40,0.95) 100%)' }}>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/8">
+          <GlassCard className="p-4 sm:p-6 md:p-8 relative overflow-hidden border-primary/20" style={{ background: 'linear-gradient(135deg, rgba(10,22,40,0.95) 0%, rgba(15,36,66,0.85) 50%, rgba(10,22,40,0.95) 100%)' }}>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-white/8">
               <div>
-                <Badge variant="primary" className="mb-2"><BarChart3 className="w-3 h-3" /> Predictive Modeling</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold font-display text-white">Centennial Climate Projection (2026 – 2100)</h2>
+                <Badge variant="primary" className="mb-2 text-xs"><BarChart3 className="w-3 h-3" /> Predictive Modeling</Badge>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-display text-white">Centennial Climate Projection (2026 – 2100)</h2>
                 <p className="text-xs text-[var(--text-muted)] mt-1">
                   Select any year to animate environmental feedback metrics and project atmospheric carbon pathways.
                 </p>
               </div>
               {/* Year selector tabs */}
-              <div className="flex items-center gap-1.5 glass rounded-2xl p-1.5 border border-white/8 overflow-x-auto max-w-full flex-shrink-0">
+              <div className="flex items-center gap-1.5 glass rounded-2xl p-1.5 border border-white/8 overflow-x-auto max-w-full flex-shrink-0 no-scrollbar">
                 {TIMELINE_YEARS.map((yr) => (
                   <button
                     key={yr}
                     onClick={() => setActiveYear(yr)}
                     className={[
-                      'inline-flex items-center justify-center min-h-[30px] px-3 rounded-xl text-xs font-mono font-bold transition-all leading-none whitespace-nowrap',
+                      'inline-flex items-center justify-center min-h-[30px] px-2.5 sm:px-3 rounded-xl text-xs font-mono font-bold transition-all leading-none whitespace-nowrap',
                       activeYear === yr
                         ? 'bg-gradient-to-r from-primary to-secondary text-ink shadow-glow-sm scale-105'
                         : 'text-[var(--text-muted)] hover:text-white',
@@ -530,25 +529,25 @@ export default function Insights() {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
               {/* Graph */}
-              <div className="lg:col-span-2 space-y-4">
+              <div className="lg:col-span-2 space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between text-xs font-mono mb-2">
                   <span className="text-white font-semibold flex items-center gap-2">
-                    <Cloud className="w-4 h-4 text-danger" />
-                    Atmospheric CO₂ Concentration Pathway
+                    <Cloud className="w-4 h-4 text-danger flex-shrink-0" />
+                    <span className="truncate">Atmospheric CO₂ Concentration</span>
                   </span>
                   <motion.span
                     key={`co2-${activeYear}`}
                     initial={{ opacity: 0, x: 8 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-danger font-bold"
+                    className="text-danger font-bold flex-shrink-0"
                   >
                     {currentProjection.carbonPpm} PPM ({activeYear})
                   </motion.span>
                 </div>
 
-                <div className="relative h-64 w-full rounded-2xl glass p-5 border border-white/8">
+                <div className="relative h-56 sm:h-64 w-full rounded-2xl glass p-3 sm:p-5 border border-white/8">
                   <svg className="w-full h-full overflow-visible" viewBox="0 0 500 180" preserveAspectRatio="none">
                     {/* Grid lines */}
                     {[30, 75, 120].map((y) => (
@@ -673,7 +672,7 @@ export default function Insights() {
                   <span>{activeYear} Indicators</span>
                   <Badge variant="secondary" className="text-[10px] font-mono">LIVE</Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                   {[
                     { label: 'Temp Anomaly',  val: `+${currentProjection.tempAnomaly}°C`, color: '#FFB830' },
                     { label: 'Sea Level',     val: `+${currentProjection.seaLevelCm}cm`,   color: '#38BDF8' },
@@ -685,10 +684,10 @@ export default function Insights() {
                       initial={{ opacity: 0, scale: 0.90 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.35, delay: ii * 0.07 }}
-                      className="glass rounded-xl p-3 border border-white/5"
+                      className="glass rounded-xl p-2.5 sm:p-3 border border-white/5"
                     >
-                      <div className="text-[10px] text-[var(--text-muted)] font-mono leading-none">{item.label}</div>
-                      <div className="text-lg font-bold font-mono mt-1 leading-none" style={{ color: item.color }}>{item.val}</div>
+                      <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] font-mono leading-none truncate">{item.label}</div>
+                      <div className="text-base sm:text-lg font-bold font-mono mt-1 leading-none" style={{ color: item.color }}>{item.val}</div>
                     </motion.div>
                   ))}
                 </div>
@@ -728,16 +727,16 @@ export default function Insights() {
 
         {/* ── DEFORESTATION MONITOR ── */}
         <section>
-          <GlassCard className="p-8 relative overflow-hidden">
+          <GlassCard className="p-4 sm:p-6 md:p-8 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/4 to-transparent pointer-events-none" />
-            <div className="relative grid lg:grid-cols-2 gap-8 items-center">
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
               <div>
-                <Badge variant="primary" className="mb-3"><Trees className="w-3 h-3" /> Deforestation Monitor</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold font-display mb-3 text-white">Global Forest Loss Tracker</h2>
-                <p className="text-[var(--text-muted)] text-xs leading-relaxed mb-6">
+                <Badge variant="primary" className="mb-2 sm:mb-3 text-xs"><Trees className="w-3 h-3" /> Deforestation Monitor</Badge>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-display mb-2 sm:mb-3 text-white">Global Forest Loss Tracker</h2>
+                <p className="text-[var(--text-muted)] text-xs leading-relaxed mb-4 sm:mb-6">
                   Real-time deforestation monitoring across five critical forest ecosystems.
                 </p>
-                <div className="relative h-32 rounded-xl overflow-hidden shadow-inner">
+                <div className="relative h-28 sm:h-32 rounded-xl overflow-hidden shadow-inner">
                   <div style={{ background: 'linear-gradient(to right, #166534, #14532d, #78350f, #92400e)' }} className="absolute inset-0" />
                   <div className="absolute inset-0 flex items-end justify-around px-2 pb-2">
                     {Array.from({ length: 14 }).map((_, i) => (
@@ -751,14 +750,14 @@ export default function Insights() {
                   <div className="absolute top-2 left-3 text-[10px] font-mono text-white/60">Forest coverage — historical</div>
                 </div>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2.5 sm:space-y-3">
                 {DEFORESTATION_HOTSPOTS.map((h, i) => (
                   <motion.div key={h.name} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                    className="flex items-center gap-3">
+                    className="flex items-center gap-2 sm:gap-3">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: h.color }} />
-                    <span className="text-xs font-medium text-white flex-1">{h.name}</span>
-                    <span className="text-xs font-mono text-[var(--text-muted)]">{(h.loss / 1000000).toFixed(1)}M ha/yr</span>
-                    <div className="w-28"><ProgressBar value={h.pct} color={h.color} height={6} /></div>
+                    <span className="text-xs font-medium text-white flex-1 truncate">{h.name}</span>
+                    <span className="text-[11px] sm:text-xs font-mono text-[var(--text-muted)] flex-shrink-0">{(h.loss / 1000000).toFixed(1)}M ha/yr</span>
+                    <div className="w-20 sm:w-28 flex-shrink-0"><ProgressBar value={h.pct} color={h.color} height={6} /></div>
                   </motion.div>
                 ))}
               </div>
@@ -768,38 +767,38 @@ export default function Insights() {
 
         {/* ── FLOOD RISK & HEATWAVE ── */}
         <section>
-          <div className="grid lg:grid-cols-2 gap-8">
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Waves className="w-5 h-5 text-danger" />
-                <h3 className="font-bold font-display text-lg text-white">Flood Risk Prediction</h3>
-                <Badge variant="danger" className="ml-auto">High Alert</Badge>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+            <GlassCard className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <Waves className="w-5 h-5 text-danger flex-shrink-0" />
+                <h3 className="font-bold font-display text-base sm:text-lg text-white">Flood Risk Prediction</h3>
+                <Badge variant="danger" className="ml-auto text-[10px] sm:text-xs font-mono">High Alert</Badge>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2.5 sm:space-y-3">
                 {FLOOD_ZONES.map((z, i) => (
                   <motion.div key={z.city} initial={{ opacity: 0, x: -15 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-                    className="flex items-center gap-3">
-                    <span className="font-medium text-xs w-20 text-white">{z.city}</span>
-                    <div className="flex-1"><ProgressBar value={z.pct} color={z.color} height={8} /></div>
-                    <span className="text-xs font-mono w-8 text-right" style={{ color: z.color }}>{z.pct}%</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full w-16 text-center"
+                    className="flex items-center gap-2 sm:gap-3">
+                    <span className="font-medium text-xs w-16 sm:w-20 text-white truncate">{z.city}</span>
+                    <div className="flex-1 min-w-[60px]"><ProgressBar value={z.pct} color={z.color} height={8} /></div>
+                    <span className="text-xs font-mono w-7 sm:w-8 text-right flex-shrink-0" style={{ color: z.color }}>{z.pct}%</span>
+                    <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full w-14 sm:w-16 text-center flex-shrink-0 truncate"
                       style={{ background: `${z.color}20`, color: z.color }}>{z.risk}</span>
                   </motion.div>
                 ))}
               </div>
             </GlassCard>
-            <GlassCard className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <ThermometerSun className="w-5 h-5 text-warning" />
-                <h3 className="font-bold font-display text-lg text-white">Heatwave Analysis</h3>
-                <Badge variant="warning" className="ml-auto">2026 Data</Badge>
+            <GlassCard className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <ThermometerSun className="w-5 h-5 text-warning flex-shrink-0" />
+                <h3 className="font-bold font-display text-base sm:text-lg text-white">Heatwave Analysis</h3>
+                <Badge variant="warning" className="ml-auto text-[10px] sm:text-xs font-mono">2026 Data</Badge>
               </div>
-              <div className="grid grid-cols-7 gap-1 mb-4">
+              <div className="grid grid-cols-7 gap-1 mb-3 sm:mb-4">
                 {Array.from({ length: 35 }, (_, i) => {
                   const temp = 28 + Math.sin(i * 0.8) * 12 + Math.cos(i * 1.2) * 8;
                   const intensity = (temp - 20) / 30;
                   return (
-                    <motion.div key={i} className="h-8 rounded"
+                    <motion.div key={i} className="h-7 sm:h-8 rounded"
                       style={{ background: `rgba(${Math.round(239 * intensity)}, ${Math.round(68 + 100 * (1 - intensity))}, ${Math.round(68 * (1 - intensity))}, ${0.4 + intensity * 0.6})` }}
                       initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.015 }}
                       title={`${Math.round(temp)}°C`}
@@ -807,7 +806,7 @@ export default function Insights() {
                   );
                 })}
               </div>
-              <div className="flex justify-between text-xs text-[var(--text-muted)] mb-4 font-mono">
+              <div className="flex justify-between text-xs text-[var(--text-muted)] mb-3 sm:mb-4 font-mono text-[10px] sm:text-xs">
                 <span>Cool (20°C)</span><span>Extreme (50°C+)</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
@@ -816,9 +815,9 @@ export default function Insights() {
                   { label: 'Heat Deaths',value: '~18K', color: '#FFB830' },
                   { label: 'Crop Loss',  value: '23%', color: '#F97316' },
                 ].map((s) => (
-                  <div key={s.label} className="glass rounded-xl p-3">
-                    <div className="font-bold text-lg" style={{ color: s.color }}>{s.value}</div>
-                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5 font-mono">{s.label}</div>
+                  <div key={s.label} className="glass rounded-xl p-2 sm:p-3">
+                    <div className="font-bold text-base sm:text-lg" style={{ color: s.color }}>{s.value}</div>
+                    <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] mt-0.5 font-mono truncate">{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -828,12 +827,12 @@ export default function Insights() {
 
         {/* ── CARBON REDUCTION PLANNER ── */}
         <section>
-          <GlassCard className="p-8 glow-primary">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
+          <GlassCard className="p-4 sm:p-6 md:p-8 glow-primary">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
               <div>
-                <Badge variant="primary" className="mb-3"><BarChart3 className="w-3 h-3" /> Carbon Planner</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold font-display mb-4 text-white">Carbon Reduction Planner</h2>
-                <p className="text-[var(--text-muted)] text-xs leading-relaxed mb-5">
+                <Badge variant="primary" className="mb-2 sm:mb-3 text-xs"><BarChart3 className="w-3 h-3" /> Carbon Planner</Badge>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-display mb-3 sm:mb-4 text-white">Carbon Reduction Planner</h2>
+                <p className="text-[var(--text-muted)] text-xs leading-relaxed mb-4 sm:mb-5">
                   Simulate renewable energy expansion and see projected CO₂ pathways. Each percentage of clean energy deployed reduces atmospheric carbon.
                 </p>
                 <div className="mb-4">
@@ -843,22 +842,22 @@ export default function Insights() {
                   </div>
                   <Slider min={10} max={100} value={renewablePlan} onChange={(v) => setRenewablePlan(v)} accentColor="#00E5A8" aria-label="Renewable Deployment" />
                 </div>
-                <div className="grid grid-cols-3 gap-3 text-center">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
                   {[
                     { label: 'CO₂ in 2030', value: `${Math.round(421 - renewablePlan * 1.8)} ppm`, color: renewablePlan > 50 ? '#00E5A8' : '#FFB830' },
                     { label: 'CO₂ in 2050', value: `${Math.round(421 - renewablePlan * 3.2)} ppm`, color: renewablePlan > 70 ? '#00E5A8' : '#FF4D6D' },
                     { label: 'Temp Change', value: `+${(2.1 - renewablePlan * 0.015).toFixed(1)}°C`, color: renewablePlan > 60 ? '#FFB830' : '#FF4D6D' },
                   ].map((s) => (
-                    <div key={s.label} className="glass rounded-xl p-3">
-                      <div className="font-bold text-base font-orbitron" style={{ color: s.color }}>{s.value}</div>
-                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5 font-mono">{s.label}</div>
+                    <div key={s.label} className="glass rounded-xl p-2.5 sm:p-3">
+                      <div className="font-bold text-sm sm:text-base font-orbitron" style={{ color: s.color }}>{s.value}</div>
+                      <div className="text-[9px] sm:text-[10px] text-[var(--text-muted)] mt-0.5 font-mono truncate">{s.label}</div>
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-4 text-xs text-[var(--text-muted)] uppercase tracking-widest font-mono">Energy Source Comparison</h3>
-                <div className="space-y-3">
+                <h3 className="font-semibold mb-3 sm:mb-4 text-xs text-[var(--text-muted)] uppercase tracking-widest font-mono">Energy Source Comparison</h3>
+                <div className="space-y-2.5 sm:space-y-3">
                   {ENERGY_PLAN.map((e, i) => {
                     const projected = e.source === 'Fossil'
                       ? Math.max(0, e.current - renewablePlan * 0.5)
@@ -866,8 +865,8 @@ export default function Insights() {
                     return (
                       <motion.div key={e.source} initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}>
                         <div className="flex items-center gap-2 mb-1 text-xs">
-                          <span className="text-base">{e.emoji}</span>
-                          <span className="font-medium text-white flex-1">{e.source}</span>
+                          <span className="text-sm sm:text-base">{e.emoji}</span>
+                          <span className="font-medium text-white flex-1 truncate">{e.source}</span>
                           <span className="font-mono font-bold" style={{ color: e.color }}>{Math.round(projected)}%</span>
                         </div>
                         <div className="h-2 rounded-full bg-[var(--glass-border)] overflow-hidden">

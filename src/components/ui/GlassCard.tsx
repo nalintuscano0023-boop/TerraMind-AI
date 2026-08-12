@@ -120,7 +120,7 @@ export function SectionTitle({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ delay: 0.1 }}
-        className="text-3xl md:text-5xl lg:text-6xl font-bold font-display tracking-tight text-balance leading-[1.1]"
+        className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-display tracking-tight text-balance leading-[1.12]"
       >
         {title}
       </motion.h2>
@@ -130,7 +130,7 @@ export function SectionTitle({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="mt-4 text-base md:text-xl text-[var(--text-muted)] max-w-2xl text-balance leading-relaxed font-normal"
+          className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-[var(--text-muted)] max-w-2xl text-balance leading-relaxed font-normal"
         >
           {description}
         </motion.p>

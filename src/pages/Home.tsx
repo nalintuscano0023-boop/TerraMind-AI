@@ -147,7 +147,7 @@ export default function Home() {
 
         <motion.div
           style={{ opacity: heroOpacity, y: heroY }}
-          className="relative mx-auto max-w-7xl px-6 w-full grid lg:grid-cols-[1fr_1.1fr] gap-8 items-center py-16"
+          className="relative mx-auto max-w-7xl px-4 sm:px-6 w-full grid lg:grid-cols-[1fr_1.1fr] gap-8 items-center py-10 sm:py-16"
         >
           {/* Left — Text Content */}
           <motion.div
@@ -155,28 +155,28 @@ export default function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Badge variant="primary" className="mb-5 gap-2">
+            <Badge variant="primary" className="mb-4 sm:mb-5 gap-2 text-xs">
               <span className="status-dot-live" />
               AI-for-Earth Hackathon 2026
             </Badge>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold font-display leading-[1.05] text-balance">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold font-display leading-[1.08] text-balance">
               The planet's{' '}
               <span className="gradient-text">decision intelligence</span>{' '}
               platform
             </h1>
 
-            <p className="mt-6 text-base md:text-lg text-[var(--text-muted)] max-w-xl leading-relaxed">
+            <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-[var(--text-muted)] max-w-xl leading-relaxed">
               Explore Earth's environmental health in immersive 3D. Simulate sustainability decisions.
               Understand their long-term impact through seasons, weather, and time across centuries.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 sm:mt-8 flex flex-wrap gap-3">
               <Link to="/simulation">
                 <motion.button
                   whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(0,229,168,0.4)' }}
                   whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-primary text-ink font-semibold shadow-glow hover:bg-primary-light transition-all"
+                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-primary text-ink font-semibold shadow-glow hover:bg-primary-light transition-all text-xs sm:text-sm"
                 >
                   Launch Simulation <ArrowRight className="w-4 h-4" />
                 </motion.button>
@@ -185,7 +185,7 @@ export default function Home() {
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full glass font-medium hover:text-primary transition-colors border border-primary/20"
+                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full glass font-medium hover:text-primary transition-colors border border-primary/20 text-xs sm:text-sm"
                 >
                   <Satellite className="w-4 h-4 text-primary" />
                   Command Center
@@ -193,18 +193,18 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Time-of-day selector */}
-            <div className="mt-8 space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-[0.2em] font-medium">Time of Day</span>
-                <div className="flex gap-1">
+            {/* Time-of-day selector (100% manual selection) */}
+            <div className="mt-6 sm:mt-8 space-y-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-[0.2em] font-medium flex-shrink-0">Time of Day</span>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
                   {TIME_CYCLE.map((t, i) => (
                     <motion.button
                       key={t.key}
                       onClick={() => setTimeIndex(i)}
-                      whileHover={{ scale: 1.08 }}
+                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all ${
                         i === timeIndex
                           ? 'bg-primary/20 text-primary border border-primary/30 shadow-glow'
                           : 'glass text-[var(--text-muted)] hover:text-[var(--text)]'
@@ -215,16 +215,16 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-[0.2em] font-medium">Season</span>
-                <div className="flex gap-1">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-[0.2em] font-medium flex-shrink-0">Season</span>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5">
                   {SEASON_CYCLE.map((s, i) => (
                     <motion.button
                       key={s.key}
                       onClick={() => setSeasonIndex(i)}
-                      whileHover={{ scale: 1.08 }}
+                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all ${
                         i === seasonIndex
                           ? 'bg-secondary/20 text-secondary border border-secondary/30'
                           : 'glass text-[var(--text-muted)] hover:text-[var(--text)]'
@@ -239,12 +239,12 @@ export default function Home() {
 
             {/* Status bar */}
             <motion.div
-              className="mt-6 flex items-center gap-3 glass rounded-xl px-4 py-3 w-fit"
+              className="mt-5 sm:mt-6 flex items-center gap-2.5 sm:gap-3 glass rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 w-fit max-w-full"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              <span className="status-dot-live" />
-              <span className="text-xs text-[var(--text-muted)] font-mono">{sky.description}</span>
+              <span className="status-dot-live flex-shrink-0" />
+              <span className="text-[11px] sm:text-xs text-[var(--text-muted)] font-mono truncate">{sky.description}</span>
             </motion.div>
           </motion.div>
 
@@ -253,7 +253,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="relative h-[420px] md:h-[540px] lg:h-[640px]"
+            className="relative h-[300px] xs:h-[380px] sm:h-[480px] md:h-[540px] lg:h-[640px] w-full"
           >
             {/* Orbital ring decorations */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -262,7 +262,7 @@ export default function Home() {
             </div>
 
             {/* Earth glow halo */}
-            <div className="absolute inset-8 rounded-full pointer-events-none"
+            <div className="absolute inset-4 sm:inset-8 rounded-full pointer-events-none"
               style={{
                 background: currentTime.key === 'night'
                   ? 'radial-gradient(circle, rgba(0,229,168,0.06) 0%, transparent 70%)'
@@ -287,24 +287,24 @@ export default function Home() {
 
             {/* Earth info floating label */}
             <motion.div
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 glass rounded-full px-5 py-2.5 text-xs text-[var(--text-muted)] flex items-center gap-2 border border-primary/15"
+              className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 glass rounded-full px-3.5 sm:px-5 py-1.5 sm:py-2.5 text-[10px] sm:text-xs text-[var(--text-muted)] flex items-center gap-1.5 sm:gap-2 border border-primary/15 whitespace-nowrap shadow-lg"
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              Drag to rotate · Scroll to zoom
+              <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />
+              <span>Drag to rotate · Scroll to zoom</span>
             </motion.div>
 
             {/* Telemetry readouts */}
             <motion.div
-              className="absolute top-6 right-4 glass rounded-xl p-3 text-[10px] font-mono text-primary/70 space-y-1 border border-primary/10"
+              className="absolute top-4 sm:top-6 right-3 sm:right-4 glass rounded-xl p-2 sm:p-3 text-[9px] sm:text-[10px] font-mono text-primary/70 space-y-0.5 sm:space-y-1 border border-primary/10"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 1.2 }}
             >
-              <div className="flex gap-2"><span className="text-[var(--text-muted)]">LAT</span><span>23.4°N</span></div>
-              <div className="flex gap-2"><span className="text-[var(--text-muted)]">ALT</span><span>408 km</span></div>
-              <div className="flex gap-2"><span className="text-[var(--text-muted)]">HEALTH</span><span className="text-primary">{Math.round(health * 100)}%</span></div>
+              <div className="flex gap-1.5 sm:gap-2"><span className="text-[var(--text-muted)]">LAT</span><span>23.4°N</span></div>
+              <div className="flex gap-1.5 sm:gap-2"><span className="text-[var(--text-muted)]">ALT</span><span>408 km</span></div>
+              <div className="flex gap-1.5 sm:gap-2"><span className="text-[var(--text-muted)]">HEALTH</span><span className="text-primary">{Math.round(health * 100)}%</span></div>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -321,9 +321,9 @@ export default function Home() {
       </section>
 
       {/* ===== STATS ===== */}
-      <section className="relative py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="relative py-10 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {STATS.map((s, i) => {
               const Icon = s.icon;
               return (
@@ -337,27 +337,27 @@ export default function Home() {
                   <motion.div
                     whileHover={{ scale: 1.03, y: -4 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    className="glass-card p-6 h-full relative overflow-hidden group"
+                    className="glass-card p-4 sm:p-6 h-full relative overflow-hidden group"
                   >
                     {/* Gradient top accent */}
                     <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Icon className={`w-5 h-5 ${s.color}`} />
+                    <div className="flex items-start justify-between mb-2 sm:mb-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${s.color}`} />
                       </div>
-                      <span className={`text-[10px] font-medium flex items-center gap-1 px-2 py-0.5 rounded-full ${s.trendDown ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'}`}>
+                      <span className={`text-[9px] sm:text-[10px] font-medium flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full ${s.trendDown ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'}`}>
                         {s.trendDown ? '↓' : '↑'} {s.trend.split(' ')[0]}
                       </span>
                     </div>
 
-                    <div className="text-3xl md:text-4xl font-bold font-display">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-display">
                       <StatCounter value={s.value} suffix={s.suffix} />
                     </div>
-                    <div className="text-sm text-[var(--text-muted)] mt-1">{s.label}</div>
+                    <div className="text-xs sm:text-sm text-[var(--text-muted)] mt-1 truncate">{s.label}</div>
 
                     {/* Mini bar */}
-                    <div className="mt-3 h-1 rounded-full bg-[var(--glass-border)] overflow-hidden">
+                    <div className="mt-2.5 sm:mt-3 h-1 rounded-full bg-[var(--glass-border)] overflow-hidden">
                       <motion.div
                         className="h-full rounded-full"
                         style={{ background: `var(--primary)` }}
@@ -376,14 +376,14 @@ export default function Home() {
       </section>
 
       {/* ===== LIVE EARTH TICKER ===== */}
-      <section className="py-4 overflow-hidden border-y border-[var(--glass-border)]">
+      <section className="py-3 sm:py-4 overflow-hidden border-y border-[var(--glass-border)]">
         <motion.div
-          className="flex gap-12 whitespace-nowrap"
+          className="flex gap-8 sm:gap-12 whitespace-nowrap"
           animate={{ x: [0, -2000] }}
           transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
         >
           {[...Array(3)].map((_, rep) => (
-            <div key={rep} className="flex gap-12">
+            <div key={rep} className="flex gap-8 sm:gap-12">
               {[
                 { label: 'CO₂ Level', value: '421.4 ppm', status: 'critical' },
                 { label: 'Sea Level Rise', value: '+3.6 mm/yr', status: 'warning' },
@@ -394,7 +394,7 @@ export default function Home() {
                 { label: 'Species Loss', value: '1000x natural rate', status: 'critical' },
                 { label: 'Clean Water', value: '2B lacking access', status: 'warning' },
               ].map((item) => (
-                <span key={item.label} className="flex items-center gap-2 text-xs font-mono">
+                <span key={item.label} className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-mono">
                   <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.status === 'critical' ? 'bg-danger animate-pulse' : item.status === 'warning' ? 'bg-warning' : 'bg-primary'}`} />
                   <span className="text-[var(--text-muted)]">{item.label}:</span>
                   <span className={item.status === 'critical' ? 'text-danger' : item.status === 'warning' ? 'text-warning' : 'text-primary'}>{item.value}</span>
@@ -406,15 +406,15 @@ export default function Home() {
       </section>
 
       {/* ===== FEATURES ===== */}
-      <section className="relative py-20">
-        <div className="mx-auto max-w-7xl px-6">
+      <section className="relative py-12 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionTitle
             center
             eyebrow="Platform Capabilities"
             title="Everything you need to understand Earth"
             description="A complete environmental intelligence platform — from immersive 3D exploration to rule-based AI advisory and mission-driven challenges."
           />
-          <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {FEATURES.map((f, i) => {
               const Icon = f.icon;
               return (
@@ -429,19 +429,19 @@ export default function Home() {
                   <motion.div
                     whileHover={{ scale: 1.02, rotateY: 2, rotateX: -1 }}
                     transition={{ type: 'spring', stiffness: 200 }}
-                    className="glass-card p-6 h-full group cursor-default"
+                    className="glass-card p-5 sm:p-6 h-full group cursor-default"
                   >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                        <Icon className="w-6 h-6 text-primary" />
+                    <div className="flex items-start justify-between mb-3 sm:mb-4">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                       </div>
-                      <span className="text-[10px] font-medium px-2 py-1 rounded-full glass text-[var(--text-muted)] border border-[var(--glass-border)]">
+                      <span className="text-[9px] sm:text-[10px] font-medium px-2 py-0.5 sm:py-1 rounded-full glass text-[var(--text-muted)] border border-[var(--glass-border)]">
                         {f.tag}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold font-display mb-2">{f.title}</h3>
-                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">{f.desc}</p>
-                    <div className="mt-4 flex items-center gap-1.5 text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    <h3 className="text-base sm:text-lg font-semibold font-display mb-1.5 sm:mb-2">{f.title}</h3>
+                    <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">{f.desc}</p>
+                    <div className="mt-3 sm:mt-4 flex items-center gap-1.5 text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                       Explore <ArrowRight className="w-3 h-3" />
                     </div>
                   </motion.div>
@@ -453,33 +453,33 @@ export default function Home() {
       </section>
 
       {/* ===== IMPACT SECTION ===== */}
-      <section className="relative py-16">
-        <div className="mx-auto max-w-7xl px-6">
+      <section className="relative py-10 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <GlassCard className="p-8 md:p-12 overflow-hidden relative glow-primary">
+            <GlassCard className="p-5 sm:p-8 md:p-12 overflow-hidden relative glow-primary">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-              <div className="relative grid lg:grid-cols-2 gap-10 items-center">
+              <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 items-center">
                 <div>
-                  <Badge variant="secondary" className="mb-4">
+                  <Badge variant="secondary" className="mb-3 sm:mb-4 text-xs">
                     <TrendingUp className="w-3 h-3" /> Environmental Impact
                   </Badge>
-                  <h2 className="text-3xl md:text-4xl font-bold font-display text-balance leading-tight">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-balance leading-tight">
                     Every decision{' '}
                     <span className="gradient-text">shapes the planet</span>
                   </h2>
-                  <p className="mt-4 text-[var(--text-muted)] leading-relaxed">
+                  <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
                     TerraMind models six interconnected environmental systems. Adjust one and watch
                     the ripple effects across forests, oceans, air, carbon, biodiversity, and
                     renewable energy — all powered by an explainable rule-based engine.
                   </p>
-                  <div className="mt-6 space-y-3">
+                  <div className="mt-5 sm:mt-6 space-y-2.5 sm:space-y-3">
                     {[
                       { icon: Trees,    label: 'Forest ecosystems absorb 31% of global CO₂', color: 'text-primary' },
                       { icon: Droplets, label: 'Oceans produce 50% of Earth\'s oxygen',        color: 'text-secondary' },
@@ -490,24 +490,24 @@ export default function Home() {
                       return (
                         <motion.div
                           key={item.label}
-                          className="flex items-center gap-3 group"
+                          className="flex items-center gap-2.5 sm:gap-3 group"
                           whileHover={{ x: 4 }}
                           transition={{ type: 'spring', stiffness: 300 }}
                         >
-                          <div className="w-7 h-7 rounded-lg bg-[var(--glass-border)] flex items-center justify-center flex-shrink-0">
-                            <Icon className={`w-3.5 h-3.5 ${item.color}`} />
+                          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-[var(--glass-border)] flex items-center justify-center flex-shrink-0">
+                            <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${item.color}`} />
                           </div>
-                          <span className="text-sm">{item.label}</span>
+                          <span className="text-xs sm:text-sm">{item.label}</span>
                         </motion.div>
                       );
                     })}
                   </div>
-                  <Link to="/challenges" className="mt-8 inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all group">
-                    Take on a mission <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <Link to="/challenges" className="mt-6 sm:mt-8 inline-flex items-center gap-2 text-primary text-xs sm:text-sm font-semibold hover:gap-3 transition-all group">
+                    Take on a mission <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5 sm:gap-3">
                   {[
                     { label: 'Forest',      value: 52, icon: Trees,    color: 'var(--primary)' },
                     { label: 'Water',       value: 61, icon: Droplets, color: 'var(--secondary)' },
@@ -520,17 +520,17 @@ export default function Home() {
                     return (
                       <motion.div
                         key={m.label}
-                        className="glass rounded-2xl p-4 group hover:scale-105 transition-transform cursor-default"
+                        className="glass rounded-2xl p-3 sm:p-4 group hover:scale-105 transition-transform cursor-default"
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: i * 0.07 }}
                       >
-                        <Icon className="w-5 h-5 mb-2" style={{ color: m.color }} />
-                        <div className="text-2xl font-bold font-display">
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 mb-1.5 sm:mb-2" style={{ color: m.color }} />
+                        <div className="text-xl sm:text-2xl font-bold font-display">
                           <StatCounter value={m.value} suffix="%" />
                         </div>
-                        <div className="text-xs text-[var(--text-muted)] mb-2">{m.label}</div>
+                        <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mb-1.5 sm:mb-2">{m.label}</div>
                         <div className="h-1 rounded-full bg-[var(--glass-border)] overflow-hidden">
                           <motion.div
                             className="h-full rounded-full"
@@ -552,8 +552,8 @@ export default function Home() {
       </section>
 
       {/* ===== ABOUT TERRAMIND AI SECTION ===== */}
-      <section className="relative py-20 bg-gradient-to-b from-transparent via-[#0a1628]/60 to-transparent">
-        <div className="mx-auto max-w-7xl px-6">
+      <section className="relative py-12 sm:py-20 bg-gradient-to-b from-transparent via-[#0a1628]/60 to-transparent">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionTitle
             center
             eyebrow="About TerraMind AI"
@@ -562,53 +562,53 @@ export default function Home() {
           />
 
           {/* Mission & Vision Cards */}
-          <div className="mt-12 grid md:grid-cols-2 gap-6 mb-12">
-            <GlassCard className="p-8 border-primary/20 relative overflow-hidden bg-gradient-to-br from-primary/5 via-transparent to-transparent">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center font-bold">
+          <div className="mt-8 sm:mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
+            <GlassCard className="p-5 sm:p-8 border-primary/20 relative overflow-hidden bg-gradient-to-br from-primary/5 via-transparent to-transparent">
+              <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary/15 text-primary flex items-center justify-center font-bold flex-shrink-0">
                   🎯
                 </div>
-                <h3 className="text-xl font-bold font-display text-white">Our Mission</h3>
+                <h3 className="text-lg sm:text-xl font-bold font-display text-white">Our Mission</h3>
               </div>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
                 Empower climate decision-makers, researchers, and global citizens with real-time, interactive 3D digital twin simulations of Earth's critical ecosystems to reverse environmental degradation.
               </p>
             </GlassCard>
 
-            <GlassCard className="p-8 border-secondary/20 relative overflow-hidden bg-gradient-to-br from-secondary/5 via-transparent to-transparent">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center font-bold">
+            <GlassCard className="p-5 sm:p-8 border-secondary/20 relative overflow-hidden bg-gradient-to-br from-secondary/5 via-transparent to-transparent">
+              <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center font-bold flex-shrink-0">
                   🚀
                 </div>
-                <h3 className="text-xl font-bold font-display text-white">Our Vision</h3>
+                <h3 className="text-lg sm:text-xl font-bold font-display text-white">Our Vision</h3>
               </div>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+              <p className="text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
                 Build the world's most accessible planetary digital twin platform — combining orbital telemetry, rule-based ecological engines, and immersive 3D WebGL visuals for immediate impact.
               </p>
             </GlassCard>
           </div>
 
           {/* Core Problem & Story Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <GlassCard className="p-6 border-white/10">
-              <div className="text-xs font-mono text-primary uppercase tracking-widest mb-2 font-semibold">The Problem We Solve</div>
-              <h4 className="text-base font-bold font-display text-white mb-2">Fragmented Climate Data</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+            <GlassCard className="p-5 sm:p-6 border-white/10">
+              <div className="text-[10px] sm:text-xs font-mono text-primary uppercase tracking-widest mb-1.5 sm:mb-2 font-semibold">The Problem We Solve</div>
+              <h4 className="text-sm sm:text-base font-bold font-display text-white mb-1.5 sm:mb-2">Fragmented Climate Data</h4>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                 Traditional environmental data is locked in dense academic reports. TerraMind AI translates complex orbital metrics into intuitive, interactive 3D simulations.
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 border-white/10">
-              <div className="text-xs font-mono text-secondary uppercase tracking-widest mb-2 font-semibold">Why This Matters</div>
-              <h4 className="text-base font-bold font-display text-white mb-2">Tipping Points Are Near</h4>
+            <GlassCard className="p-5 sm:p-6 border-white/10">
+              <div className="text-[10px] sm:text-xs font-mono text-secondary uppercase tracking-widest mb-1.5 sm:mb-2 font-semibold">Why This Matters</div>
+              <h4 className="text-sm sm:text-base font-bold font-display text-white mb-1.5 sm:mb-2">Tipping Points Are Near</h4>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                 With atmospheric CO₂ over 421 ppm and 1M species endangered, instant feedback loops on policy decisions are mandatory for global resilience.
               </p>
             </GlassCard>
 
-            <GlassCard className="p-6 border-white/10">
-              <div className="text-xs font-mono text-warning uppercase tracking-widest mb-2 font-semibold">Development Team</div>
-              <h4 className="text-base font-bold font-display text-white mb-2">Built by Nalin & Tanishq</h4>
+            <GlassCard className="p-5 sm:p-6 border-white/10 sm:col-span-2 md:col-span-1">
+              <div className="text-[10px] sm:text-xs font-mono text-warning uppercase tracking-widest mb-1.5 sm:mb-2 font-semibold">Development Team</div>
+              <h4 className="text-sm sm:text-base font-bold font-display text-white mb-1.5 sm:mb-2">Built by Nalin & Tanishq</h4>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">
                 Architected by <strong>Nalin Tuscano</strong> (3D WebGL & Full-Stack Engine) and <strong>Tanishq</strong> (AI Systems & Environmental Telemetry).
               </p>
@@ -616,59 +616,59 @@ export default function Home() {
           </div>
 
           {/* Project Statistics - Animated Counters */}
-          <GlassCard className="p-8 border-primary/20 bg-gradient-to-r from-[#0a1628] via-[#0f2442] to-[#0a1628] mb-12">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <GlassCard className="p-5 sm:p-8 border-primary/20 bg-gradient-to-r from-[#0a1628] via-[#0f2442] to-[#0a1628] mb-8 sm:mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
               <div>
-                <div className="text-3xl md:text-4xl font-bold font-display text-primary">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-primary">
                   <StatCounter value={10} suffix=" Domains" />
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Climate Monitoring</div>
+                <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Climate Monitoring</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold font-display text-secondary">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-secondary">
                   <StatCounter value={142} suffix=" Nodes" />
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Orbital Satellites</div>
+                <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Orbital Satellites</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold font-display text-warning">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-warning">
                   <StatCounter value={100} suffix="%" />
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Deterministic Engine</div>
+                <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Deterministic Engine</div>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-bold font-display text-accent">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold font-display text-accent">
                   <StatCounter value={1.2} decimals={1} suffix="s" />
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Telemetry Speed</div>
+                <div className="text-[10px] sm:text-xs text-[var(--text-muted)] mt-1 font-mono uppercase">Telemetry Speed</div>
               </div>
             </div>
           </GlassCard>
 
           {/* Interactive Roadmap / Timeline */}
-          <div className="glass rounded-2xl p-8 border border-white/10">
-            <h3 className="text-lg font-bold font-display text-white mb-6 text-center">Project Development Timeline</h3>
-            <div className="grid md:grid-cols-3 gap-6 relative">
-              <div className="glass rounded-xl p-5 border-l-4 border-l-primary border-white/5">
-                <div className="text-xs font-mono text-primary font-bold">2026 — HACKATHON PROTOTYPE</div>
-                <h4 className="font-bold text-sm text-white mt-1">TerraMind AI v1.0</h4>
-                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
+          <div className="glass rounded-2xl p-5 sm:p-8 border border-white/10">
+            <h3 className="text-base sm:text-lg font-bold font-display text-white mb-5 sm:mb-6 text-center">Project Development Timeline</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 relative">
+              <div className="glass rounded-xl p-4 sm:p-5 border-l-4 border-l-primary border-white/5">
+                <div className="text-[11px] sm:text-xs font-mono text-primary font-bold">2026 — HACKATHON PROTOTYPE</div>
+                <h4 className="font-bold text-xs sm:text-sm text-white mt-1">TerraMind AI v1.0</h4>
+                <p className="text-xs text-[var(--text-muted)] mt-1.5 sm:mt-2 leading-relaxed">
                   Interactive 3D Earth Digital Twin, Policy Simulation, Climate Action Hub, and Ocean Cleanup Simulator.
                 </p>
               </div>
 
-              <div className="glass rounded-xl p-5 border-l-4 border-l-secondary border-white/5">
-                <div className="text-xs font-mono text-secondary font-bold">2027 — LIVE IOT INTEGRATION</div>
-                <h4 className="font-bold text-sm text-white mt-1">Ground & Ocean Sensor Mesh</h4>
-                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
+              <div className="glass rounded-xl p-4 sm:p-5 border-l-4 border-l-secondary border-white/5">
+                <div className="text-[11px] sm:text-xs font-mono text-secondary font-bold">2027 — LIVE IOT INTEGRATION</div>
+                <h4 className="font-bold text-xs sm:text-sm text-white mt-1">Ground & Ocean Sensor Mesh</h4>
+                <p className="text-xs text-[var(--text-muted)] mt-1.5 sm:mt-2 leading-relaxed">
                   Direct API streaming from NASA Sentinel, NOAA buoys, and autonomous oceanic monitoring drones.
                 </p>
               </div>
 
-              <div className="glass rounded-xl p-5 border-l-4 border-l-accent border-white/5">
-                <div className="text-xs font-mono text-accent font-bold">2030 — GLOBAL DEPLOYMENT</div>
-                <h4 className="font-bold text-sm text-white mt-1">Autonomous Policy Grid</h4>
-                <p className="text-xs text-[var(--text-muted)] mt-2 leading-relaxed">
+              <div className="glass rounded-xl p-4 sm:p-5 border-l-4 border-l-accent border-white/5">
+                <div className="text-[11px] sm:text-xs font-mono text-accent font-bold">2030 — GLOBAL DEPLOYMENT</div>
+                <h4 className="font-bold text-xs sm:text-sm text-white mt-1">Autonomous Policy Grid</h4>
+                <p className="text-xs text-[var(--text-muted)] mt-1.5 sm:mt-2 leading-relaxed">
                   AI-driven policy execution and automated carbon offset verification across international jurisdictions.
                 </p>
               </div>
@@ -678,40 +678,40 @@ export default function Home() {
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="relative py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center">
+      <section className="relative py-12 sm:py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <Badge variant="primary" className="mb-6">
+            <Badge variant="primary" className="mb-4 sm:mb-6 text-xs">
               <Globe2 className="w-3 h-3" /> Open Environmental Intelligence
             </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold font-display text-balance leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold font-display text-balance leading-tight">
               Ready to save the{' '}
               <span className="text-aurora">planet</span>?
             </h2>
-            <p className="mt-4 text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-[var(--text-muted)] max-w-xl mx-auto leading-relaxed">
               Join TerraMind and explore what Earth could become with the right decisions. Every
               simulation matters. Every choice counts.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4 justify-center">
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center">
               <Link to="/simulation">
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(0,229,168,0.5)' }}
                   whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-primary text-ink font-bold shadow-glow text-base"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-primary text-ink font-bold shadow-glow text-sm sm:text-base"
                 >
-                  Start Simulation <ArrowRight className="w-5 h-5" />
+                  Start Simulation <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.button>
               </Link>
               <Link to="/insights">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full glass font-semibold border border-primary/20 text-base"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full glass font-semibold border border-primary/20 text-sm sm:text-base"
                 >
                   <Activity className="w-4 h-4 text-primary" /> View Insights
                 </motion.button>
