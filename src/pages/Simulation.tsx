@@ -47,16 +47,25 @@ export default function Simulation() {
   const updateControl = (key: ControlKey, value: number) => {
     setControls((prev) => prev.map((c) => (c.key === key ? { ...c, value } : c)));
   };
-  const resetControls = () => setControls(CONTROLS.map((c) => ({ ...c, value: 50 })));
+  const resetControls = () => {
+    setControls(CONTROLS.map((c) => ({ ...c, value: 50 })));
+    setDayCycle('day');
+    setSeason('spring');
+    setWeather('clear');
+    setDroneMode(false);
+  };
 
   const ecosystemHealth = (metrics.forest + metrics.water + metrics.biodiversity) / 3;
   const isPolluted = ecosystemHealth < 45;
 
-  const treeDensity  = controls.find((c) => c.key === 'trees')?.value ?? 50;
-  const factoryLevel = controls.find((c) => c.key === 'factories')?.value ?? 50;
-  const solarLevel   = controls.find((c) => c.key === 'solar')?.value ?? 50;
-  const windLevel    = controls.find((c) => c.key === 'wind')?.value ?? 50;
-  const plasticLevel = 100 - (controls.find((c) => c.key === 'plastic')?.value ?? 50);
+  const treeDensity        = controls.find((c) => c.key === 'trees')?.value ?? 50;
+  const factoryLevel       = controls.find((c) => c.key === 'factories')?.value ?? 50;
+  const cleanTransport     = controls.find((c) => c.key === 'transport')?.value ?? 50;
+  const solarLevel         = controls.find((c) => c.key === 'solar')?.value ?? 50;
+  const windLevel          = controls.find((c) => c.key === 'wind')?.value ?? 50;
+  const plasticLevel       = controls.find((c) => c.key === 'plastic')?.value ?? 50;
+  const recyclingRate      = controls.find((c) => c.key === 'recycling')?.value ?? 50;
+  const waterConservation  = controls.find((c) => c.key === 'waterUsage')?.value ?? 50;
 
   // Keyboard navigation listener for Drone Mode WASD
   useEffect(() => {
@@ -123,9 +132,12 @@ export default function Simulation() {
                     weather={weather}
                     treeDensity={treeDensity}
                     factoryLevel={factoryLevel}
+                    cleanTransport={cleanTransport}
                     solarLevel={solarLevel}
                     windLevel={windLevel}
                     plasticLevel={plasticLevel}
+                    recyclingRate={recyclingRate}
+                    waterConservation={waterConservation}
                     droneMode={droneMode}
                     droneAltitude={droneAltitude}
                     health={ecosystemHealth}
