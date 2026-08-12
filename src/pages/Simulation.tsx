@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Trees, Droplets, Wind, Cloud, Sun, Factory, Car, Recycle, Trash2,
   CloudRain, CloudSnow, CloudFog, Zap, AlertTriangle, CheckCircle2,
@@ -8,7 +8,6 @@ import { GlassCard, SectionTitle, Badge, Tooltip, Slider } from '@/components/ui
 import { Particles, FloatingShapes } from '@/components/ui/Particles';
 import { Footer } from '@/components/layout/Footer';
 import { CONTROLS, type ControlKey } from '@/data/environment';
-import { computeMetrics } from '@/lib/advisorEngine';
 import { EnvironmentScene, WildlifeScene, type DayCycle, type Season, type Weather } from '@/components/simulation';
 
 const DAY_CYCLES: { key: DayCycle; label: string; icon: typeof Sun; color: string }[] = [
@@ -42,8 +41,6 @@ export default function Simulation() {
   const [droneAltitude, setDroneAltitude] = useState(120);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const metrics = useMemo(() => computeMetrics(controls), [controls]);
-
   const updateControl = (key: ControlKey, value: number) => {
     setControls((prev) => prev.map((c) => (c.key === key ? { ...c, value } : c)));
   };
@@ -55,9 +52,6 @@ export default function Simulation() {
     setDroneMode(false);
   };
 
-  const ecosystemHealth = (metrics.forest + metrics.water + metrics.biodiversity) / 3;
-  const isPolluted = ecosystemHealth < 45;
-
   const treeDensity        = controls.find((c) => c.key === 'trees')?.value ?? 50;
   const factoryLevel       = controls.find((c) => c.key === 'factories')?.value ?? 50;
   const cleanTransport     = controls.find((c) => c.key === 'transport')?.value ?? 50;
@@ -66,6 +60,15 @@ export default function Simulation() {
   const plasticLevel       = controls.find((c) => c.key === 'plastic')?.value ?? 50;
   const recyclingRate      = controls.find((c) => c.key === 'recycling')?.value ?? 50;
   const waterConservation  = controls.find((c) => c.key === 'waterUsage')?.value ?? 50;
+
+  const forestHealth   = treeDensity;
+  const airHealth      = factoryLevel * 0.5 + cleanTransport * 0.5;
+  const cleanEnergy    = solarLevel * 0.5 + windLevel * 0.5;
+  const oceanHealth    = plasticLevel * 0.4 + recyclingRate * 0.3 + waterConservation * 0.3;
+  const ecosystemHealth = Math.min(100, Math.max(0, Math.round(
+    forestHealth * 0.25 + airHealth * 0.25 + cleanEnergy * 0.25 + oceanHealth * 0.25
+  )));
+  const isPolluted = ecosystemHealth < 45;
 
   // Keyboard navigation listener for Drone Mode WASD
   useEffect(() => {

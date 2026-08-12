@@ -64,10 +64,14 @@ const GROUND_CONFIGS: Record<Season, { healthy: string; degraded: string }> = {
   },
 };
 
-/* ── Turbine speed by weather ── */
-function turbineSpeed(weather: Weather, windLevel: number): number {
-  const base = weather === 'storm' ? 0.3 : weather === 'rain' ? 0.7 : 1.8;
-  return Math.max(0.2, base - (windLevel / 180));
+/* ── Wind turbine rotation speed calculation (0 to 100 slider mapping) ── */
+function calculateTurbineSpeed(windLevel: number, weather: Weather): number {
+  if (windLevel <= 2) return 0; // stopped
+  // Map windLevel 1..100 to rotation duration (seconds per 360deg rotation)
+  // 100 -> 0.35s (fast), 50 -> 1.5s (medium), 10 -> 4.5s (slow)
+  const baseDuration = 5.0 - (windLevel / 100) * 4.65;
+  const weatherMult = weather === 'storm' ? 0.7 : weather === 'rain' ? 0.9 : 1.0;
+  return Math.max(0.25, baseDuration * weatherMult);
 }
 
 /* ── Tree sway by weather ── */
@@ -77,7 +81,7 @@ function treeSway(weather: Weather): { angle: number; duration: number } {
   return { angle: 2, duration: 3.5 };
 }
 
-/* ── Deterministic PRNG for natural star generation ── */
+/* ── Deterministic PRNG for star generation ── */
 function createPRNG(seed: number) {
   let s = seed;
   return function () {
@@ -105,27 +109,13 @@ function generateNightStars(): StarSpec[] {
   const stars: StarSpec[] = [];
   const targetCount = 170;
 
-  const getDensity = (x: number, y: number) => {
-    const wave1 = Math.sin(x * 0.07 + y * 0.09);
-    const wave2 = Math.cos(x * 0.13 - y * 0.05);
-    const wave3 = Math.sin(x * 0.03 + y * 0.04);
-    return 0.52 + 0.22 * wave1 + 0.16 * wave2 + 0.10 * wave3;
-  };
-
   let attempts = 0;
   while (stars.length < targetCount && attempts < 2500) {
     attempts++;
     const left = 1 + rng() * 97.5;
     const top = 2 + rng() * 52;
 
-    if (top >= 6 && top <= 18 && left >= 81 && left <= 93) {
-      continue;
-    }
-
-    const density = getDensity(left, top);
-    if (rng() > density) {
-      continue;
-    }
+    if (top >= 6 && top <= 18 && left >= 81 && left <= 93) continue;
 
     const r = rng();
     let size: number;
@@ -192,16 +182,16 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
   const sky            = SKY_CONFIGS[dayCycle];
   const ground         = GROUND_CONFIGS[season];
   const sway           = treeSway(weather);
-  const turbSpeed      = turbineSpeed(weather, windLevel);
+  const turbSpeedSec   = calculateTurbineSpeed(windLevel, weather);
 
   /* ── Derived Policy Metrics ── */
   const pollutionLevel  = Math.max(0, 100 - factoryLevel); // 0 = Clean, 100 = Max Smog
-  const numTrees        = Math.max(2, Math.round((treeDensity / 100) * 24));
-  const numTurbines     = windLevel > 10 ? Math.max(1, Math.round((windLevel / 100) * 4)) : 0;
-  const numSolar        = solarLevel > 10 ? Math.max(1, Math.round((solarLevel / 100) * 6)) : 0;
+  const numTrees        = Math.max(2, Math.round((treeDensity / 100) * 26));
+  const numTurbines     = windLevel > 8 ? Math.max(1, Math.round((windLevel / 100) * 4)) : 0;
+  const numSolar        = solarLevel > 8 ? Math.max(1, Math.round((solarLevel / 100) * 6)) : 0;
   const solarMW         = Math.round((solarLevel / 100) * 140);
   const windMW          = Math.round((windLevel / 100) * 180 * (weather === 'storm' ? 1.2 : weather === 'rain' ? 0.9 : 1.0));
-  const riverHeight     = Math.round(6 + (waterConservation / 100) * 10); // 6px (shallow) -> 16px (full capacity)
+  const riverHeight     = Math.round(5 + (waterConservation / 100) * 11); // 5px (shallow) -> 16px (full capacity)
 
   /* Stars for night */
   const stars = useMemo(() => generateNightStars(), []);
@@ -231,7 +221,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
         <div
           className="absolute inset-0 pointer-events-none z-[16] transition-opacity duration-700"
           style={{
-            background: `linear-gradient(to bottom, rgba(120, 113, 108, ${(pollutionLevel / 100) * 0.35}), rgba(245, 158, 11, ${(pollutionLevel / 100) * 0.20}))`,
+            background: `linear-gradient(to bottom, rgba(120, 113, 108, ${(pollutionLevel / 100) * 0.38}), rgba(245, 158, 11, ${(pollutionLevel / 100) * 0.22}))`,
             filter: 'blur(4px)',
           }}
         />
@@ -302,7 +292,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
               animate={{ y: [0, -5, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             />
-            {/* Fireflies (not winter) */}
+            {/* Fireflies (spring / summer) */}
             {season !== 'winter' && Array.from({ length: 10 }).map((_, i) => (
               <motion.div
                 key={`ff-${i}`}
@@ -409,7 +399,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
       {numSolar > 0 && (
         <div className="absolute z-[7] flex items-center gap-1.5" style={{ left: '4%', bottom: '33%' }}>
           {Array.from({ length: numSolar }).map((_, i) => (
-            <div key={`solar-${i}`} className="relative group">
+            <div key={`solar-${i}`} className="relative">
               <div
                 className="rounded-sm border border-sky-400/50 shadow-md transition-all duration-300"
                 style={{
@@ -425,48 +415,20 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
           ))}
           {/* Solar Capacity Label */}
           <div className="bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded text-[8px] font-mono text-cyan-300 border border-cyan-500/30 whitespace-nowrap ml-1">
-            ⚡ {solarMW} MW Solar
+            ⚡ {solarMW} MW Solar Array
           </div>
         </div>
       )}
 
-      {/* ── Wind turbines (Driven by Wind Energy Slider) ── */}
+      {/* ── Wind Turbines (Driven by Wind Energy Slider) ── */}
       {numTurbines > 0 && Array.from({ length: numTurbines }).map((_, i) => (
         <div key={`turbine-${i}`} className="absolute z-[7]" style={{ left: `${26 + i * 18}%`, bottom: '33%' }}>
-          {/* Tower */}
-          <div className="relative flex flex-col items-center">
-            <div
-              className="rounded-sm"
-              style={{ width: 3, height: 50, background: 'linear-gradient(to bottom, #e2e8f0, #94a3b8)', margin: '0 auto' }}
-            />
-            {/* Rotor hub */}
-            <div
-              className="absolute"
-              style={{ top: 0, left: '50%', transform: 'translateX(-50%)' }}
-            >
-              {/* SVG Blades */}
-              <motion.svg
-                width="40" height="40"
-                viewBox="0 0 40 40"
-                style={{ position: 'absolute', top: -18, left: -18 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: turbSpeed, repeat: Infinity, ease: 'linear' }}
-              >
-                <path d="M 20 20 L 20 2 Q 22 11 20 20 Z" fill="rgba(226,232,240,0.95)" />
-                <path d="M 20 20 L 33 29 Q 26 22 20 20 Z" fill="rgba(203,213,225,0.90)" />
-                <path d="M 20 20 L 7 29 Q 14 22 20 20 Z" fill="rgba(226,232,240,0.95)" />
-                <circle cx="20" cy="20" r="2.5" fill="#94a3b8" />
-              </motion.svg>
-            </div>
-            {i === 0 && (
-              <div
-                className="absolute font-mono text-white/90 bg-black/70 px-1 py-0.2 rounded border border-white/15 whitespace-nowrap"
-                style={{ fontSize: 7, bottom: -13, left: '50%', transform: 'translateX(-50%)' }}
-              >
-                💨 {windMW} MW Wind
-              </div>
-            )}
-          </div>
+          <WindTurbineGraphic
+            speedSec={turbSpeedSec}
+            nightGlow={dayCycle === 'night'}
+            showLabel={i === 0}
+            powerMW={windMW}
+          />
         </div>
       ))}
 
@@ -525,8 +487,8 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
         {/* Ocean Skimmer Cleanup Vessel when Plastic Reduction is HIGH (>=60%) */}
         {plasticLevel >= 60 && (
           <motion.div
-            className="absolute z-[12] flex items-center gap-1 bg-black/80 text-emerald-400 font-mono text-[7px] px-1 rounded border border-emerald-500/40"
-            style={{ top: 1, left: '40%' }}
+            className="absolute z-[12] flex items-center gap-1 bg-black/80 text-emerald-400 font-mono text-[7px] px-1 rounded border border-emerald-500/40 shadow-lg"
+            style={{ top: 1, left: '38%' }}
             animate={{ x: [-15, 15, -15] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -536,12 +498,12 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
       </div>
 
       {/* ── Clean Transport Highway / EV Pods (Driven by Clean Transport Slider) ── */}
-      <div className="absolute z-[11] left-0 right-0 flex items-center justify-between px-4" style={{ bottom: '29%' }}>
+      <div className="absolute z-[11] left-0 right-0 flex items-center justify-between px-4 pointer-events-none" style={{ bottom: '29%' }}>
         {cleanTransport >= 50 ? (
           <div className="w-full flex items-center justify-between text-[8px] font-mono text-emerald-300 bg-black/60 px-2 py-0.5 rounded border border-emerald-500/30">
             <span className="flex items-center gap-1">⚡ EV Transit Grid Active</span>
             <motion.div
-              className="w-3 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_#10B981]"
+              className="w-3.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_#10B981]"
               animate={{ x: [-50, 250] }}
               transition={{ duration: 3.5, repeat: Infinity, ease: 'linear' }}
             />
@@ -550,7 +512,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
           <div className="w-full flex items-center justify-between text-[8px] font-mono text-amber-400 bg-black/60 px-2 py-0.5 rounded border border-amber-500/30">
             <span className="flex items-center gap-1">🚗 Fossil Transport Line</span>
             <motion.div
-              className="w-3 h-1.5 bg-amber-500 rounded-full"
+              className="w-3.5 h-1.5 bg-amber-500 rounded-full"
               animate={{ x: [-50, 250] }}
               transition={{ duration: 4.5, repeat: Infinity, ease: 'linear' }}
             />
@@ -584,7 +546,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
       {/* ── Eco Recycling Bins on Shore (Driven by Recycling Rate Slider) ── */}
       {recyclingRate >= 50 && (
         <div className="absolute z-[12] flex items-center gap-1" style={{ left: '78%', bottom: '18%' }}>
-          <div className="bg-emerald-600/80 text-white p-0.5 rounded text-[8px] font-bold border border-emerald-400">
+          <div className="bg-emerald-600/80 text-white p-0.5 rounded text-[8px] font-bold border border-emerald-400 shadow-md">
             ♻️ Recycling 100%
           </div>
         </div>
@@ -840,7 +802,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
         )}
       </AnimatePresence>
 
-      {/* ── Factory & Smoke (Driven by Factory Regulation Slider) ── */}
+      {/* ── Factory & Industrial Smokestacks (Driven by Factory Regulation Slider) ── */}
       <div className="absolute z-[12]" style={{ bottom: '34%', right: '6%' }}>
         <div className="flex items-end gap-1.5">
           <div className="relative w-6 h-14 bg-slate-800 border border-slate-600/60 rounded-t-sm">
@@ -873,7 +835,7 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
             )}
             {/* Green Eco Filtration Status Badge (when factoryLevel >= 85) */}
             {factoryLevel >= 85 && (
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[7px] font-mono font-bold px-1 rounded whitespace-nowrap">
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[7px] font-mono font-bold px-1 rounded whitespace-nowrap shadow-md">
                 🌱 Clean Filter Active
               </div>
             )}
@@ -883,6 +845,91 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
     </div>
   );
 };
+
+/* ── Wind Turbine Graphic Component ── */
+interface WindTurbineProps {
+  speedSec:   number;  // 0 = stopped, >0 = seconds per 360deg rotation
+  nightGlow:  boolean;
+  showLabel:  boolean;
+  powerMW:    number;
+}
+
+function WindTurbineGraphic({ speedSec, nightGlow, showLabel, powerMW }: WindTurbineProps) {
+  const isStopped = speedSec <= 0;
+
+  return (
+    <div className="relative flex flex-col items-center">
+      {/* Tapered Vertical Tower (Fixed) */}
+      <div
+        className="relative"
+        style={{
+          width: 4,
+          height: 54,
+          background: 'linear-gradient(to bottom, #f1f5f9, #94a3b8, #64748b)',
+          clipPath: 'polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%)',
+          boxShadow: nightGlow ? '0 0 8px rgba(56,189,248,0.4)' : 'none',
+        }}
+      />
+      {/* Base Foundation */}
+      <div className="w-3 h-1 bg-slate-700 rounded-sm -mt-0.5" />
+
+      {/* Nacelle & Rotor Hub Assembly at Top */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center">
+        {/* Nacelle Generator Box (Fixed at top of tower) */}
+        <div
+          className="absolute z-[1] rounded-full bg-slate-300 border border-slate-400"
+          style={{
+            width: 7,
+            height: 7,
+            top: -3.5,
+            boxShadow: nightGlow ? '0 0 6px rgba(56,189,248,0.8)' : 'none',
+          }}
+        />
+
+        {/* Rotatable 3-Blade SVG Rotor Fan Assembly */}
+        {isStopped ? (
+          <svg
+            width="46" height="46"
+            viewBox="0 0 46 46"
+            className="absolute z-[2]"
+            style={{ top: -23, left: -23 }}
+          >
+            {/* 3 Aerodynamic Tapered Blades */}
+            <path d="M 23 23 L 21 4 C 21 2, 25 2, 25 4 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
+            <path d="M 23 23 L 39.4 32.5 C 41.1 33.5, 39.1 37, 37.4 36 Z" fill="rgba(203,213,225,0.95)" stroke="#94a3b8" strokeWidth="0.5" />
+            <path d="M 23 23 L 6.6 32.5 C 4.9 33.5, 6.9 37, 8.6 36 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
+            <circle cx="23" cy="23" r="3" fill="#64748b" stroke="#e2e8f0" strokeWidth="0.8" />
+          </svg>
+        ) : (
+          <motion.svg
+            width="46" height="46"
+            viewBox="0 0 46 46"
+            className="absolute z-[2]"
+            style={{ top: -23, left: -23 }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: speedSec, repeat: Infinity, ease: 'linear' }}
+          >
+            {/* 3 Aerodynamic Tapered Blades */}
+            <path d="M 23 23 L 21 4 C 21 2, 25 2, 25 4 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
+            <path d="M 23 23 L 39.4 32.5 C 41.1 33.5, 39.1 37, 37.4 36 Z" fill="rgba(203,213,225,0.95)" stroke="#94a3b8" strokeWidth="0.5" />
+            <path d="M 23 23 L 6.6 32.5 C 4.9 33.5, 6.9 37, 8.6 36 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
+            <circle cx="23" cy="23" r="3" fill="#64748b" stroke="#e2e8f0" strokeWidth="0.8" />
+          </motion.svg>
+        )}
+      </div>
+
+      {/* Telemetry Output Badge */}
+      {showLabel && (
+        <div
+          className="absolute font-mono text-white/90 bg-black/75 px-1 py-0.2 rounded border border-white/15 whitespace-nowrap shadow-md"
+          style={{ fontSize: 7, bottom: -14, left: '50%', transform: 'translateX(-50%)' }}
+        >
+          💨 {powerMW} MW Wind Grid
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ── Tree component — layered realistic foliage ── */
 interface TreeProps {
