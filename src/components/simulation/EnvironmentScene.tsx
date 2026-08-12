@@ -264,9 +264,9 @@ export const EnvironmentScene: React.FC<EnvironmentSceneProps> = ({
                   animationDelay: star.delay,
                   animationIterationCount: 'infinite',
                   animationTimingFunction: 'ease-in-out',
-                  ['--star-base-opacity' as any]: star.baseOpacity,
-                  ['--star-min-opacity' as any]: star.minOpacity,
-                } as React.CSSProperties}
+                  '--star-base-opacity': star.baseOpacity,
+                  '--star-min-opacity': star.minOpacity,
+                } as React.CSSProperties & Record<string, string | number | undefined>}
               />
             ))}
             {/* Moon */}

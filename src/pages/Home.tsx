@@ -1,6 +1,6 @@
-import { Suspense, useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, Trees, Droplets, Wind, Sun, Cloud, Bird,
   Satellite, Target, BarChart3, Sparkles, Activity, Globe2, Zap,
@@ -70,7 +70,6 @@ export default function Home() {
   const [health] = useState(0.62);
 
   const heroRef    = useRef<HTMLDivElement>(null);
-  const heroInView = useInView(heroRef, { once: true });
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroOpacity  = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const heroY        = useTransform(scrollYProgress, [0, 1], [0, -80]);
@@ -79,21 +78,7 @@ export default function Home() {
   const currentSeason = SEASON_CYCLE[seasonIndex];
   const sky = SKY_CONFIGS[currentTime.key];
 
-  // Auto-cycle time of day
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeIndex((p) => (p + 1) % TIME_CYCLE.length);
-    }, 7000);
-    return () => clearInterval(interval);
-  }, []);
 
-  // Auto-cycle seasons (slower)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSeasonIndex((p) => (p + 1) % SEASON_CYCLE.length);
-    }, 20000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="relative">
@@ -167,7 +152,7 @@ export default function Home() {
           {/* Left — Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
-            animate={heroInView ? { opacity: 1, x: 0 } : {}}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
             <Badge variant="primary" className="mb-5 gap-2">
@@ -266,7 +251,7 @@ export default function Home() {
           {/* Right — 3D Earth */}
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
-            animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative h-[420px] md:h-[540px] lg:h-[640px]"
           >
@@ -314,7 +299,7 @@ export default function Home() {
             <motion.div
               className="absolute top-6 right-4 glass rounded-xl p-3 text-[10px] font-mono text-primary/70 space-y-1 border border-primary/10"
               initial={{ opacity: 0, x: 20 }}
-              animate={heroInView ? { opacity: 1, x: 0 } : {}}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 1.2 }}
             >
               <div className="flex gap-2"><span className="text-[var(--text-muted)]">LAT</span><span>23.4°N</span></div>
