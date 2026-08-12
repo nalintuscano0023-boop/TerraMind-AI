@@ -859,70 +859,130 @@ function WindTurbineGraphic({ speedSec, nightGlow, showLabel, powerMW }: WindTur
 
   return (
     <div className="relative flex flex-col items-center">
-      {/* Tapered Vertical Tower (Fixed) */}
+      {/* Tapered Vertical Tower (Stationary) */}
       <div
-        className="relative"
+        className="relative shadow-md"
         style={{
           width: 4,
-          height: 54,
-          background: 'linear-gradient(to bottom, #f1f5f9, #94a3b8, #64748b)',
-          clipPath: 'polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%)',
-          boxShadow: nightGlow ? '0 0 8px rgba(56,189,248,0.4)' : 'none',
+          height: 56,
+          background: 'linear-gradient(to bottom, #f8fafc 0%, #cbd5e1 50%, #64748b 100%)',
+          clipPath: 'polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%)',
+          boxShadow: nightGlow ? '0 0 8px rgba(56,189,248,0.5)' : 'none',
         }}
       />
-      {/* Base Foundation */}
-      <div className="w-3 h-1 bg-slate-700 rounded-sm -mt-0.5" />
+      {/* Tower Foundation */}
+      <div className="w-3.5 h-1 bg-slate-800 rounded-sm -mt-0.5" />
 
-      {/* Nacelle & Rotor Hub Assembly at Top */}
+      {/* Nacelle & Rotor Hub Assembly at Top (Fixed Position at Top of Tower) */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center">
-        {/* Nacelle Generator Box (Fixed at top of tower) */}
+        {/* Stationary Nacelle Generator Box */}
         <div
-          className="absolute z-[1] rounded-full bg-slate-300 border border-slate-400"
+          className="absolute z-[1] rounded-sm bg-gradient-to-r from-slate-200 to-slate-400 border border-slate-500/80 shadow-md"
           style={{
-            width: 7,
-            height: 7,
-            top: -3.5,
-            boxShadow: nightGlow ? '0 0 6px rgba(56,189,248,0.8)' : 'none',
+            width: 9,
+            height: 5,
+            top: -2.5,
+            left: -4.5,
+            boxShadow: nightGlow ? '0 0 8px rgba(56,189,248,0.7)' : 'none',
           }}
-        />
+        >
+          {/* Red Aviation Warning Obstacle Light */}
+          <div className="absolute -top-1 right-0.5 w-1 h-1 rounded-full bg-red-500 shadow-[0_0_4px_#ef4444] animate-pulse" />
+        </div>
 
-        {/* Rotatable 3-Blade SVG Rotor Fan Assembly */}
-        {isStopped ? (
-          <svg
-            width="46" height="46"
-            viewBox="0 0 46 46"
-            className="absolute z-[2]"
-            style={{ top: -23, left: -23 }}
-          >
-            {/* 3 Aerodynamic Tapered Blades */}
-            <path d="M 23 23 L 21 4 C 21 2, 25 2, 25 4 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
-            <path d="M 23 23 L 39.4 32.5 C 41.1 33.5, 39.1 37, 37.4 36 Z" fill="rgba(203,213,225,0.95)" stroke="#94a3b8" strokeWidth="0.5" />
-            <path d="M 23 23 L 6.6 32.5 C 4.9 33.5, 6.9 37, 8.6 36 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
-            <circle cx="23" cy="23" r="3" fill="#64748b" stroke="#e2e8f0" strokeWidth="0.8" />
-          </svg>
-        ) : (
-          <motion.svg
-            width="46" height="46"
-            viewBox="0 0 46 46"
-            className="absolute z-[2]"
-            style={{ top: -23, left: -23 }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: speedSec, repeat: Infinity, ease: 'linear' }}
-          >
-            {/* 3 Aerodynamic Tapered Blades */}
-            <path d="M 23 23 L 21 4 C 21 2, 25 2, 25 4 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
-            <path d="M 23 23 L 39.4 32.5 C 41.1 33.5, 39.1 37, 37.4 36 Z" fill="rgba(203,213,225,0.95)" stroke="#94a3b8" strokeWidth="0.5" />
-            <path d="M 23 23 L 6.6 32.5 C 4.9 33.5, 6.9 37, 8.6 36 Z" fill="rgba(241,245,249,0.95)" stroke="#cbd5e1" strokeWidth="0.5" />
-            <circle cx="23" cy="23" r="3" fill="#64748b" stroke="#e2e8f0" strokeWidth="0.8" />
-          </motion.svg>
-        )}
+        {/* Rotatable 3-Blade SVG Rotor Fan Assembly (Rotates around central hub at 27, 27) */}
+        <div className="absolute z-[2]" style={{ top: -27, left: -27 }}>
+          {isStopped ? (
+            <svg width="54" height="54" viewBox="0 0 54 54">
+              <g id="static-rotor">
+                {/* Blade 1 (0 deg - Up) */}
+                <g transform="rotate(0, 27, 27)">
+                  <path
+                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
+                    fill="#f8fafc"
+                    stroke="#334155"
+                    strokeWidth="0.8"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                  />
+                </g>
+                {/* Blade 2 (120 deg) */}
+                <g transform="rotate(120, 27, 27)">
+                  <path
+                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
+                    fill="#e2e8f0"
+                    stroke="#334155"
+                    strokeWidth="0.8"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                  />
+                </g>
+                {/* Blade 3 (240 deg) */}
+                <g transform="rotate(240, 27, 27)">
+                  <path
+                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
+                    fill="#f8fafc"
+                    stroke="#334155"
+                    strokeWidth="0.8"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 4px rgba(255,255,255,0.8))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                  />
+                </g>
+                {/* Central Rotor Hub Nose Cone */}
+                <circle cx="27" cy="27" r="3.5" fill="#475569" stroke="#cbd5e1" strokeWidth="1" />
+                <circle cx="27" cy="27" r="1.5" fill="#ffffff" />
+              </g>
+            </svg>
+          ) : (
+            <motion.svg
+              width="54" height="54"
+              viewBox="0 0 54 54"
+              animate={{ rotate: 360 }}
+              transition={{ duration: speedSec, repeat: Infinity, ease: 'linear' }}
+              style={{ transformOrigin: '27px 27px' }}
+            >
+              <g id="animated-rotor">
+                {/* Blade 1 (0 deg - Up) */}
+                <g transform="rotate(0, 27, 27)">
+                  <path
+                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
+                    fill="#f8fafc"
+                    stroke="#334155"
+                    strokeWidth="0.8"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 5px rgba(255,255,255,0.9))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                  />
+                </g>
+                {/* Blade 2 (120 deg) */}
+                <g transform="rotate(120, 27, 27)">
+                  <path
+                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
+                    fill="#e2e8f0"
+                    stroke="#334155"
+                    strokeWidth="0.8"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 5px rgba(255,255,255,0.9))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                  />
+                </g>
+                {/* Blade 3 (240 deg) */}
+                <g transform="rotate(240, 27, 27)">
+                  <path
+                    d="M 27 26 C 24.5 19, 22.5 10, 26 4 C 27.5 3, 29.5 5, 28.5 10 C 28.5 19, 27.5 26, 27 26 Z"
+                    fill="#f8fafc"
+                    stroke="#334155"
+                    strokeWidth="0.8"
+                    style={{ filter: nightGlow ? 'drop-shadow(0 0 5px rgba(255,255,255,0.9))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' }}
+                  />
+                </g>
+                {/* Central Rotor Hub Nose Cone */}
+                <circle cx="27" cy="27" r="3.5" fill="#475569" stroke="#cbd5e1" strokeWidth="1" />
+                <circle cx="27" cy="27" r="1.5" fill="#ffffff" />
+              </g>
+            </motion.svg>
+          )}
+        </div>
       </div>
 
       {/* Telemetry Output Badge */}
       {showLabel && (
         <div
-          className="absolute font-mono text-white/90 bg-black/75 px-1 py-0.2 rounded border border-white/15 whitespace-nowrap shadow-md"
-          style={{ fontSize: 7, bottom: -14, left: '50%', transform: 'translateX(-50%)' }}
+          className="absolute font-mono text-white/95 bg-black/80 px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap shadow-xl"
+          style={{ fontSize: 7, bottom: -15, left: '50%', transform: 'translateX(-50%)' }}
         >
           💨 {powerMW} MW Wind Grid
         </div>
